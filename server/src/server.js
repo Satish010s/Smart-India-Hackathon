@@ -1,0 +1,14 @@
+import dotenv from 'dotenv';
+import app from './app.js';
+import { connectDB } from './config/db.js';
+
+dotenv.config();
+
+const PORT = process.env.PORT || 5001;
+
+// Verify database connection
+await connectDB();
+
+app.listen(PORT, () => {
+  console.log(`Quantum Server running on port ${PORT}`);
+});
