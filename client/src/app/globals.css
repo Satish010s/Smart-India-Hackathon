@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Geist Sans", "Space Grotesk", system-ui, sans-serif;
+  --font-heading: "Geist", "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* We'll use CSS variables for theme colors so next-themes can easily switch them */
+  --color-background: var(--bg);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+}
+
+:root {
+  /* Light Mode (default) */
+  --bg: #f8fafc; /* warm white / very light cool gray */
+  --surface: #ffffff;
+  --primary: #3730a3; /* deep indigo */
+  --secondary: #06b6d4; /* cyan */
+  --text: #0f172a; /* deep navy */
+  --muted: #64748b; /* slate */
+  --border: #cbd5e1; /* light slate */
+}
+
+.dark {
+  /* Dark Mode */
+  --bg: #020617; /* near-black / deep navy */
+  --surface: #0f172a; /* slightly lighter navy */
+  --primary: #6366f1; /* electric indigo / violet */
+  --secondary: #22d3ee; /* cyan */
+  --text: #f8fafc; /* off-white */
+  --muted: #94a3b8; /* cool gray */
+  --border: #334155; /* subtle slate/indigo */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+  code, pre {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer utilities {
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+  
+  .bento-card {
+    @apply relative overflow-hidden bg-[var(--color-surface)] border border-[var(--color-border)] rounded-3xl shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .bento-glow {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none;
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.08), transparent 40%);
+  }
+  
+  .bento-card:hover .bento-glow {
+    @apply opacity-100;
+  }
+  
+  .glass-panel {
+    @apply bg-[var(--color-surface)]/70 backdrop-blur-xl border border-[var(--color-border)]/50 shadow-2xl;
+  }
+}
