@@ -1,0 +1,57 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+
+/**
+ * Universal Fetch API client configured with credentials: 'include' for HttpOnly cookie transport.
+ * Implements silent token refresh on 401 TOKEN_EXPIRED errors.
+ */
+export async function apiFetch(endpoint, options = {}) {
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  const config = {
+    ...options,
+    headers,
+    credentials: 'include', // Always send and accept HttpOnly cookies
+  };
+
+  try {
+    let response = await fetch(url, config);
+
+    // If access token expired, attempt transparent refresh once
+    if (response.status === 401 && !endpoint.includes('/auth/refresh') && !endpoint.includes('/auth/login')) {
+      const clone = response.clone();
+      const errData = await clone.json().catch(() => ({}));
+
+      if (errData.code === 'TOKEN_EXPIRED') {
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (refreshResponse.ok) {
+          // Token refreshed successfully! Retry original request with newly issued cookie
+          response = await fetch(url, config);
+        }
+      }
+    }
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const error = new Error(data?.error || `Request failed with status ${response.status}`);
+      error.status = response.status;
+      error.data = data;
+      error.code = data?.code;
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
