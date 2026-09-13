@@ -4,7 +4,6 @@ import React from 'react';
 import {
   LuShieldAlert,
   LuSparkles,
-  LuCheckCircle2,
   LuCpu,
   LuActivity,
 } from 'react-icons/lu';

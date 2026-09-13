@@ -26,7 +26,7 @@ export async function apiFetch(endpoint, options = {}) {
       const clone = response.clone();
       const errData = await clone.json().catch(() => ({}));
 
-      if (errData.code === 'TOKEN_EXPIRED') {
+      if (errData.code === 'TOKEN_EXPIRED' || errData.detail === 'Not authenticated' || errData.detail === 'Invalid token') {
         const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,7 @@
 from typing import List, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 
 
 class Settings(BaseSettings):
@@ -8,9 +9,12 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     DESCRIPTION: str = "FastAPI service for Quantum simulation and AI-assisted learning"
     
-    HOST: str = "0.0.0.0"
-    PORT: int = 8000
-    ENVIRONMENT: str = "development"
+    HOST: str = os.getenv("HOST", "0.0.0.0")
+    PORT: int = int(os.getenv("PORT", 8000))
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    JWT_ACCESS_SECRET: str = os.getenv("JWT_ACCESS_SECRET", "")
     
     # Allowed CORS origins
     CORS_ORIGINS: Union[List[str], str] = [

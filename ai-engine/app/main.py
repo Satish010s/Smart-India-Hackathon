@@ -40,3 +40,15 @@ def health_check():
         "service": "quantum-ai-engine",
         "environment": settings.ENVIRONMENT,
     }
+
+# 1. Navigate to the project directory:
+#cd ai-engine
+
+# 2. Activate the Virtual Environment
+# source venv/bin/activate
+
+# 3. Start the Server You can use the provided start.sh script to run the server:
+# ./start.sh
+
+# Alternatively, if you want to run it directly using Uvicorn (the ASGI server), you can run:
+# uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

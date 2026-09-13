@@ -10,6 +10,8 @@
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@google/genai": "^2.21.0",
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.4.1",
     "argon2": "^0.45.1",
     "cookie-parser": "^1.4.7",
