@@ -1,5 +1,3 @@
-// Prisma schema for Quantum Learning Platform
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,6 +5,79 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String             @id @default(cuid())
+  name            String
+  email           String             @unique
+  passwordHash    String
+  role            Role               @default(LEARNER)
+  isEmailVerified Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  aiChats         AiChatHistory[]
+  aiVideos        AiGeneratedVideo[]
+  otps            Otp[]
+  refreshTokens   RefreshToken[]
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  familyId  String
+  userId    String
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@index([userId])
+}
+
+model Otp {
+  id         String   @id @default(cuid())
+  userId     String
+  codeHash   String
+  type       OtpType
+  attempts   Int      @default(0)
+  expiresAt  DateTime
+  lastSentAt DateTime @default(now())
+  isUsed     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model AiChatHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  context   String
+  reply     String
+  source    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AiGeneratedVideo {
+  id        String   @id @default(cuid())
+  userId    String
+  topic     String
+  level     String
+  duration  String
+  videoData Json
+  source    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum Role {
@@ -19,48 +90,4 @@ enum Role {
 enum OtpType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
-}
-
-model User {
-  id              String         @id @default(cuid())
-  name            String
-  email           String         @unique
-  passwordHash    String
-  role            Role           @default(LEARNER)
-  isEmailVerified Boolean        @default(false)
-  refreshTokens   RefreshToken[]
-  otps            Otp[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  @@index([email])
-}
-
-model RefreshToken {
-  id        String   @id @default(cuid())
-  tokenHash String   @unique
-  familyId  String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  isRevoked Boolean  @default(false)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([familyId])
-  @@index([userId])
-}
-
-model Otp {
-  id         String   @id @default(cuid())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  codeHash   String
-  type       OtpType
-  attempts   Int      @default(0)
-  expiresAt  DateTime
-  lastSentAt DateTime @default(now())
-  isUsed     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-
-  @@index([userId, type])
 }

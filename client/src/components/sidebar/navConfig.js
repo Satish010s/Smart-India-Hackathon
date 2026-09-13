@@ -17,37 +17,54 @@ import {
   LuUserPlus,
   LuChartBar,
   LuSettings,
+  LuMedal,
+  LuUser,
 } from 'react-icons/lu';
 
 export const ROLE_NAV_ITEMS = {
   LEARNER: [
     {
-      label: 'Learner Hub',
+      label: 'Dashboard',
       href: '/dashboard',
       icon: LuLayoutDashboard,
-      badge: 'Main',
     },
     {
-      label: 'Quantum Tracks',
+      label: 'Learn',
       href: '/learn',
       icon: LuBookOpen,
-      badge: '12 Tracks',
+      badge: '12',
     },
     {
-      label: 'Circuit Playground',
+      label: 'Playground',
       href: '/playground',
       icon: LuCpu,
     },
     {
-      label: 'Challenges & Quizzes',
+      label: 'Challenges',
       href: '/challenges',
       icon: LuTrophy,
       badge: 'XP',
     },
     {
-      label: 'My Progress',
+      label: 'AI Tutor',
+      href: '/ai-tutor',
+      icon: LuBot,
+      badge: 'NEW',
+    },
+    {
+      label: 'Progress',
       href: '/progress',
       icon: LuChartBar,
+    },
+    {
+      label: 'Achievement',
+      href: '/achievement',
+      icon: LuMedal,
+    },
+    {
+      label: 'Profile',
+      href: '/profile',
+      icon: LuUser,
     },
   ],
 

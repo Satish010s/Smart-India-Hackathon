@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
-import Sidebar from '../../components/sidebar/Sidebar';
+import { LearnerSidebar } from '../../components/sidebar';
 import DashboardNavbar from '../../components/navbar/DashboardNavbar';
 import {
   LuTrophy,
@@ -64,7 +64,7 @@ export default function ChallengesPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] flex">
-        <Sidebar
+        <LearnerSidebar
           isCollapsed={isCollapsed}
           onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
           isMobileOpen={isMobileOpen}
