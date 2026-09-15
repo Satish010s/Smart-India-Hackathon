@@ -63,7 +63,7 @@ export default function ChallengesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] flex">
+      <div className="h-screen overflow-hidden bg-[var(--color-background)] text-[var(--color-text)] flex">
         <LearnerSidebar
           isCollapsed={isCollapsed}
           onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
@@ -72,7 +72,7 @@ export default function ChallengesPage() {
         />
 
         <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${
+          className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-300 ${
             isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
           }`}
         >
@@ -83,7 +83,7 @@ export default function ChallengesPage() {
             onMobileMenuClick={() => setIsMobileOpen(true)}
           />
 
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
             {/* Gamification Header */}
             <div className="p-8 rounded-3xl bg-gradient-to-r from-[var(--color-surface)] via-[var(--color-surface)] to-amber-500/10 border border-[var(--color-border)] shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="space-y-2">

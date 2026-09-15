@@ -6,7 +6,6 @@ import adminRoutes from './routes/adminRoutes.js';
 import roleDemoRoutes from './routes/roleDemoRoutes.js';
 import learnerRoutes from './routes/learnerRoutes.js';
 import instructorRoutes from './routes/instructorRoutes.js';
-import researcherRoutes from './routes/researcherRoutes.js';
 
 const app = express();
 
@@ -56,12 +55,9 @@ app.get('/', (req, res) => {
 // Auth and RBAC routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', roleDemoRoutes);
-
-// Role-specific data routes
 app.use('/api/learner', learnerRoutes);
 app.use('/api/instructor', instructorRoutes);
-app.use('/api/researcher', researcherRoutes);
+app.use('/api', roleDemoRoutes);
 
 // Global 404 Handler for undefined API routes
 app.use('/api/*', (req, res) => {

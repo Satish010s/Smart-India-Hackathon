@@ -260,7 +260,7 @@ export default function AITutorPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] flex">
+      <div className="h-screen overflow-hidden bg-[var(--color-background)] text-[var(--color-text)] flex">
         <LearnerSidebar
           isCollapsed={isCollapsed}
           onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
@@ -268,7 +268,7 @@ export default function AITutorPage() {
           onMobileClose={() => setIsMobileOpen(false)}
         />
 
-        <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+        <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
           <DashboardNavbar
             title="Quantum AI Tutor & Video Studio"
             isCollapsed={isCollapsed}

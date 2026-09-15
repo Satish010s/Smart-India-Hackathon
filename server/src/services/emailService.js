@@ -47,7 +47,7 @@ export const sendVerificationOtpEmail = async (email, name, otp) => {
             <div class="logo">QubitMind &middot; Quantum</div>
             <div class="title">Verify Your Email Address</div>
           </div>
-          <p class="text">Hello ${name || 'Researcher/Learner'},</p>
+          <p class="text">Hello ${name || 'Learner'},</p>
           <p class="text">Thank you for joining the Quantum Computing Platform. Please enter the following 6-digit verification code to activate your account:</p>
           <div class="otp-card">
             <div class="otp-code">${otp}</div>

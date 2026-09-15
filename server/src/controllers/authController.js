@@ -30,7 +30,7 @@ const ARGON2_OPTIONS = {
 };
 
 /**
- * Public Signup: Only LEARNER or RESEARCHER accounts can be created publicly
+ * Public Signup: Only LEARNER accounts can be created publicly
  */
 export const signup = async (req, res) => {
   try {

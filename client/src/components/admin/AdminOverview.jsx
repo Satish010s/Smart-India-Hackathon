@@ -22,7 +22,7 @@ export default function AdminOverview({ user, userCount = 0 }) {
             Command Center: {user?.name || 'Administrator'}
           </h1>
           <p className="text-sm sm:text-base text-[var(--color-muted)] leading-relaxed">
-            Public signups are strictly restricted to Learner and Researcher roles. You manage platform security policies, provision Instructor faculty accounts, and control role-based access.
+            Public signups are strictly restricted to Learner roles. You manage platform security policies, provision Instructor faculty accounts, and control role-based access.
           </p>
         </div>
       </div>

@@ -27,12 +27,6 @@ async function seed() {
       role: 'INSTRUCTOR',
     },
     {
-      name: 'Dr. Aris Thorne',
-      email: 'researcher@quantum.platform',
-      password: 'Researcher@2025!',
-      role: 'RESEARCHER',
-    },
-    {
       name: 'Kai Chen',
       email: 'learner@quantum.platform',
       password: 'Learner@2025!',

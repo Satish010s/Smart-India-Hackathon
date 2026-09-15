@@ -22,8 +22,6 @@ export default function NotFound() {
         return '/admin';
       case 'INSTRUCTOR':
         return '/instructor';
-      case 'RESEARCHER':
-        return '/dashboard/researcher';
       default:
         return '/dashboard';
     }
@@ -36,8 +34,6 @@ export default function NotFound() {
         return 'Admin Console';
       case 'INSTRUCTOR':
         return 'Instructor Portal';
-      case 'RESEARCHER':
-        return 'Researcher Lab';
       default:
         return 'Learner Hub';
     }

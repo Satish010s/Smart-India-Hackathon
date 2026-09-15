@@ -1,104 +1,431 @@
 "use client";
 
-import React from 'react';
-import { LuBookOpen, LuUsers, LuClipboardList, LuCheck, LuArrowRight } from 'react-icons/lu';
+import React, { useState } from 'react';
+import {
+  LuBookOpen, LuPlus, LuSearch, LuFilter, LuPencil, LuCopy, LuTrash2,
+  LuEye, LuArchive, LuUpload, LuDownload, LuUsers, LuStar,
+  LuCircleCheck, LuClock, LuEllipsisVertical, LuX, LuCheck,
+  LuGlobe, LuFlaskConical, LuGraduationCap,
+} from 'react-icons/lu';
+import { apiFetch } from '../../services/api';
 
-export default function CourseManagement({ portalData }) {
-  const courses = [
-    {
-      code: 'PHYS-401',
-      title: 'Introduction to Quantum Information and Qubits',
-      term: 'Fall 2026',
-      students: 84,
-      avgScore: '89.4%',
-      status: 'Active',
-    },
-    {
-      code: 'CS-550',
-      title: 'Quantum Algorithms: Shor, Grover, and QPE',
-      term: 'Fall 2026',
-      students: 58,
-      avgScore: '92.1%',
-      status: 'Active',
-    },
-  ];
+const DIFFICULTY_COLORS = {
+  Beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  Intermediate: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  Advanced: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+};
 
-  const submissions = [
-    { student: 'Kai Chen', course: 'PHYS-401', assignment: 'Bell State Measurement', date: '2 hours ago' },
-    { student: 'Maya Patel', course: 'CS-550', assignment: 'Grover Oracle Implementation', date: '5 hours ago' },
-    { student: 'Liam O’Connor', course: 'PHYS-401', assignment: 'Quantum Teleportation Circuit', date: '1 day ago' },
+const STATUS_COLORS = {
+  Published: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  Draft: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+  Review: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  Archived: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+};
+
+const CATEGORIES = ['All', 'Foundations', 'Algorithms', 'QML', 'Cryptography', 'Error Correction', 'Quantum Chemistry'];
+const DIFFICULTIES = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+const STATUSES = ['All', 'Published', 'Draft', 'Review', 'Archived'];
+
+function CourseCard({ course, onAction }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const actions = [
+    { label: 'Edit Course', icon: LuPencil, action: 'edit' },
+    { label: 'Course Builder', icon: LuFlaskConical, action: 'builder' },
+    { label: 'Duplicate', icon: LuCopy, action: 'duplicate' },
+    { label: course.status === 'Published' ? 'Unpublish' : 'Publish', icon: course.status === 'Published' ? LuDownload : LuUpload, action: 'togglePublish' },
+    { label: 'Archive', icon: LuArchive, action: 'archive' },
+    { label: 'Delete', icon: LuTrash2, action: 'delete', danger: true },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Active Courses Table */}
-      <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-4">
-        <div className="flex items-center justify-between">
+    <div className="group p-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] hover:border-violet-500/30 transition-all duration-200 hover:shadow-lg hover:shadow-violet-500/5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* Header badges */}
+          <div className="flex items-center flex-wrap gap-2">
+            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${DIFFICULTY_COLORS[course.difficulty] || DIFFICULTY_COLORS.Beginner}`}>
+              {course.difficulty}
+            </span>
+            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${STATUS_COLORS[course.status] || STATUS_COLORS.Draft}`}>
+              {course.status}
+            </span>
+            <span className="text-[10px] font-mono text-[var(--color-muted)] px-2 py-0.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)]">
+              {course.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3 className="font-bold text-sm text-[var(--color-text)] leading-snug group-hover:text-violet-300 transition-colors">
+            {course.title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-[11px] text-[var(--color-muted)] leading-relaxed line-clamp-2">{course.description}</p>
+
+          {/* Stats row */}
+          <div className="flex items-center flex-wrap gap-4 text-[11px] font-mono text-[var(--color-muted)]">
+            <span className="flex items-center gap-1"><LuUsers size={12} className="text-violet-400" />{course.enrolledStudents} enrolled</span>
+            <span className="flex items-center gap-1"><LuClock size={12} className="text-cyan-400" />{course.duration}</span>
+            <span className="flex items-center gap-1"><LuBookOpen size={12} className="text-amber-400" />{course.publishedLessons}/{course.totalLessons} lessons</span>
+            {course.rating && <span className="flex items-center gap-1"><LuStar size={12} className="text-amber-400" />{course.rating}</span>}
+          </div>
+
+          {/* Progress bar */}
+          {course.enrolledStudents > 0 && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-[10px] text-[var(--color-muted)] font-mono">
+                <span>Avg. completion</span>
+                <span className="text-violet-400 font-bold">{course.completionRate}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-[var(--color-surface)]">
+                <div className="h-1.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all duration-500" style={{ width: `${course.completionRate}%` }} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action menu */}
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-xl hover:bg-[var(--color-surface)] transition-colors text-[var(--color-muted)] hover:text-[var(--color-text)] cursor-pointer"
+          >
+            <LuEllipsisVertical size={16} />
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-9 z-50 w-44 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl shadow-black/30 overflow-hidden">
+              {actions.map((act) => {
+                const Icon = act.icon;
+                return (
+                  <button
+                    key={act.action}
+                    onClick={() => { onAction(act.action, course); setMenuOpen(false); }}
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs hover:bg-[var(--color-background)] transition-colors cursor-pointer ${act.danger ? 'text-rose-400 hover:text-rose-300' : 'text-[var(--color-text)]'}`}
+                  >
+                    <Icon size={13} />
+                    {act.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CreateCourseModal({ onClose, onCreated }) {
+  const [form, setForm] = useState({
+    title: '', description: '', difficulty: 'Beginner', category: 'Foundations',
+    duration: '', objectives: [''], prerequisites: [''],
+  });
+  const [saving, setSaving] = useState(false);
+
+  const updateField = (field, value) => setForm(f => ({ ...f, [field]: value }));
+  const updateList = (field, idx, value) => setForm(f => ({
+    ...f, [field]: f[field].map((v, i) => i === idx ? value : v)
+  }));
+  const addListItem = (field) => setForm(f => ({ ...f, [field]: [...f[field], ''] }));
+  const removeListItem = (field, idx) => setForm(f => ({ ...f, [field]: f[field].filter((_, i) => i !== idx) }));
+
+  const handleSubmit = async () => {
+    if (!form.title.trim() || !form.description.trim()) return;
+    setSaving(true);
+    try {
+      const res = await apiFetch('/instructor/courses', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...form,
+          objectives: form.objectives.filter(Boolean),
+          prerequisites: form.prerequisites.filter(Boolean),
+        }),
+      });
+      if (res?.success) onCreated(res.data.course);
+    } catch (e) {
+      console.warn('Create course failed:', e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl shadow-black/40"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-[var(--color-border)] bg-[var(--color-surface)] rounded-t-3xl">
+          <div>
+            <h2 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
+              <LuBookOpen size={18} className="text-violet-400" /> Create New Course
+            </h2>
+            <p className="text-xs text-[var(--color-muted)] mt-0.5">Fill in the course details to get started.</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-[var(--color-background)] text-[var(--color-muted)] transition-colors cursor-pointer"><LuX size={18} /></button>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Title */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Course Title *</label>
+            <input
+              type="text" placeholder="e.g. Quantum Error Correction & Surface Codes"
+              value={form.title} onChange={e => updateField('title', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Description *</label>
+            <textarea
+              rows={3} placeholder="Describe what students will learn..."
+              value={form.description} onChange={e => updateField('description', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none"
+            />
+          </div>
+
+          {/* Row: Difficulty, Category, Duration */}
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Difficulty', field: 'difficulty', options: ['Beginner', 'Intermediate', 'Advanced'] },
+              { label: 'Category', field: 'category', options: ['Foundations', 'Algorithms', 'QML', 'Cryptography', 'Error Correction', 'Quantum Chemistry'] },
+            ].map(({ label, field, options }) => (
+              <div key={field} className="space-y-1.5">
+                <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">{label}</label>
+                <select
+                  value={form[field]} onChange={e => updateField(field, e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                >
+                  {options.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+            ))}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Duration</label>
+              <input
+                type="text" placeholder="e.g. 12 hrs"
+                value={form.duration} onChange={e => updateField('duration', e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+              />
+            </div>
+          </div>
+
+          {/* Objectives */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Learning Objectives</label>
+            {form.objectives.map((obj, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="text" placeholder={`Objective ${i + 1}`}
+                  value={obj} onChange={e => updateList('objectives', i, e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                />
+                {form.objectives.length > 1 && (
+                  <button onClick={() => removeListItem('objectives', i)} className="p-2 text-rose-400 hover:text-rose-300 cursor-pointer"><LuX size={14} /></button>
+                )}
+              </div>
+            ))}
+            <button onClick={() => addListItem('objectives')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer">
+              <LuPlus size={13} /> Add objective
+            </button>
+          </div>
+
+          {/* Prerequisites */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Prerequisites</label>
+            {form.prerequisites.map((pre, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="text" placeholder={`Prerequisite ${i + 1}`}
+                  value={pre} onChange={e => updateList('prerequisites', i, e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                />
+                {form.prerequisites.length > 1 && (
+                  <button onClick={() => removeListItem('prerequisites', i)} className="p-2 text-rose-400 hover:text-rose-300 cursor-pointer"><LuX size={14} /></button>
+                )}
+              </div>
+            ))}
+            <button onClick={() => addListItem('prerequisites')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer">
+              <LuPlus size={13} /> Add prerequisite
+            </button>
+          </div>
+        </div>
+
+        <div className="sticky bottom-0 flex items-center justify-end gap-3 p-6 border-t border-[var(--color-border)] bg-[var(--color-surface)] rounded-b-3xl">
+          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-background)] transition-colors cursor-pointer">
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit} disabled={saving || !form.title.trim()}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/25 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+          >
+            {saving ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <LuCheck size={14} />}
+            {saving ? 'Creating...' : 'Create Course'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CourseManagement({ onOpenBuilder }) {
+  const [courses, setCourses] = useState([
+    {
+      id: 'ic1', title: 'Quantum Fundamentals: From Bits to Qubits',
+      description: 'A comprehensive introduction to quantum mechanics principles and their application in computing. Students learn superposition, entanglement, and quantum measurement through interactive experiments.',
+      difficulty: 'Beginner', category: 'Foundations', duration: '8 hrs',
+      status: 'Published', enrolledStudents: 98, avgProgress: 71, avgScore: 84.2,
+      completionRate: 68, publishedLessons: 24, totalLessons: 24, rating: 4.9, pendingGrades: 12,
+      objectives: ['Understand qubits', 'Master superposition', 'Build quantum circuits'],
+      prerequisites: ['Basic linear algebra', 'Classical computing basics'],
+    },
+    {
+      id: 'ic2', title: 'Advanced Quantum Algorithms: Shor, Grover & QPE',
+      description: "Deep dive into the three canonical quantum algorithms. Includes working Qiskit implementations, complexity analysis, and real-hardware experiments on IBM Quantum.",
+      difficulty: 'Advanced', category: 'Algorithms', duration: '14 hrs',
+      status: 'Published', enrolledStudents: 44, avgProgress: 58, avgScore: 89.6,
+      completionRate: 42, publishedLessons: 38, totalLessons: 42, rating: 4.7, pendingGrades: 6,
+      objectives: ["Implement Shor's algorithm", "Master Grover's search"],
+      prerequisites: ['Quantum Fundamentals', 'Linear algebra (advanced)'],
+    },
+    {
+      id: 'ic3', title: 'Quantum Machine Learning Fundamentals',
+      description: 'Explore variational quantum circuits, quantum kernels, and hybrid classical-quantum ML algorithms.',
+      difficulty: 'Intermediate', category: 'QML', duration: '12 hrs',
+      status: 'Draft', enrolledStudents: 0, avgProgress: 0, avgScore: 0,
+      completionRate: 0, publishedLessons: 8, totalLessons: 32, rating: null, pendingGrades: 0,
+      objectives: ['Understand VQC', 'Build quantum neural networks'],
+      prerequisites: ['Quantum Fundamentals', 'Classical ML basics'],
+    },
+  ]);
+
+  const [showCreate, setShowCreate] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
+
+  const filtered = courses.filter(c => {
+    const matchSearch = !search || c.title.toLowerCase().includes(search.toLowerCase());
+    const matchCat = filterCategory === 'All' || c.category === filterCategory;
+    const matchDiff = filterDifficulty === 'All' || c.difficulty === filterDifficulty;
+    const matchStatus = filterStatus === 'All' || c.status === filterStatus;
+    return matchSearch && matchCat && matchDiff && matchStatus;
+  });
+
+  const handleAction = async (action, course) => {
+    switch (action) {
+      case 'builder':
+        if (onOpenBuilder) onOpenBuilder(course);
+        break;
+      case 'duplicate':
+        try {
+          const res = await apiFetch(`/instructor/courses/${course.id}/duplicate`, { method: 'POST' });
+          if (res?.success) setCourses(c => [res.data.course, ...c]);
+        } catch { setCourses(c => [{ ...course, id: `copy_${Date.now()}`, title: `${course.title} (Copy)`, status: 'Draft', enrolledStudents: 0 }, ...c]); }
+        break;
+      case 'togglePublish': {
+        const newStatus = course.status === 'Published' ? 'Draft' : 'Published';
+        try {
+          await apiFetch(`/instructor/courses/${course.id}/status`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
+        } catch { /* optimistic */ }
+        setCourses(c => c.map(x => x.id === course.id ? { ...x, status: newStatus } : x));
+        break;
+      }
+      case 'archive':
+        setCourses(c => c.map(x => x.id === course.id ? { ...x, status: 'Archived' } : x));
+        break;
+      case 'delete':
+        if (window.confirm(`Delete "${course.title}"?`)) {
+          setCourses(c => c.filter(x => x.id !== course.id));
+        }
+        break;
+    }
+  };
+
+  const handleCreated = (course) => {
+    setCourses(c => [course, ...c]);
+    setShowCreate(false);
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuBookOpen size={22} className="text-emerald-500" />
-            Curriculum & Courses
+            <LuBookOpen size={20} className="text-violet-400" /> Course Management
           </h2>
-          <span className="text-xs font-mono font-semibold text-[var(--color-muted)]">
-            2 Assigned Sections
-          </span>
+          <p className="text-xs text-[var(--color-muted)] mt-1">{courses.length} courses · {courses.filter(c => c.status === 'Published').length} published</p>
         </div>
-
-        <div className="space-y-3">
-          {courses.map((course) => (
-            <div
-              key={course.code}
-              className="p-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex flex-col md:flex-row md:items-center justify-between gap-4"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-emerald-500 font-bold px-2 py-0.5 rounded bg-emerald-500/10">
-                    {course.code}
-                  </span>
-                  <span className="text-xs text-[var(--color-muted)] font-mono">{course.term}</span>
-                </div>
-                <h3 className="font-semibold text-sm text-[var(--color-text)]">{course.title}</h3>
-              </div>
-
-              <div className="flex items-center gap-4 text-xs font-mono text-[var(--color-muted)]">
-                <span>{course.students} enrolled students</span>
-                <span>&bull;</span>
-                <span className="text-emerald-500 font-semibold">{course.avgScore} class average</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/20 hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+        >
+          <LuPlus size={15} /> New Course
+        </button>
       </div>
 
-      {/* Submissions Queue */}
-      <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-4">
-        <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuClipboardList size={22} className="text-amber-500" />
-          Recent Student Submissions
-        </h2>
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <LuSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" />
+          <input
+            type="text" placeholder="Search courses..."
+            value={search} onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+          />
+        </div>
+        {[
+          { label: 'Category', value: filterCategory, options: CATEGORIES, set: setFilterCategory },
+          { label: 'Difficulty', value: filterDifficulty, options: DIFFICULTIES, set: setFilterDifficulty },
+          { label: 'Status', value: filterStatus, options: STATUSES, set: setFilterStatus },
+        ].map(({ label, value, options, set }) => (
+          <select
+            key={label} value={value} onChange={e => set(e.target.value)}
+            className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+          >
+            {options.map(o => <option key={o} value={o}>{label}: {o}</option>)}
+          </select>
+        ))}
+      </div>
 
-        <div className="space-y-3">
-          {submissions.map((sub, i) => (
-            <div
-              key={i}
-              className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex items-center justify-between gap-3"
-            >
-              <div className="space-y-0.5">
-                <div className="font-semibold text-sm text-[var(--color-text)]">{sub.student}</div>
-                <div className="text-xs text-[var(--color-muted)]">
-                  {sub.course} &bull; {sub.assignment}
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-[var(--color-muted)] hidden sm:inline">{sub.date}</span>
-                <button className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:opacity-90 transition-opacity inline-flex items-center gap-1 cursor-pointer">
-                  <LuCheck size={14} />
-                  <span>Grade</span>
-                </button>
-              </div>
-            </div>
+      {/* Stats bar */}
+      <div className="grid grid-cols-4 gap-3">
+        {[
+          { label: 'Total Courses', value: courses.length, color: 'text-violet-400' },
+          { label: 'Published', value: courses.filter(c => c.status === 'Published').length, color: 'text-emerald-400' },
+          { label: 'Draft', value: courses.filter(c => c.status === 'Draft').length, color: 'text-amber-400' },
+          { label: 'Total Students', value: courses.reduce((a, c) => a + c.enrolledStudents, 0), color: 'text-cyan-400' },
+        ].map(stat => (
+          <div key={stat.label} className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] text-center">
+            <div className={`text-xl font-bold font-heading ${stat.color}`}>{stat.value}</div>
+            <div className="text-[10px] text-[var(--color-muted)] font-mono mt-1 uppercase tracking-wider">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Course Cards Grid */}
+      {filtered.length === 0 ? (
+        <div className="py-16 text-center space-y-3">
+          <LuBookOpen size={32} className="mx-auto text-[var(--color-muted)]" />
+          <p className="text-sm text-[var(--color-muted)]">No courses match your filters</p>
+          <button onClick={() => { setSearch(''); setFilterCategory('All'); setFilterDifficulty('All'); setFilterStatus('All'); }} className="text-xs text-violet-400 hover:text-violet-300 cursor-pointer">Clear filters</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filtered.map(course => (
+            <CourseCard key={course.id} course={course} onAction={handleAction} />
           ))}
         </div>
-      </div>
+      )}
+
+      {/* Create Modal */}
+      {showCreate && <CreateCourseModal onClose={() => setShowCreate(false)} onCreated={handleCreated} />}
     </div>
   );
 }

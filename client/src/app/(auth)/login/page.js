@@ -30,7 +30,6 @@ function LoginForm() {
       const role = (user.role || '').toUpperCase();
       if (role === 'ADMIN') router.replace('/admin');
       else if (role === 'INSTRUCTOR') router.replace('/instructor');
-      else if (role === 'RESEARCHER') router.replace('/dashboard/researcher');
       else router.replace('/dashboard');
     }
   }, [authLoading, isAuthenticated, user, router]);
@@ -62,8 +61,6 @@ function LoginForm() {
         router.replace('/admin');
       } else if (role === 'INSTRUCTOR') {
         router.replace('/instructor');
-      } else if (role === 'RESEARCHER') {
-        router.replace('/dashboard/researcher');
       } else {
         router.replace('/dashboard');
       }
@@ -187,7 +184,7 @@ function LoginForm() {
                 href="/signup"
                 className="font-semibold text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors"
               >
-                Sign up as Learner or Researcher
+                Sign up as Learner
               </Link>
             </p>
           </div>
@@ -196,7 +193,7 @@ function LoginForm() {
         {/* Demo Credentials Quick-Fill helper */}
         <div className="p-4 rounded-2xl bg-[var(--color-surface)]/50 border border-[var(--color-border)]/60 text-xs text-[var(--color-muted)] space-y-2">
           <div className="font-semibold text-[var(--color-text)]">Quick Demo Credentials:</div>
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
             <button
               type="button"
               onClick={() => setFormData({ email: 'learner@quantum.platform', password: 'Learner@2025!' })}
@@ -204,14 +201,6 @@ function LoginForm() {
             >
               <div className="font-medium text-[var(--color-text)]">Learner</div>
               <div className="truncate">learner@quantum.platform</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ email: 'researcher@quantum.platform', password: 'Researcher@2025!' })}
-              className="text-left p-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)]/50 hover:border-[var(--color-primary)]"
-            >
-              <div className="font-medium text-[var(--color-text)]">Researcher</div>
-              <div className="truncate">researcher@quantum.platform</div>
             </button>
             <button
               type="button"

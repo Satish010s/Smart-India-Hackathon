@@ -8,18 +8,24 @@ datasource db {
 }
 
 model User {
-  id              String             @id @default(cuid())
-  name            String
-  email           String             @unique
-  passwordHash    String
-  role            Role               @default(LEARNER)
-  isEmailVerified Boolean            @default(false)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  aiChats         AiChatHistory[]
-  aiVideos        AiGeneratedVideo[]
-  otps            Otp[]
-  refreshTokens   RefreshToken[]
+  id                 String               @id @default(cuid())
+  name               String
+  email              String               @unique
+  passwordHash       String
+  role               Role                 @default(LEARNER)
+  isEmailVerified    Boolean              @default(false)
+  isSuspended        Boolean              @default(false)
+  lastActiveAt       DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  aiChats            AiChatHistory[]
+  aiVideos           AiGeneratedVideo[]
+  otps               Otp[]
+  refreshTokens      RefreshToken[]
+  experiments        Experiment[]
+  simulationRuns     SimulationRun[]
+  backendComparisons BackendComparison[]
+  savedCircuits      SavedCircuit[]
 
   @@index([email])
 }
@@ -80,9 +86,116 @@ model AiGeneratedVideo {
   @@index([userId])
 }
 
+// ─── Experiment Models ──────────────────────────────────────────────────────
+
+model Experiment {
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  objective      String
+  hypothesis     String          @default("")
+  circuit        Json?           // circuit JSON (drag-and-drop)
+  circuitCode    String?         // raw code (Qiskit / PennyLane / etc.)
+  parameters     Json?           // shot count, qubit count, custom params
+  backend        String          @default("qiskit_aer")
+  framework      String          @default("qiskit")
+  noiseConfig    Json?           // noise model configuration
+  status         ExperimentStatus @default(DRAFT)
+  observations   String?
+  tags           String[]        @default([])
+  reproducibility Json?          // seed, env info, timestamp
+  simulationRuns SimulationRun[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+model SimulationRun {
+  id              String        @id @default(cuid())
+  userId          String
+  experimentId    String?
+  circuitCode     String
+  backend         String        // e.g. "qiskit_aer", "pennylane", "cirq", "qbraid"
+  framework       String        // e.g. "qiskit", "pennylane", "cirq"
+  status          RunStatus     @default(PENDING)
+  shots           Int           @default(1024)
+  results         Json?         // counts, probabilities, statevector, bloch sphere
+  executionTimeMs Int?
+  depth           Int?
+  gateCount       Int?
+  fidelity        Float?
+  noiseImpact     Json?
+  errorMessage    String?
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experiment      Experiment?   @relation(fields: [experimentId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, backend])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([experimentId])
+}
+
+model BackendComparison {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String   @default("Untitled Comparison")
+  circuitCode String
+  backends    String[] // list of backends compared
+  runs        Json     // array of run results per backend
+  summary     Json?    // aggregated comparison metrics
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SavedCircuit {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String   @default("")
+  circuitCode String?  // raw code
+  circuitJson Json?    // drag-and-drop JSON
+  backend     String   @default("qiskit_aer")
+  framework   String   @default("qiskit")
+  tags        String[] @default([])
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  actorName  String?
+  action     String   // e.g. "ROLE_CHANGE", "USER_SUSPEND", "USER_ACTIVATE", "CONTENT_PUBLISH", "BACKEND_UPDATE", "AI_CONFIG_UPDATE", "SETTINGS_UPDATE"
+  resource   String   // e.g. "User:123", "Course:456", "Backend:qiskit_aer"
+  details    Json?    // { old: ..., new: ..., ip: ..., reason: ... }
+  createdAt  DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+}
+
+model PlatformSetting {
+  id        String   @id @default("default")
+  config    Json     // full platform settings, AI config, quantum config, etc.
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────────────
+
 enum Role {
   LEARNER
-  RESEARCHER
   INSTRUCTOR
   ADMIN
 }
@@ -91,3 +204,19 @@ enum OtpType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
 }
+
+enum ExperimentStatus {
+  DRAFT
+  RUNNING
+  COMPLETED
+  FAILED
+  ARCHIVED
+}
+
+enum RunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+

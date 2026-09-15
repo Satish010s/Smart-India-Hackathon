@@ -80,7 +80,7 @@ export default function AchievementPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] flex">
+      <div className="h-screen overflow-hidden bg-[var(--color-background)] text-[var(--color-text)] flex">
         <LearnerSidebar
           isCollapsed={isCollapsed}
           onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
@@ -88,7 +88,7 @@ export default function AchievementPage() {
           onMobileClose={() => setIsMobileOpen(false)}
         />
 
-        <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+        <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
           <DashboardNavbar
             title="Achievements"
             isCollapsed={isCollapsed}
@@ -96,7 +96,7 @@ export default function AchievementPage() {
             onMobileMenuClick={() => setIsMobileOpen(true)}
           />
 
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
             {/* Hero */}
             <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-[var(--color-surface)] to-[var(--color-primary)]/10 p-6 sm:p-8">
               <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />

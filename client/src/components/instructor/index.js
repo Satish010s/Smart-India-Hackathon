@@ -1,2 +1,10 @@
 export { default as InstructorOverview } from './InstructorOverview';
 export { default as CourseManagement } from './CourseManagement';
+export { default as CourseBuilder } from './CourseBuilder';
+export { default as LessonBuilder } from './LessonBuilder';
+export { default as QuizBuilder } from './QuizBuilder';
+export { default as ChallengeBuilder } from './ChallengeBuilder';
+export { default as StudentManagement } from './StudentManagement';
+export { default as InstructorAnalytics } from './InstructorAnalytics';
+export { default as ContentManagement } from './ContentManagement';
+export { default as InstructorSettings } from './InstructorSettings';

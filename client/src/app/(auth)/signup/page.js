@@ -13,7 +13,6 @@ import {
   LuCircleAlert,
   LuLoaderCircle,
   LuBookOpen,
-  LuMicroscope,
   LuShieldAlert,
 } from 'react-icons/lu';
 
@@ -21,7 +20,7 @@ export default function SignupPage() {
   const router = useRouter();
   const { signup, isLoading, error, clearError } = useAuthStore();
 
-  const [role, setRole] = useState('LEARNER');
+  const role = 'LEARNER'; // Only LEARNER accounts can be created publicly
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -109,66 +108,22 @@ export default function SignupPage() {
 
         <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Role Selection (Learner vs Researcher) */}
+            {/* Account Type Info */}
             <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
-                Select Your Access Role
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole('LEARNER')}
-                  className={`p-4 rounded-2xl border text-left transition-all flex flex-col gap-2 ${
-                    role === 'LEARNER'
-                      ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] shadow-sm'
-                      : 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-primary)]/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <LuBookOpen
-                      size={20}
-                      className={role === 'LEARNER' ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]'}
-                    />
-                    {role === 'LEARNER' && (
-                      <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-[var(--color-text)]">Learner</div>
-                    <div className="text-xs text-[var(--color-muted)]">Interactive courses & quizzes</div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setRole('RESEARCHER')}
-                  className={`p-4 rounded-2xl border text-left transition-all flex flex-col gap-2 ${
-                    role === 'RESEARCHER'
-                      ? 'bg-[var(--color-secondary)]/10 border-[var(--color-secondary)] shadow-sm'
-                      : 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-secondary)]/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <LuMicroscope
-                      size={20}
-                      className={role === 'RESEARCHER' ? 'text-[var(--color-secondary)]' : 'text-[var(--color-muted)]'}
-                    />
-                    {role === 'RESEARCHER' && (
-                      <span className="w-2 h-2 rounded-full bg-[var(--color-secondary)]" />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm text-[var(--color-text)]">Researcher</div>
-                    <div className="text-xs text-[var(--color-muted)]">High-qubit sim & algorithms</div>
-                  </div>
-                </button>
+              <div className="p-4 rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/20 flex items-center justify-center flex-shrink-0">
+                  <LuBookOpen size={20} className="text-[var(--color-primary)]" />
+                </div>
+                <div>
+                  <div className="font-semibold text-sm text-[var(--color-text)]">Learner Account</div>
+                  <div className="text-xs text-[var(--color-muted)] mt-0.5">Interactive courses, quantum circuit design, AI tutor, experiments & simulations</div>
+                </div>
+                <span className="ml-auto w-2.5 h-2.5 rounded-full bg-[var(--color-primary)] flex-shrink-0" />
               </div>
-
-              {/* Policy note regarding Instructor */}
               <div className="mt-3 p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]/70 flex items-start gap-2.5 text-xs text-[var(--color-muted)]">
                 <LuShieldAlert size={16} className="text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong>Notice:</strong> Instructor accounts cannot be registered publicly. They are provisioned directly by Institution Administrators.
+                  <strong>Notice:</strong> Instructor accounts are provisioned by Institution Administrators. Contact your institution to get faculty access.
                 </span>
               </div>
             </div>
