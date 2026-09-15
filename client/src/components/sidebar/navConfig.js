@@ -12,13 +12,17 @@ import {
   LuGraduationCap,
   LuUsers,
   LuClipboardList,
-  LuSlidersHorizontal,
   LuShieldAlert,
   LuUserPlus,
   LuChartBar,
   LuSettings,
   LuMedal,
   LuUser,
+  LuHistory,
+  LuGitCompare,
+  LuCircuitBoard,
+  LuBrain,
+  LuKeyRound,
 } from 'react-icons/lu';
 
 export const ROLE_NAV_ITEMS = {
@@ -52,6 +56,27 @@ export const ROLE_NAV_ITEMS = {
       badge: 'NEW',
     },
     {
+      label: 'Experiments',
+      href: '/dashboard?tab=experiments',
+      icon: LuFlaskConical,
+    },
+    {
+      label: 'Backend Compare',
+      href: '/dashboard?tab=backend-compare',
+      icon: LuGitCompare,
+      badge: '4 Backends',
+    },
+    {
+      label: 'Sim History',
+      href: '/dashboard?tab=sim-history',
+      icon: LuHistory,
+    },
+    {
+      label: 'Saved Circuits',
+      href: '/dashboard?tab=saved-circuits',
+      icon: LuCircuitBoard,
+    },
+    {
       label: 'Progress',
       href: '/progress',
       icon: LuChartBar,
@@ -68,111 +93,116 @@ export const ROLE_NAV_ITEMS = {
     },
   ],
 
-  RESEARCHER: [
-    {
-      label: 'Research Hub',
-      href: '/dashboard/researcher',
-      icon: LuLayoutDashboard,
-      badge: 'Active',
-    },
-    {
-      label: 'Quantum Circuits',
-      href: '/playground',
-      icon: LuCpu,
-    },
-    {
-      label: 'Simulations & VQE',
-      href: '/dashboard/researcher?tab=simulations',
-      icon: LuActivity,
-      badge: '64 Qubits',
-    },
-    {
-      label: 'QPU Hardware Quota',
-      href: '/dashboard/researcher?tab=hardware',
-      icon: LuDatabase,
-    },
-    {
-      label: 'Research Papers',
-      href: '/dashboard/researcher?tab=papers',
-      icon: LuFileText,
-      badge: '3 Docs',
-    },
-    {
-      label: 'Algorithms Lab',
-      href: '/learn',
-      icon: LuFlaskConical,
-    },
-  ],
-
   INSTRUCTOR: [
     {
-      label: 'Instructor Portal',
+      label: 'Dashboard',
       href: '/instructor',
       icon: LuLayoutDashboard,
       badge: 'Faculty',
     },
     {
-      label: 'Assigned Courses',
+      label: 'Courses',
       href: '/instructor?tab=courses',
       icon: LuBookOpen,
-      badge: '2 Active',
+      badge: '3',
     },
     {
-      label: 'Enrolled Students',
+      label: 'Course Builder',
+      href: '/instructor?tab=course-builder',
+      icon: LuFlaskConical,
+    },
+    {
+      label: 'Lesson Builder',
+      href: '/instructor?tab=lesson-builder',
+      icon: LuFileText,
+    },
+    {
+      label: 'Quiz Builder',
+      href: '/instructor?tab=quiz-builder',
+      icon: LuClipboardList,
+    },
+    {
+      label: 'Challenge Builder',
+      href: '/instructor?tab=challenge-builder',
+      icon: LuMicroscope,
+    },
+    {
+      label: 'Students',
       href: '/instructor?tab=students',
       icon: LuUsers,
       badge: '142',
     },
     {
-      label: 'Grading & Submissions',
-      href: '/instructor?tab=grading',
-      icon: LuClipboardList,
-      badge: '18 Pending',
+      label: 'Analytics',
+      href: '/instructor?tab=analytics',
+      icon: LuChartBar,
     },
     {
-      label: 'Course Settings',
+      label: 'Content',
+      href: '/instructor?tab=content',
+      icon: LuDatabase,
+    },
+    {
+      label: 'Settings',
       href: '/instructor?tab=settings',
-      icon: LuSlidersHorizontal,
-    },
-    {
-      label: 'Learner Preview',
-      href: '/dashboard',
-      icon: LuGraduationCap,
+      icon: LuSettings,
     },
   ],
 
   ADMIN: [
     {
-      label: 'Admin Console',
+      label: 'Dashboard',
       href: '/admin',
       icon: LuShieldAlert,
-      badge: 'Super',
+      badge: 'Live',
     },
     {
-      label: 'User Directory',
+      label: 'Users',
       href: '/admin?tab=users',
       icon: LuUsers,
     },
     {
-      label: 'Provision Faculty',
-      href: '/admin?tab=provision',
-      icon: LuUserPlus,
-      badge: 'Invite',
+      label: 'Roles & Permissions',
+      href: '/admin?tab=roles',
+      icon: LuKeyRound,
+      badge: '3 Roles',
     },
     {
-      label: 'System Metrics',
-      href: '/admin?tab=metrics',
+      label: 'Content Governance',
+      href: '/admin?tab=content',
+      icon: LuDatabase,
+    },
+    {
+      label: 'AI Management',
+      href: '/admin?tab=ai',
+      icon: LuBrain,
+      badge: 'FastAPI',
+    },
+    {
+      label: 'Quantum Backends',
+      href: '/admin?tab=backends',
+      icon: LuCpu,
+      badge: '4 QPU',
+    },
+    {
+      label: 'Platform Analytics',
+      href: '/admin?tab=analytics',
+      icon: LuChartBar,
+    },
+    {
+      label: 'System Health',
+      href: '/admin?tab=health',
       icon: LuActivity,
     },
     {
-      label: 'Instructor View',
-      href: '/instructor',
-      icon: LuGraduationCap,
+      label: 'Audit Logs',
+      href: '/admin?tab=audit',
+      icon: LuHistory,
     },
     {
-      label: 'Learner View',
-      href: '/dashboard',
-      icon: LuBookOpen,
+      label: 'Platform Settings',
+      href: '/admin?tab=settings',
+      icon: LuSettings,
     },
   ],
 };
@@ -184,13 +214,6 @@ export const ROLE_THEMES = {
     badgeText: 'text-[var(--color-primary)]',
     badgeBorder: 'border-[var(--color-primary)]/20',
     name: 'Learner',
-  },
-  RESEARCHER: {
-    color: 'var(--color-secondary)',
-    badgeBg: 'bg-cyan-500/10',
-    badgeText: 'text-cyan-500',
-    badgeBorder: 'border-cyan-500/20',
-    name: 'Researcher',
   },
   INSTRUCTOR: {
     color: '#10b981',
@@ -207,3 +230,5 @@ export const ROLE_THEMES = {
     name: 'Super Admin',
   },
 };
+
+

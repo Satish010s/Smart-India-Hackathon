@@ -60,7 +60,7 @@ function SidebarInner({
       return false;
     }
 
-    // 3. If item has NO query tab or hash (root hub view like /admin, /instructor, /dashboard/researcher):
+    // 3. If item has NO query tab or hash (root hub view like /admin, /instructor):
     // Active only when there is no query tab or when tab is 'overview'
     return !currentTab || currentTab === 'overview';
   };
@@ -121,29 +121,6 @@ function SidebarInner({
             >
               <LuX size={20} />
             </button>
-          )}
-        </div>
-
-        {/* Role Pill Banner */}
-        <div className={`px-4 py-3 border-b border-[var(--color-border)]/40 ${isCollapsed ? 'text-center' : ''}`}>
-          {!isCollapsed ? (
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-                Portal Mode
-              </span>
-              <span
-                className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
-              >
-                {theme.name}
-              </span>
-            </div>
-          ) : (
-            <div
-              className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-mono font-bold border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
-              title={`Active Role: ${theme.name}`}
-            >
-              {theme.name.charAt(0)}
-            </div>
           )}
         </div>
 

@@ -103,7 +103,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   /**
-   * Public Signup (Learner or Researcher only)
+   * Public Signup (Learner only)
    */
   signup: async ({ name, email, password, role }) => {
     try {

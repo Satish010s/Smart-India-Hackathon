@@ -67,8 +67,6 @@ export default function Navbar() {
         return "/admin";
       case "INSTRUCTOR":
         return "/instructor";
-      case "RESEARCHER":
-        return "/dashboard/researcher";
       default:
         return "/dashboard";
     }
@@ -80,8 +78,6 @@ export default function Navbar() {
         return "bg-rose-500/10 text-rose-500 border-rose-500/20";
       case "INSTRUCTOR":
         return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-      case "RESEARCHER":
-        return "bg-cyan-500/10 text-cyan-500 border-cyan-500/20";
       default:
         return "bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20";
     }
@@ -175,8 +171,6 @@ export default function Navbar() {
                           ? "Admin Console"
                           : user.role === "INSTRUCTOR"
                           ? "Instructor Portal"
-                          : user.role === "RESEARCHER"
-                          ? "Researcher Workspace"
                           : "Learner Dashboard"}
                       </span>
                     </Link>

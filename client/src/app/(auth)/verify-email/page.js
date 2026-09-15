@@ -100,7 +100,6 @@ function VerifyEmailForm() {
       const role = (result.user?.role || '').toUpperCase();
       if (role === 'ADMIN') router.replace('/admin');
       else if (role === 'INSTRUCTOR') router.replace('/instructor');
-      else if (role === 'RESEARCHER') router.replace('/dashboard/researcher');
       else router.replace('/dashboard');
     }
   };

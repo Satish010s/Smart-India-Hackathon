@@ -14,7 +14,6 @@ import {
   LuPanelLeftClose,
   LuShieldAlert,
   LuGraduationCap,
-  LuMicroscope,
 } from 'react-icons/lu';
 import { useAuthStore } from '../../store/useAuthStore';
 import { ROLE_THEMES } from '../sidebar/navConfig';
@@ -54,8 +53,6 @@ export default function DashboardNavbar({
         return '/admin';
       case 'INSTRUCTOR':
         return '/instructor';
-      case 'RESEARCHER':
-        return '/dashboard/researcher';
       default:
         return '/dashboard';
     }
@@ -177,16 +174,6 @@ export default function DashboardNavbar({
                 </Link>
               )}
 
-              {role === 'RESEARCHER' && (
-                <Link
-                  href="/dashboard/researcher"
-                  onClick={() => setIsProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-500 hover:bg-cyan-500/10 transition-colors"
-                >
-                  <LuMicroscope size={15} />
-                  <span>Researcher Workspace</span>
-                </Link>
-              )}
 
               <button
                 onClick={() => {

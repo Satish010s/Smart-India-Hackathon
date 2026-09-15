@@ -21,7 +21,7 @@ export const validateOtpCode = (code) => {
 };
 
 /**
- * Public signup validator - only allows LEARNER or RESEARCHER
+ * Public signup validator - only allows LEARNER
  */
 export const validateSignupInput = ({ name, email, password, role }) => {
   const errors = [];
@@ -39,10 +39,10 @@ export const validateSignupInput = ({ name, email, password, role }) => {
   }
 
   const normalizedRole = (role || 'LEARNER').toUpperCase();
-  const allowedPublicRoles = ['LEARNER', 'RESEARCHER'];
+  const allowedPublicRoles = ['LEARNER'];
 
   if (!allowedPublicRoles.includes(normalizedRole)) {
-    errors.push('Public signups are only allowed for Learner or Researcher accounts.');
+    errors.push('Public signups are only allowed for Learner accounts. Instructor accounts are provisioned by administrators.');
   }
 
   return {

@@ -23,41 +23,9 @@ router.get('/learner/dashboard', authenticateUser, authorizeRoles('LEARNER', 'IN
   });
 });
 
-/**
- * Researcher Workspace Data (Accessible by RESEARCHER, ADMIN)
- */
-router.get('/researcher/workspace', authenticateUser, authorizeRoles('RESEARCHER', 'ADMIN'), (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: 'Welcome to the Advanced Quantum Researcher Workspace!',
-    data: {
-      role: req.user.role,
-      activeSimulations: 3,
-      allocatedQubits: 64,
-      hardwareTarget: 'IBM Quantum Eagle / IonQ Forte',
-      recentPapers: [
-        'Variational Quantum Eigensolver for Molecular Binding',
-        'Error Mitigation in 127-Qubit Systems',
-      ],
-    },
-  });
-});
 
-/**
- * Instructor Portal Data (Accessible by INSTRUCTOR, ADMIN)
- */
-router.get('/instructor/portal', authenticateUser, authorizeRoles('INSTRUCTOR', 'ADMIN'), (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: 'Welcome to the Instructor Command Portal!',
-    data: {
-      role: req.user.role,
-      assignedCourses: ['PHYS-401: Quantum Mechanics Computing', 'CS-550: Quantum Algorithms'],
-      totalEnrolledStudents: 142,
-      pendingSubmissions: 18,
-    },
-  });
-});
+// Note: /instructor/portal is handled by instructorRoutes.js
+
 
 /**
  * Admin Overview Data (Accessible ONLY by ADMIN)

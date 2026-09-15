@@ -24,8 +24,6 @@ export default function RoleGuard({ allowedRoles = [], children }) {
           return '/admin';
         case 'INSTRUCTOR':
           return '/instructor';
-        case 'RESEARCHER':
-          return '/dashboard/researcher';
         default:
           return '/dashboard';
       }

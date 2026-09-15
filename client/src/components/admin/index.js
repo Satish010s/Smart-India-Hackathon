@@ -1,3 +1,13 @@
-export { default as AdminOverview } from './AdminOverview';
-export { default as InstructorProvisionModal } from './InstructorProvisionModal';
-export { default as UserDirectoryTable } from './UserDirectoryTable';
+export { default as AdminOverview } from './AdminOverview.jsx';
+export { default as InstructorProvisionModal } from './InstructorProvisionModal.jsx';
+export { default as UserDirectoryTable } from './UserDirectoryTable.jsx';
+export { default as AdminDashboardOverview } from './AdminDashboardOverview.jsx';
+export { default as AdminUserManager } from './AdminUserManager.jsx';
+export { default as AdminRolesPermissions } from './AdminRolesPermissions.jsx';
+export { default as AdminContentGovernance } from './AdminContentGovernance.jsx';
+export { default as AdminPlatformAnalytics } from './AdminPlatformAnalytics.jsx';
+export { default as AdminAiManagement } from './AdminAiManagement.jsx';
+export { default as AdminQuantumBackends } from './AdminQuantumBackends.jsx';
+export { default as AdminSystemHealth } from './AdminSystemHealth.jsx';
+export { default as AdminAuditLogs } from './AdminAuditLogs.jsx';
+export { default as AdminPlatformSettings } from './AdminPlatformSettings.jsx';

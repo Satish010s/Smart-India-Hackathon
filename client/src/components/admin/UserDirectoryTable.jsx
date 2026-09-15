@@ -40,7 +40,6 @@ export default function UserDirectoryTable({
           >
             <option value="ALL">All Roles ({users.length})</option>
             <option value="LEARNER">Learner</option>
-            <option value="RESEARCHER">Researcher</option>
             <option value="INSTRUCTOR">Instructor</option>
             <option value="ADMIN">Admin</option>
           </select>
@@ -76,8 +75,6 @@ export default function UserDirectoryTable({
                           ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
                           : u.role === 'INSTRUCTOR'
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                          : u.role === 'RESEARCHER'
-                          ? 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
                           : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20'
                       }`}
                     >
@@ -106,7 +103,6 @@ export default function UserDirectoryTable({
                         className="text-xs px-2 py-1 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] font-mono text-[var(--color-text)] cursor-pointer"
                       >
                         <option value="LEARNER">Set Learner</option>
-                        <option value="RESEARCHER">Set Researcher</option>
                         <option value="INSTRUCTOR">Set Instructor</option>
                         <option value="ADMIN">Set Admin</option>
                       </select>
