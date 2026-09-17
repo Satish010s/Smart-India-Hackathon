@@ -501,12 +501,7 @@ export default function ExperimentsView() {
       if (res?.success) { setExperiments(res.data.experiments); setTotal(res.data.total); }
     } catch (err) {
       console.warn('Could not fetch experiments:', err);
-      // Show mock data if API not ready
-      setExperiments([
-        { id: 'mock1', name: 'Bell State Entanglement', objective: 'Demonstrate quantum entanglement using a Bell circuit', status: 'COMPLETED', backend: 'qiskit_aer', _count: { simulationRuns: 3 }, updatedAt: new Date().toISOString(), tags: ['entanglement', 'bell-state'] },
-        { id: 'mock2', name: 'Grover Search Demo', objective: 'Implement Grovers algorithm for unstructured search', status: 'DRAFT', backend: 'pennylane', _count: { simulationRuns: 0 }, updatedAt: new Date().toISOString(), tags: ['grover', 'search'] },
-        { id: 'mock3', name: 'VQE Hydrogen Molecule', objective: 'Find ground state energy of H₂ using VQE', status: 'RUNNING', backend: 'cirq', _count: { simulationRuns: 5 }, updatedAt: new Date().toISOString(), tags: ['vqe', 'chemistry'] },
-      ]);
+      setExperiments([]);
     }
     setLoading(false);
   }, [search, statusFilter]);

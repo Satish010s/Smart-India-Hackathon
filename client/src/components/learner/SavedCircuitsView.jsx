@@ -15,12 +15,7 @@ const FRAMEWORK_COLORS = {
   qbraid: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
 };
 
-const MOCK_CIRCUITS = [
-  { id: 'c1', name: 'Bell State', description: 'Standard 2-qubit entangled Bell state', framework: 'qiskit', backend: 'qiskit_aer', tags: ['entanglement', 'bell'], isPublic: false, createdAt: new Date(Date.now() - 86400000).toISOString(), circuitCode: `from qiskit import QuantumCircuit\nqc = QuantumCircuit(2,2)\nqc.h(0)\nqc.cx(0,1)\nqc.measure_all()` },
-  { id: 'c2', name: 'GHZ State (3 Qubits)', description: 'Greenberger–Horne–Zeilinger state for 3 qubits', framework: 'qiskit', backend: 'qiskit_aer', tags: ['ghz', 'multipartite'], isPublic: true, createdAt: new Date(Date.now() - 172800000).toISOString(), circuitCode: `from qiskit import QuantumCircuit\nqc = QuantumCircuit(3,3)\nqc.h(0)\nqc.cx(0,1)\nqc.cx(0,2)\nqc.measure_all()` },
-  { id: 'c3', name: 'Quantum Teleportation', description: 'Teleport quantum state from qubit 0 to qubit 2', framework: 'qiskit', backend: 'qiskit_aer', tags: ['teleportation', 'protocol'], isPublic: false, createdAt: new Date(Date.now() - 259200000).toISOString(), circuitCode: `# Quantum Teleportation Circuit\nfrom qiskit import QuantumCircuit\nqc = QuantumCircuit(3, 2)` },
-  { id: 'c4', name: 'Hadamard Test', description: 'Hadamard test circuit for expectation value estimation', framework: 'pennylane', backend: 'pennylane', tags: ['hadamard', 'vqe'], isPublic: false, createdAt: new Date(Date.now() - 345600000).toISOString(), circuitCode: `import pennylane as qml\ndev = qml.device("default.qubit", wires=2)` },
-];
+
 
 function CircuitCard({ circuit, onOpen, onDelete, onRun }) {
   const [copied, setCopied] = useState(false);
@@ -245,9 +240,9 @@ export default function SavedCircuitsView() {
       const res = await apiFetch(`/learner/circuits?${params}`);
       if (res?.success) { setCircuits(res.data.circuits); setTotal(res.data.total); }
     } catch (err) {
-      console.warn('Could not fetch circuits, showing mock data:', err);
-      setCircuits(MOCK_CIRCUITS);
-      setTotal(MOCK_CIRCUITS.length);
+      console.warn('Could not fetch circuits:', err);
+      setCircuits([]);
+      setTotal(0);
     }
     setLoading(false);
   }, [search, frameworkFilter, tagFilter]);

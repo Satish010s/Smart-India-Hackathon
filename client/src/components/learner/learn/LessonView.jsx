@@ -232,7 +232,7 @@ export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPr
         {activeTab === 'theory' && (
           <div className="space-y-5">
             <div className="prose prose-sm max-w-none">
-              {LESSON_DATA.theory.split('\n\n').map((para, i) => (
+              {(lesson.theory || '').split('\n\n').map((para, i) => (
                 <p key={i} className="text-sm text-[var(--color-muted)] leading-relaxed"
                    dangerouslySetInnerHTML={{ __html: para.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[var(--color-text)]">$1</strong>') }}
                 />
@@ -247,7 +247,7 @@ export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPr
                 <LuLightbulb size={14} className="text-amber-400" /> Key Takeaways
               </div>
               <ul className="space-y-1.5">
-                {LESSON_DATA.keyPoints.map(pt => (
+                {(lesson.keyPoints || []).map(pt => (
                   <li key={pt} className="flex items-start gap-2 text-xs text-[var(--color-muted)]">
                     <LuCheck size={12} className="text-emerald-400 mt-0.5 flex-shrink-0" /> {pt}
                   </li>
@@ -276,7 +276,7 @@ export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPr
                 </button>
               </div>
               <pre className="p-4 text-[11px] text-cyan-300 leading-relaxed overflow-x-auto font-mono">
-                {LESSON_DATA.code}
+                {lesson.code}
               </pre>
             </div>
 
@@ -291,7 +291,7 @@ Success after ≈2.2 iterations`}</pre>
               </div>
             )}
 
-            <AIPanel explanation={AI_EXPLANATIONS.code} label="this code" />
+            <AIPanel explanation={AI_EXPLANATIONS.code} label="this implementation" />
             {simDone && <AIPanel explanation={AI_EXPLANATIONS.result} label="the result" />}
           </div>
         )}
@@ -304,7 +304,7 @@ Success after ≈2.2 iterations`}</pre>
                 <span className="text-[10px] font-mono text-violet-400">Grover Circuit (1 iteration)</span>
               </div>
               <div className="p-6">
-                <pre className="text-sm font-mono text-violet-300 leading-loose">{LESSON_DATA.circuit}</pre>
+                <pre className="text-sm font-mono text-violet-300 leading-loose">{lesson.circuit}</pre>
               </div>
             </div>
             <button

@@ -104,7 +104,33 @@ const ANALYTICS_DATA = {
 };
 
 export default function InstructorAnalytics() {
-  const data = ANALYTICS_DATA;
+  const [data, setData] = useState(ANALYTICS_DATA);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const res = await apiFetch('/instructor/analytics');
+        if (res?.success && res.data) {
+          // Merge with fallback data for any missing fields to ensure UI doesn't break
+          setData({ ...ANALYTICS_DATA, ...res.data });
+        }
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fadeIn">

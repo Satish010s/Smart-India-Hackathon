@@ -273,35 +273,22 @@ function CreateCourseModal({ onClose, onCreated }) {
 }
 
 export default function CourseManagement({ onOpenBuilder }) {
-  const [courses, setCourses] = useState([
-    {
-      id: 'ic1', title: 'Quantum Fundamentals: From Bits to Qubits',
-      description: 'A comprehensive introduction to quantum mechanics principles and their application in computing. Students learn superposition, entanglement, and quantum measurement through interactive experiments.',
-      difficulty: 'Beginner', category: 'Foundations', duration: '8 hrs',
-      status: 'Published', enrolledStudents: 98, avgProgress: 71, avgScore: 84.2,
-      completionRate: 68, publishedLessons: 24, totalLessons: 24, rating: 4.9, pendingGrades: 12,
-      objectives: ['Understand qubits', 'Master superposition', 'Build quantum circuits'],
-      prerequisites: ['Basic linear algebra', 'Classical computing basics'],
-    },
-    {
-      id: 'ic2', title: 'Advanced Quantum Algorithms: Shor, Grover & QPE',
-      description: "Deep dive into the three canonical quantum algorithms. Includes working Qiskit implementations, complexity analysis, and real-hardware experiments on IBM Quantum.",
-      difficulty: 'Advanced', category: 'Algorithms', duration: '14 hrs',
-      status: 'Published', enrolledStudents: 44, avgProgress: 58, avgScore: 89.6,
-      completionRate: 42, publishedLessons: 38, totalLessons: 42, rating: 4.7, pendingGrades: 6,
-      objectives: ["Implement Shor's algorithm", "Master Grover's search"],
-      prerequisites: ['Quantum Fundamentals', 'Linear algebra (advanced)'],
-    },
-    {
-      id: 'ic3', title: 'Quantum Machine Learning Fundamentals',
-      description: 'Explore variational quantum circuits, quantum kernels, and hybrid classical-quantum ML algorithms.',
-      difficulty: 'Intermediate', category: 'QML', duration: '12 hrs',
-      status: 'Draft', enrolledStudents: 0, avgProgress: 0, avgScore: 0,
-      completionRate: 0, publishedLessons: 8, totalLessons: 32, rating: null, pendingGrades: 0,
-      objectives: ['Understand VQC', 'Build quantum neural networks'],
-      prerequisites: ['Quantum Fundamentals', 'Classical ML basics'],
-    },
-  ]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await apiFetch('/instructor/courses');
+        if (res?.success) setCourses(res.data.courses || []);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
@@ -410,7 +397,12 @@ export default function CourseManagement({ onOpenBuilder }) {
       </div>
 
       {/* Course Cards Grid */}
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="py-16 text-center space-y-3">
+          <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-[var(--color-muted)]">Loading courses...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="py-16 text-center space-y-3">
           <LuBookOpen size={32} className="mx-auto text-[var(--color-muted)]" />
           <p className="text-sm text-[var(--color-muted)]">No courses match your filters</p>
