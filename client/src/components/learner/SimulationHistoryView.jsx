@@ -27,29 +27,7 @@ const BACKEND_COLORS = {
   qbraid: 'text-emerald-400',
 };
 
-// ─── Mock data when API not yet available ─────────────────────────────────────
-const MOCK_RUNS = Array.from({ length: 12 }, (_, i) => ({
-  id: `mock-${i}`,
-  circuitCode: `# Circuit ${i + 1}\nqc = QuantumCircuit(2, 2)\nqc.h(0)\nqc.cx(0, 1)\nqc.measure_all()`,
-  backend: BACKENDS[i % 4],
-  framework: FRAMEWORKS[i % 4],
-  status: STATUSES[i % 4 === 3 ? 2 : i % 4],
-  shots: [512, 1024, 2048, 4096][i % 4],
-  results: {
-    counts: { '00': 480, '11': 544 },
-    probabilities: { '00': 0.469, '11': 0.531 },
-    executionTimeMs: 100 + i * 30,
-    depth: 3 + i % 5,
-    gateCount: 5 + i % 8,
-    fidelity: 0.92 + Math.random() * 0.07,
-  },
-  executionTimeMs: 100 + i * 30,
-  depth: 3 + i % 5,
-  gateCount: 5 + i % 8,
-  fidelity: 0.92 + Math.random() * 0.07,
-  experiment: i % 3 === 0 ? { id: `exp-${i}`, name: `Experiment ${Math.ceil(i / 3)}` } : null,
-  createdAt: new Date(Date.now() - i * 3600000).toISOString(),
-}));
+
 
 function RunDetailPanel({ run, onClose, onRerun, onDelete }) {
   const [rerunning, setRerunning] = useState(false);
@@ -201,9 +179,9 @@ export default function SimulationHistoryView() {
         setTotal(res.data.total);
       }
     } catch (err) {
-      console.warn('Could not fetch simulations, showing mock data:', err);
-      setRuns(MOCK_RUNS);
-      setTotal(MOCK_RUNS.length);
+      console.warn('Could not fetch simulations:', err);
+      setRuns([]);
+      setTotal(0);
     }
     setLoading(false);
   }, [page, filters]);

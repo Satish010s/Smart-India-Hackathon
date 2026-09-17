@@ -344,37 +344,39 @@ export const createInstructor = async (req, res) => {
 };
 
 // ─── 3. Content Governance ────────────────────────────────────────────────────
-// In-memory catalog enhanced with live DB records
-const DEFAULT_CONTENT_CATALOG = [
-  { id: 'cnt-1', title: 'Introduction to Superposition & Qubits', type: 'COURSE', author: 'Dr. Eleanor Vance', status: 'PUBLISHED', enrollment: 342, rating: 4.9, updatedAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'cnt-2', title: 'Quantum Phase Kickback & Deutsch-Jozsa', type: 'COURSE', author: 'Dr. Eleanor Vance', status: 'PUBLISHED', enrollment: 218, rating: 4.8, updatedAt: new Date(Date.now() - 172800000).toISOString() },
-  { id: 'cnt-3', title: 'Grover Search 3-Qubit Oracle Challenge', type: 'CHALLENGE', author: 'Faculty Committee', status: 'PUBLISHED', enrollment: 154, rating: 4.7, updatedAt: new Date(Date.now() - 259200000).toISOString() },
-  { id: 'cnt-4', title: 'Quantum Teleportation Lab Experiment', type: 'EXPERIMENT', author: 'Dr. Eleanor Vance', status: 'PUBLISHED', enrollment: 98, rating: 4.9, updatedAt: new Date(Date.now() - 345600000).toISOString() },
-  { id: 'cnt-5', title: 'Shor Factorization Circuit Walkthrough', type: 'LESSON', author: 'Guest Faculty', status: 'IN_REVIEW', enrollment: 0, rating: null, updatedAt: new Date(Date.now() - 43200000).toISOString() },
-  { id: 'cnt-6', title: 'Variational Quantum Eigensolver Module', type: 'MODULE', author: 'Dr. Eleanor Vance', status: 'DRAFT', enrollment: 0, rating: null, updatedAt: new Date(Date.now() - 12000000).toISOString() },
-  { id: 'cnt-7', title: 'Quantum Error Mitigation with Zero-Noise', type: 'CHALLENGE', author: 'Faculty Reviewer', status: 'IN_REVIEW', enrollment: 0, rating: null, updatedAt: new Date(Date.now() - 8000000).toISOString() },
-];
-
-let contentCatalog = [...DEFAULT_CONTENT_CATALOG];
-
 export const getContentGovernance = async (req, res) => {
   try {
     const { type, status, search } = req.query;
-    let list = [...contentCatalog];
+    
+    let where = {};
+    if (status && status !== 'ALL') where.status = status;
+    
+    // In a real app we'd query Course, Challenge, Lesson, Experiment, Quiz separately 
+    // and combine them. For now, since the admin page needs all content in one list,
+    // let's fetch Courses as the main content for simplicity, or we can fetch all and combine.
+    
+    const courses = await prisma.course.findMany({ where, include: { instructor: true } });
+    const challenges = await prisma.challenge.findMany({ where });
+    const modules = await prisma.module.findMany({ where });
+    
+    let list = [
+      ...courses.map(c => ({ id: c.id, title: c.title, type: 'COURSE', author: c.instructor?.name || 'Unknown', status: c.status.toUpperCase(), enrollment: c.enrolledStudents, rating: c.rating, updatedAt: c.updatedAt })),
+      ...challenges.map(c => ({ id: c.id, title: c.title, type: 'CHALLENGE', author: 'Faculty', status: c.status.toUpperCase(), enrollment: c.submissionCount, rating: null, updatedAt: c.updatedAt })),
+      ...modules.map(c => ({ id: c.id, title: c.title, type: 'MODULE', author: 'Faculty', status: c.status.toUpperCase(), enrollment: 0, rating: null, updatedAt: c.updatedAt }))
+    ];
 
     if (type && type !== 'ALL') list = list.filter(c => c.type === type.toUpperCase());
-    if (status && status !== 'ALL') list = list.filter(c => c.status === status.toUpperCase());
     if (search && search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(c => c.title.toLowerCase().includes(q) || c.author.toLowerCase().includes(q));
     }
 
     const stats = {
-      total: contentCatalog.length,
-      published: contentCatalog.filter(c => c.status === 'PUBLISHED').length,
-      inReview: contentCatalog.filter(c => c.status === 'IN_REVIEW').length,
-      draft: contentCatalog.filter(c => c.status === 'DRAFT').length,
-      archived: contentCatalog.filter(c => c.status === 'ARCHIVED').length,
+      total: list.length,
+      published: list.filter(c => c.status === 'PUBLISHED').length,
+      inReview: list.filter(c => c.status === 'IN_REVIEW').length,
+      draft: list.filter(c => c.status === 'DRAFT').length,
+      archived: list.filter(c => c.status === 'ARCHIVED').length,
     };
 
     return res.status(200).json({ success: true, data: { items: list, stats } });
@@ -383,32 +385,39 @@ export const getContentGovernance = async (req, res) => {
   }
 };
 
+
+
 export const updateContentStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, feedbackReason, instructorName } = req.body;
-
-    const item = contentCatalog.find(c => c.id === id);
+    const { status, feedbackReason } = req.body;
+    
+    // We try to update in Course, Challenge, or Module
+    let item;
+    let type = '';
+    item = await prisma.course.findUnique({ where: { id } });
+    if (item) { type = 'COURSE'; await prisma.course.update({ where: { id }, data: { status }}); }
+    else {
+      item = await prisma.challenge.findUnique({ where: { id } });
+      if (item) { type = 'CHALLENGE'; await prisma.challenge.update({ where: { id }, data: { status }}); }
+      else {
+        item = await prisma.module.findUnique({ where: { id } });
+        if (item) { type = 'MODULE'; await prisma.module.update({ where: { id }, data: { status }}); }
+      }
+    }
+    
     if (!item) return res.status(404).json({ success: false, error: 'Content item not found.' });
-
-    const oldStatus = item.status;
-    if (status) item.status = status.toUpperCase();
-    if (instructorName) item.author = instructorName;
-    item.updatedAt = new Date().toISOString();
 
     await auditLog(req.user, 'CONTENT_STATUS_UPDATE', `Content:${item.id}`, {
       title: item.title,
-      type: item.type,
-      oldStatus,
-      newStatus: item.status,
+      type,
+      oldStatus: item.status,
+      newStatus: status,
       reason: feedbackReason || null,
     });
 
-    return res.status(200).json({
-      success: true,
-      message: `Content "${item.title}" updated to status ${item.status}.`,
-      data: { item },
-    });
+    item.status = status;
+    return res.status(200).json({ success: true, message: `Content "${item.title}" updated to status ${status}.`, data: { item } });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to update content status.' });
   }
@@ -417,14 +426,26 @@ export const updateContentStatus = async (req, res) => {
 export const deleteContentItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const idx = contentCatalog.findIndex(c => c.id === id);
-    if (idx === -1) return res.status(404).json({ success: false, error: 'Content not found.' });
-
-    const [deleted] = contentCatalog.splice(idx, 1);
+    
+    let deleted;
+    let type = '';
+    try {
+      deleted = await prisma.course.delete({ where: { id } }); type = 'COURSE';
+    } catch(e) {
+      try {
+        deleted = await prisma.challenge.delete({ where: { id } }); type = 'CHALLENGE';
+      } catch(e2) {
+        try {
+          deleted = await prisma.module.delete({ where: { id } }); type = 'MODULE';
+        } catch(e3) {
+          return res.status(404).json({ success: false, error: 'Content not found.' });
+        }
+      }
+    }
 
     await auditLog(req.user, 'CONTENT_DELETE', `Content:${id}`, {
       title: deleted.title,
-      type: deleted.type,
+      type,
     });
 
     return res.status(200).json({ success: true, message: `Content "${deleted.title}" deleted.` });
@@ -481,51 +502,73 @@ export const getPlatformAnalytics = async (req, res) => {
 };
 
 // ─── 5. AI Management ─────────────────────────────────────────────────────────
-let aiConfig = {
-  provider: 'gemini',
-  model: 'gemini-1.5-flash',
-  temperature: 0.2,
-  maxOutputTokens: 2048,
-  rateLimitPerMin: 60,
-  dailyTokenQuota: 1000000,
-  systemPrompt: 'You are QubitMind AI, a state-of-the-art quantum computing tutor. Provide rigorous, mathematically sound yet accessible explanations for quantum concepts, circuits, gates, and algorithms.',
-  features: {
-    tutor: true,
-    codeGeneration: true,
-    circuitDebugging: true,
-    circuitOptimization: true,
-    recommendations: true,
-  },
-  metrics: {
-    todayRequests: 142,
-    avgLatencyMs: 320,
-    errorRate: 0.5,
-  },
+// Helper to get platform settings from DB
+const fetchPlatformSettings = async () => {
+  let setting = await prisma.platformSetting.findUnique({ where: { id: 'default' } });
+  if (!setting) {
+    setting = await prisma.platformSetting.create({
+      data: {
+        id: 'default',
+        config: {
+          aiConfig: {
+            provider: 'gemini',
+            model: 'gemini-1.5-flash',
+            temperature: 0.2,
+            maxOutputTokens: 2048,
+            rateLimitPerMin: 60,
+            dailyTokenQuota: 1000000,
+            systemPrompt: 'You are QubitMind AI...',
+            features: { tutor: true, codeGeneration: true, circuitDebugging: true, circuitOptimization: true, recommendations: true },
+            metrics: { todayRequests: 142, avgLatencyMs: 320, errorRate: 0.5 }
+          },
+          quantumBackends: [
+            { id: 'qiskit_aer', label: 'Qiskit Aer', framework: 'qiskit', version: '1.2.0', status: 'ONLINE', availabilityPct: 99.9, avgExecutionTimeMs: 24, errorRatePct: 0.4, maxQubits: 32, maxShots: 100000, isDefault: true, enabled: true, color: 'indigo', description: 'Local simulator' }
+          ],
+          platformSettings: {
+            general: { platformName: 'QubitMind Quantum', tagline: 'Interactive Quantum Computing Learning Platform', supportEmail: 'support@quantum.platform', contactUrl: 'https://quantum.platform/support', maintenanceMode: false },
+            learning: { defaultLessonXp: 50, challengePassXp: 150, quizPassingThresholdPct: 75, enableAutoCertificates: true },
+            security: { enforceEmailVerification: true, sessionDurationHours: 72, passwordMinLength: 8, enableGoogleAuth: false },
+            notifications: { globalAnnouncement: 'Welcome to QubitMind!', showAnnouncementBanner: true, defaultAppearance: 'dark' }
+          }
+        }
+      }
+    });
+  }
+  return setting.config;
+};
+
+const savePlatformSettings = async (newConfig, req, auditAction) => {
+  await prisma.platformSetting.update({
+    where: { id: 'default' },
+    data: { config: newConfig }
+  });
+  
+  if (auditAction) {
+    await auditLog(req.user, auditAction, 'PlatformSetting', {});
+  }
 };
 
 export const getAiConfig = async (req, res) => {
-  return res.status(200).json({ success: true, data: { config: aiConfig } });
+  const config = await fetchPlatformSettings();
+  return res.status(200).json({ success: true, data: { config: config.aiConfig } });
 };
 
 export const updateAiConfig = async (req, res) => {
   try {
     const updates = req.body;
-    aiConfig = {
-      ...aiConfig,
+    const fullConfig = await fetchPlatformSettings();
+    fullConfig.aiConfig = {
+      ...fullConfig.aiConfig,
       ...updates,
-      features: { ...aiConfig.features, ...(updates.features || {}) },
+      features: { ...fullConfig.aiConfig.features, ...(updates.features || {}) },
     };
 
-    await auditLog(req.user, 'AI_CONFIG_UPDATE', 'AiConfig', {
-      provider: aiConfig.provider,
-      model: aiConfig.model,
-      features: aiConfig.features,
-    });
+    await savePlatformSettings(fullConfig, req, 'AI_CONFIG_UPDATE');
 
     return res.status(200).json({
       success: true,
       message: 'AI engine configuration successfully saved.',
-      data: { config: aiConfig },
+      data: { config: fullConfig.aiConfig },
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to update AI config.' });
@@ -533,75 +576,9 @@ export const updateAiConfig = async (req, res) => {
 };
 
 // ─── 6. Quantum Backend Management ────────────────────────────────────────────
-let quantumBackends = [
-  {
-    id: 'qiskit_aer',
-    label: 'Qiskit Aer',
-    framework: 'qiskit',
-    version: '1.2.0',
-    status: 'ONLINE',
-    availabilityPct: 99.9,
-    avgExecutionTimeMs: 24,
-    errorRatePct: 0.4,
-    maxQubits: 32,
-    maxShots: 100000,
-    isDefault: true,
-    enabled: true,
-    color: 'indigo',
-    description: 'Local high-performance C++ simulator via Qiskit Aer',
-  },
-  {
-    id: 'pennylane',
-    label: 'PennyLane',
-    framework: 'pennylane',
-    version: '0.38.0',
-    status: 'ONLINE',
-    availabilityPct: 99.8,
-    avgExecutionTimeMs: 42,
-    errorRatePct: 0.6,
-    maxQubits: 28,
-    maxShots: 50000,
-    isDefault: false,
-    enabled: true,
-    color: 'violet',
-    description: 'Differentiable quantum simulation for variational algorithms (VQE/QML)',
-  },
-  {
-    id: 'cirq',
-    label: 'Cirq',
-    framework: 'cirq',
-    version: '1.4.1',
-    status: 'ONLINE',
-    availabilityPct: 99.7,
-    avgExecutionTimeMs: 36,
-    errorRatePct: 0.8,
-    maxQubits: 26,
-    maxShots: 50000,
-    isDefault: false,
-    enabled: true,
-    color: 'cyan',
-    description: "Google's framework for near-term Noisy Intermediate-Scale Quantum (NISQ) circuits",
-  },
-  {
-    id: 'qbraid',
-    label: 'qBraid',
-    framework: 'qbraid',
-    version: '0.9.2',
-    status: 'ONLINE',
-    availabilityPct: 99.5,
-    avgExecutionTimeMs: 84,
-    errorRatePct: 1.2,
-    maxQubits: 64,
-    maxShots: 10000,
-    isDefault: false,
-    enabled: true,
-    color: 'emerald',
-    description: 'Unified multi-cloud quantum abstraction layer and device routing',
-  },
-];
-
 export const getQuantumBackends = async (req, res) => {
-  return res.status(200).json({ success: true, data: { backends: quantumBackends } });
+  const fullConfig = await fetchPlatformSettings();
+  return res.status(200).json({ success: true, data: { backends: fullConfig.quantumBackends } });
 };
 
 export const updateQuantumBackend = async (req, res) => {
@@ -609,7 +586,10 @@ export const updateQuantumBackend = async (req, res) => {
     const { id } = req.params;
     const { enabled, isDefault, maxShots, maxQubits } = req.body;
 
-    const b = quantumBackends.find(item => item.id === id);
+    const fullConfig = await fetchPlatformSettings();
+    let backends = fullConfig.quantumBackends;
+    
+    const b = backends.find(item => item.id === id);
     if (!b) return res.status(404).json({ success: false, error: 'Backend not found.' });
 
     if (typeof enabled === 'boolean') b.enabled = enabled;
@@ -617,20 +597,16 @@ export const updateQuantumBackend = async (req, res) => {
     if (maxQubits) b.maxQubits = Number(maxQubits);
 
     if (isDefault) {
-      quantumBackends.forEach(item => { item.isDefault = (item.id === id); });
+      backends.forEach(item => { item.isDefault = (item.id === id); });
     }
 
-    await auditLog(req.user, 'BACKEND_UPDATE', `Backend:${id}`, {
-      backend: id,
-      enabled: b.enabled,
-      isDefault: b.isDefault,
-      maxShots: b.maxShots,
-    });
+    fullConfig.quantumBackends = backends;
+    await savePlatformSettings(fullConfig, req, 'BACKEND_UPDATE');
 
     return res.status(200).json({
       success: true,
       message: `Backend ${b.label} updated successfully.`,
-      data: { backend: b, backends: quantumBackends },
+      data: { backend: b, backends: fullConfig.quantumBackends },
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to update backend.' });
@@ -639,8 +615,8 @@ export const updateQuantumBackend = async (req, res) => {
 
 export const testQuantumBackend = async (req, res) => {
   try {
-    const { id } = req.params;
-    const b = quantumBackends.find(item => item.id === id);
+    const fullConfig = await fetchPlatformSettings();
+    const b = fullConfig.quantumBackends.find(item => item.id === id);
     if (!b) return res.status(404).json({ success: false, error: 'Backend not found.' });
 
     const start = Date.now();
@@ -770,54 +746,34 @@ export const getAuditLogs = async (req, res) => {
 };
 
 // ─── 9. Platform Settings ─────────────────────────────────────────────────────
-let platformSettings = {
-  general: {
-    platformName: 'QubitMind Quantum',
-    tagline: 'Interactive Quantum Computing Learning Platform',
-    supportEmail: 'support@quantum.platform',
-    contactUrl: 'https://quantum.platform/support',
-    maintenanceMode: false,
-  },
-  learning: {
-    defaultLessonXp: 50,
-    challengePassXp: 150,
-    quizPassingThresholdPct: 75,
-    enableAutoCertificates: true,
-  },
-  security: {
-    enforceEmailVerification: true,
-    sessionDurationHours: 72,
-    passwordMinLength: 8,
-    enableGoogleAuth: false,
-  },
-  notifications: {
-    globalAnnouncement: 'Welcome to the updated QubitMind Quantum Learning Platform! Explore our new multi-backend simulation tools.',
-    showAnnouncementBanner: true,
-    defaultAppearance: 'dark',
-  },
-};
-
 export const getPlatformSettings = async (req, res) => {
-  return res.status(200).json({ success: true, data: { settings: platformSettings } });
+  try {
+    const fullConfig = await fetchPlatformSettings();
+    return res.status(200).json({ success: true, data: { settings: fullConfig.platformSettings } });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch platform settings.' });
+  }
 };
 
 export const updatePlatformSettings = async (req, res) => {
   try {
     const updates = req.body;
-    platformSettings = {
-      ...platformSettings,
-      general: { ...platformSettings.general, ...(updates.general || {}) },
-      learning: { ...platformSettings.learning, ...(updates.learning || {}) },
-      security: { ...platformSettings.security, ...(updates.security || {}) },
-      notifications: { ...platformSettings.notifications, ...(updates.notifications || {}) },
+    const fullConfig = await fetchPlatformSettings();
+    
+    fullConfig.platformSettings = {
+      ...fullConfig.platformSettings,
+      general: { ...fullConfig.platformSettings.general, ...(updates.general || {}) },
+      learning: { ...fullConfig.platformSettings.learning, ...(updates.learning || {}) },
+      security: { ...fullConfig.platformSettings.security, ...(updates.security || {}) },
+      notifications: { ...fullConfig.platformSettings.notifications, ...(updates.notifications || {}) },
     };
 
-    await auditLog(req.user, 'SETTINGS_UPDATE', 'PlatformSettings', updates);
+    await savePlatformSettings(fullConfig, req, 'SETTINGS_UPDATE');
 
     return res.status(200).json({
       success: true,
       message: 'Platform configuration updated successfully.',
-      data: { settings: platformSettings },
+      data: { settings: fullConfig.platformSettings },
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to update platform settings.' });

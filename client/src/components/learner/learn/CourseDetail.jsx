@@ -7,54 +7,6 @@ import {
   LuClock, LuUsers, LuStar, LuGraduationCap, LuTarget, LuZap,
 } from 'react-icons/lu';
 
-// Curriculum tree for each course (static mock)
-const CURRICULUM = [
-  {
-    id: 'm1', title: 'Module 1: Quantum Fundamentals', completed: true, locked: false, progress: 100,
-    items: [
-      { id: 'l1', type: 'lesson', title: 'What is a Qubit?', duration: '12 min', completed: true },
-      { id: 'l2', type: 'lesson', title: 'Superposition & Bloch Sphere', duration: '18 min', completed: true },
-      { id: 'e1', type: 'experiment', title: 'Lab: Visualize a Qubit State', duration: '20 min', completed: true },
-      { id: 'q1', type: 'quiz', title: 'Module 1 Quiz', duration: '8 min', completed: true },
-    ],
-  },
-  {
-    id: 'm2', title: 'Module 2: Quantum Gates & Circuits', completed: true, locked: false, progress: 100,
-    items: [
-      { id: 'l3', type: 'lesson', title: 'Pauli Gates: X, Y, Z', duration: '15 min', completed: true },
-      { id: 'l4', type: 'lesson', title: 'Hadamard & Phase Gates', duration: '20 min', completed: true },
-      { id: 'l5', type: 'lesson', title: 'CNOT & Entanglement', duration: '22 min', completed: true },
-      { id: 'e2', type: 'experiment', title: 'Lab: Build a Bell State', duration: '25 min', completed: true },
-      { id: 'c1', type: 'challenge', title: 'Challenge: Multi-qubit Circuit', duration: '30 min', completed: true },
-    ],
-  },
-  {
-    id: 'm3', title: "Module 3: Grover's Search Algorithm", completed: false, locked: false, progress: 40,
-    items: [
-      { id: 'l6', type: 'lesson', title: 'Oracle Construction', duration: '20 min', completed: true },
-      { id: 'l7', type: 'lesson', title: 'Amplitude Amplification', duration: '25 min', completed: true },
-      { id: 'l8', type: 'lesson', title: 'Diffusion Operator', duration: '20 min', completed: false },
-      { id: 'e3', type: 'experiment', title: "Lab: Grover on 3 Qubits", duration: '35 min', completed: false },
-      { id: 'q2', type: 'quiz', title: 'Module 3 Quiz', duration: '10 min', completed: false },
-      { id: 'c2', type: 'challenge', title: "Challenge: Optimize Oracle Depth", duration: '45 min', completed: false },
-    ],
-  },
-  {
-    id: 'm4', title: 'Module 4: Quantum Phase Estimation', completed: false, locked: false, progress: 0,
-    items: [
-      { id: 'l9', type: 'lesson', title: 'Phase Kickback Intuition', duration: '18 min', completed: false },
-      { id: 'l10', type: 'lesson', title: 'Controlled Unitary Operations', duration: '22 min', completed: false },
-      { id: 'e4', type: 'experiment', title: 'Lab: QPE Circuit', duration: '40 min', completed: false },
-    ],
-  },
-  {
-    id: 'm5', title: "Module 5: Shor's Algorithm", completed: false, locked: true, progress: 0,
-    items: [
-      { id: 'l11', type: 'lesson', title: 'Period Finding', duration: '25 min', completed: false },
-      { id: 'l12', type: 'lesson', title: 'Modular Exponentiation', duration: '30 min', completed: false },
-    ],
-  },
-];
 
 const TYPE_STYLES = {
   lesson: { icon: LuBookOpen, color: 'text-blue-400', bg: 'bg-blue-500/10', label: 'Lesson' },
@@ -159,14 +111,15 @@ function ModuleSection({ module, onSelectLesson }) {
 export default function CourseDetail({ course, onClose, onSelectLesson }) {
   if (!course) return null;
 
-  const totalItems = CURRICULUM.reduce((s, m) => s + m.items.length, 0);
-  const completedItems = CURRICULUM.reduce((s, m) => s + m.items.filter(i => i.completed).length, 0);
-  const overallPct = Math.round((completedItems / totalItems) * 100);
+  const curriculumData = course.curriculum || [];
+  const totalItems = curriculumData.reduce((s, m) => s + (m.items?.length || 0), 0);
+  const completedItems = curriculumData.reduce((s, m) => s + (m.items || []).filter(i => i.completed).length, 0);
+  const overallPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   // Find next incomplete item
   let nextItem = null;
-  for (const mod of CURRICULUM) {
-    for (const item of mod.items) {
+  for (const mod of curriculumData) {
+    for (const item of (mod.items || [])) {
       if (!item.completed && !mod.locked) { nextItem = item; break; }
     }
     if (nextItem) break;
@@ -246,7 +199,7 @@ export default function CourseDetail({ course, onClose, onSelectLesson }) {
       {/* Curriculum Tree */}
       <div className="space-y-3">
         <h3 className="font-semibold text-base text-[var(--color-text)]">Course Curriculum</h3>
-        {CURRICULUM.map(module => (
+        {curriculumData.map(module => (
           <ModuleSection key={module.id} module={module} onSelectLesson={onSelectLesson} />
         ))}
       </div>

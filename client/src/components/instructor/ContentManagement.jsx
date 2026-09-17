@@ -87,7 +87,22 @@ function ContentRow({ item, onStatusChange, onDelete }) {
 }
 
 export default function ContentManagement() {
-  const [content, setContent] = useState(INITIAL_CONTENT);
+  const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const res = await apiFetch('/instructor/content');
+        if (res?.success) setContent(res.data.items || []);
+      } catch (err) {
+        console.error('Failed to fetch content:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContent();
+  }, []);
   const [filterType, setFilterType] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
   const [search, setSearch] = useState('');
@@ -180,7 +195,12 @@ export default function ContentManagement() {
 
       {/* Content list */}
       <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="py-16 text-center space-y-3">
+            <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-sm text-[var(--color-muted)]">Loading content...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="py-12 text-center space-y-2">
             <LuFolderOpen size={28} className="mx-auto text-[var(--color-muted)]" />
             <p className="text-sm text-[var(--color-muted)]">No content matches your filters</p>

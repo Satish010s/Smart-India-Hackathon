@@ -30,48 +30,7 @@ import {
   LuShield,
 } from 'react-icons/lu';
 
-// ─── Mock data ───────────────────────────────────────────────────────────────
-const MOCK = {
-  user: { name: 'Arjun Sharma', level: 7, xp: 4_250, nextLevelXp: 5_000, streak: 12 },
-  currentCourse: {
-    title: 'Quantum Algorithms Masterclass',
-    module: "Module 3: Grover\u2019s Search",
-    lesson: 'Lesson 5: Diffusion Operator',
-    progress: 62,
-    instructor: 'Dr. Priya Nair',
-  },
-  todaysGoals: [
-    { id: 'g1', type: 'lesson', label: 'Complete Diffusion Operator lesson', done: false, icon: LuBookOpen },
-    { id: 'g2', type: 'challenge', label: 'Solve: Phase Kickback challenge', done: false, icon: LuTrophy },
-    { id: 'g3', type: 'simulation', label: 'Run Bell State experiment', done: true, icon: LuFlaskConical },
-    { id: 'g4', type: 'quiz', label: 'Module 2 knowledge quiz (5 Qs)', done: true, icon: LuBrain },
-  ],
-  stats: {
-    courses: { enrolled: 4, completed: 1 },
-    lessons: { total: 87, completed: 54 },
-    challenges: { attempted: 18, solved: 13 },
-    quizScore: 84,
-    learningHours: 38.5,
-  },
-  recentActivity: [
-    { id: 'a1', type: 'lesson', label: 'Completed: Hadamard Gate & Superposition', time: '2h ago', icon: LuCircleCheckBig, color: 'text-emerald-400' },
-    { id: 'a2', type: 'simulation', label: 'Ran simulation: 3-qubit GHZ state', time: '3h ago', icon: LuFlaskConical, color: 'text-cyan-400' },
-    { id: 'a3', type: 'circuit', label: 'Saved circuit: CNOT Entanglement Demo', time: 'Yesterday', icon: LuSave, color: 'text-violet-400' },
-    { id: 'a4', type: 'ai', label: 'AI explained: Phase estimation theory', time: 'Yesterday', icon: LuBot, color: 'text-amber-400' },
-    { id: 'a5', type: 'lesson', label: 'Completed: Quantum Interference', time: '2d ago', icon: LuCircleCheckBig, color: 'text-emerald-400' },
-  ],
-  recommendation: {
-    title: 'Quantum Phase Estimation',
-    reason: 'Builds on your Fourier Transform knowledge. You struggled with phase concepts — this will strengthen that.',
-    module: 'Module 4 · Lesson 1',
-    difficulty: 'Intermediate',
-    duration: '35 min',
-  },
-};
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function WelcomeCard({ user = MOCK.user, currentCourse = MOCK.currentCourse }) {
+function WelcomeCard({ user = {}, currentCourse = {} }) {
   const xpPct = Math.round((user.xp / user.nextLevelXp) * 100);
 
   return (
@@ -155,7 +114,7 @@ function WelcomeCard({ user = MOCK.user, currentCourse = MOCK.currentCourse }) {
   );
 }
 
-function ContinueLearning({ currentCourse = MOCK.currentCourse }) {
+function ContinueLearning({ currentCourse = {} }) {
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 hover:border-[var(--color-primary)]/40 transition-all group">
       <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
@@ -187,7 +146,7 @@ function ContinueLearning({ currentCourse = MOCK.currentCourse }) {
   );
 }
 
-function TodaysGoals({ goals = MOCK.todaysGoals }) {
+function TodaysGoals({ goals = [] }) {
   const [checked, setChecked] = useState(goals.map(g => g.done));
   const donePct = Math.round((checked.filter(Boolean).length / (checked.length || 1)) * 100);
 
@@ -249,7 +208,7 @@ function TodaysGoals({ goals = MOCK.todaysGoals }) {
   );
 }
 
-function ProgressOverview({ stats = MOCK.stats }) {
+function ProgressOverview({ stats = { courses: {}, lessons: {}, challenges: {} } }) {
   const items = [
     { label: 'Courses', value: `${stats.courses.completed} / ${stats.courses.enrolled} Completed`, pct: Math.round((stats.courses.completed / (stats.courses.enrolled || 1)) * 100), color: 'bg-blue-500', icon: LuBookOpen },
     { label: 'Lessons', value: `${stats.lessons.completed} / ${stats.lessons.total}`, pct: Math.round((stats.lessons.completed / (stats.lessons.total || 1)) * 100), color: 'bg-[var(--color-primary)]', icon: LuGraduationCap },
@@ -289,7 +248,7 @@ function ProgressOverview({ stats = MOCK.stats }) {
   );
 }
 
-function RecentActivity({ activities = MOCK.recentActivity }) {
+function RecentActivity({ activities = [] }) {
   const getActivityIcon = (a) => {
     if (a.icon && typeof a.icon !== 'string') return a.icon;
     if (a.type === 'simulation') return LuFlaskConical;
@@ -335,7 +294,7 @@ function RecentActivity({ activities = MOCK.recentActivity }) {
   );
 }
 
-function AIRecommended({ rec = MOCK.recommendation }) {
+function AIRecommended({ rec = {} }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[var(--color-secondary)]/30 bg-gradient-to-br from-cyan-500/5 via-[var(--color-surface)] to-violet-500/5 p-6 space-y-4">
       <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-cyan-500/10 blur-2xl pointer-events-none" />
@@ -368,19 +327,19 @@ function AIRecommended({ rec = MOCK.recommendation }) {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function LearnerOverview({ user, hubData }) {
   const mergedUser = {
-    name: hubData?.user?.name || user?.name || MOCK.user.name,
-    level: hubData?.level || MOCK.user.level,
-    xp: hubData?.xp || MOCK.user.xp,
-    nextLevelXp: hubData?.nextLevelXp || MOCK.user.nextLevelXp,
-    streak: hubData?.streak || MOCK.user.streak,
+    name: hubData?.user?.name || user?.name || 'Learner',
+    level: hubData?.level || 1,
+    xp: hubData?.xp || 0,
+    nextLevelXp: hubData?.nextLevelXp || 1000,
+    streak: hubData?.streak || 0,
   };
 
-  const currentCourse = hubData?.currentCourse || MOCK.currentCourse;
-  const todaysGoals = hubData?.todayGoals || hubData?.todaysGoals || MOCK.todaysGoals;
-  const stats = hubData?.stats || MOCK.stats;
-  const recentActivity = hubData?.recentActivity || MOCK.recentActivity;
-  const recommendation = hubData?.recommendation || MOCK.recommendation;
-  const quickStats = hubData?.quickStats || { rank: 42, badges: 7, daysActive: 24, xpThisWeek: 850 };
+  const currentCourse = hubData?.currentCourse || { title: 'Welcome to Quantum Platform', module: 'Getting Started', lesson: 'Introduction', progress: 0 };
+  const todaysGoals = hubData?.todayGoals || hubData?.todaysGoals || [];
+  const stats = hubData?.stats || { courses: {}, lessons: {}, challenges: {}, quizScore: 0, learningHours: 0 };
+  const recentActivity = hubData?.recentActivity || [];
+  const recommendation = hubData?.recommendation || { title: 'Start Exploring', reason: 'Check out our courses.', module: 'General', difficulty: 'Beginner', duration: '5 min' };
+  const quickStats = hubData?.quickStats || { rank: 0, badges: 0, daysActive: 0, xpThisWeek: 0 };
 
   return (
     <div className="space-y-6">

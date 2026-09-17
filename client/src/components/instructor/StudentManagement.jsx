@@ -188,8 +188,23 @@ const SAMPLE_STUDENTS = [
 ];
 
 export default function StudentManagement() {
-  const [students] = useState(SAMPLE_STUDENTS);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const res = await apiFetch('/instructor/students');
+        if (res?.success) setStudents(res.data.students || []);
+      } catch (err) {
+        console.error('Failed to fetch students:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudents();
+  }, []);
   const [search, setSearch] = useState('');
   const [filterCourse, setFilterCourse] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
@@ -259,6 +274,12 @@ export default function StudentManagement() {
       </div>
 
       {/* Student Table */}
+      {loading ? (
+        <div className="py-16 text-center space-y-3">
+          <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-[var(--color-muted)]">Loading students...</p>
+        </div>
+      ) : (
       <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
         <table className="w-full text-left text-xs">
           <thead className="border-b border-[var(--color-border)] bg-[var(--color-background)]">
@@ -314,6 +335,7 @@ export default function StudentManagement() {
           <div className="py-12 text-center text-sm text-[var(--color-muted)]">No students match your filters</div>
         )}
       </div>
+      )}
 
       {/* Detail panel */}
       {selected && <StudentDetailPanel student={selected} onClose={() => setSelected(null)} />}
