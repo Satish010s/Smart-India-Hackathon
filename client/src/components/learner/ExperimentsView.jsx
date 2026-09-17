@@ -8,6 +8,7 @@ import {
   LuActivity, LuCpu, LuZap, LuDatabase,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import NewExperimentWizard from './NewExperimentWizard';
 
 const BACKENDS = [
   { id: 'qiskit_aer', label: 'Qiskit Aer', color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' },
@@ -100,9 +101,9 @@ function ExperimentCard({ exp, onOpen, onDelete, onRun }) {
       <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
         <button
           onClick={handleRun}
-          disabled={running || exp.status === 'RUNNING'}
+          disabled={running || exp.status === 'RUNNING' || !exp.circuitCode?.trim()}
           className="p-1.5 rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 transition-colors disabled:opacity-50"
-          title="Run experiment"
+          title={!exp.circuitCode?.trim() ? "Add circuit code to run" : "Run experiment"}
         >
           {running ? <LuLoader size={13} className="animate-spin" /> : <LuPlay size={13} />}
         </button>
@@ -213,7 +214,7 @@ function CreateExperimentModal({ onClose, onCreate }) {
 function ExperimentDetail({ exp: initialExp, onBack, onRefresh }) {
   const [exp, setExp] = useState(initialExp);
   const [tab, setTab] = useState('circuit'); // circuit | params | results | observations
-  const [circuitCode, setCircuitCode] = useState(initialExp.circuitCode || DEFAULT_CIRCUIT_CODE);
+  const [circuitCode, setCircuitCode] = useState(initialExp.circuitCode || '');
   const [backend, setBackend] = useState(initialExp.backend || 'qiskit_aer');
   const [framework, setFramework] = useState(initialExp.framework || 'qiskit');
   const [shots, setShots] = useState((initialExp.parameters?.shots) || 1024);
@@ -283,7 +284,7 @@ function ExperimentDetail({ exp: initialExp, onBack, onRefresh }) {
           <button onClick={handleSaveDraft} disabled={saving} className="px-3 py-2 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center gap-1.5 disabled:opacity-50">
             {saving ? <LuLoader size={13} className="animate-spin" /> : <LuSave size={13} />} Save Draft
           </button>
-          <button onClick={handleRun} disabled={running || exp.status === 'RUNNING'} className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 transition-all disabled:opacity-50 shadow-md shadow-[var(--color-primary)]/20">
+          <button onClick={handleRun} disabled={running || exp.status === 'RUNNING' || !circuitCode?.trim()} className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 transition-all disabled:opacity-50 shadow-md shadow-[var(--color-primary)]/20" title={!circuitCode?.trim() ? "Add circuit code to run" : "Run"}>
             {running ? <LuLoader size={13} className="animate-spin" /> : <LuPlay size={13} />}
             {running ? 'Running...' : 'Run'}
           </button>
@@ -451,7 +452,7 @@ function ExperimentDetail({ exp: initialExp, onBack, onRefresh }) {
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
               <LuActivity size={32} className="text-[var(--color-muted)] mx-auto mb-3" />
               <p className="text-sm text-[var(--color-muted)]">No results yet. Run the experiment to see results here.</p>
-              <button onClick={handleRun} className="mt-4 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold inline-flex items-center gap-2 hover:opacity-90 transition-all">
+              <button onClick={handleRun} disabled={!circuitCode?.trim()} className="mt-4 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold inline-flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
                 <LuPlay size={14} /> Run Experiment
               </button>
             </div>
@@ -529,6 +530,20 @@ export default function ExperimentsView() {
     } catch { setSelected(exp); }
   };
 
+  if (showCreate) {
+    return (
+      <NewExperimentWizard
+        onCancel={() => setShowCreate(false)}
+        onComplete={(exp) => {
+          setShowCreate(false);
+          setExperiments(prev => [exp, ...prev]);
+          setTotal(t => t + 1);
+          setSelected(exp); // Optional: immediately open the saved experiment
+        }}
+      />
+    );
+  }
+
   if (selected) {
     return <ExperimentDetail exp={selected} onBack={() => setSelected(null)} onRefresh={fetchExperiments} />;
   }
@@ -585,12 +600,7 @@ export default function ExperimentsView() {
         </div>
       )}
 
-      {showCreate && (
-        <CreateExperimentModal
-          onClose={() => setShowCreate(false)}
-          onCreate={exp => { setExperiments(prev => [exp, ...prev]); setTotal(t => t + 1); }}
-        />
-      )}
+
     </div>
   );
 }

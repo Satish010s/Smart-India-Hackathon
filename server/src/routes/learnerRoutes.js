@@ -22,6 +22,7 @@ import {
   runExperiment,
 } from '../controllers/experimentController.js';
 import {
+  runStandaloneSimulation,
   listSimulations,
   getSimulation,
   deleteSimulation,
@@ -83,6 +84,7 @@ router.post('/experiments/:id/save-draft', saveDraft);
 router.get('/simulations/backends', getSupportedBackends);
 router.get('/simulations/comparisons', listComparisons);
 router.post('/simulations/compare', compareBackends);
+router.post('/simulations/run', runStandaloneSimulation);
 router.get('/simulations', listSimulations);
 router.get('/simulations/:id', getSimulation);
 router.delete('/simulations/:id', deleteSimulation);
