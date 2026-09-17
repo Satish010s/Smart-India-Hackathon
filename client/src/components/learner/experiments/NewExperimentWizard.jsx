@@ -6,8 +6,7 @@ import {
   LuArrowLeft, LuLoader, LuDatabase, LuSettings2, LuCpu, LuZap, LuCircleCheckBig,
   LuChartBar, LuFileCode
 } from 'react-icons/lu';
-import { apiFetch } from '../../services/api';
-import CircuitPlayground from './playground/CircuitPlayground';
+import { apiFetch } from '../../../services/api';
 
 const BACKENDS = [
   { id: 'qiskit_aer', label: 'Qiskit Aer', color: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/30' },
@@ -250,8 +249,22 @@ export default function NewExperimentWizard({ onCancel, onComplete }) {
                   </div>
                   
                   {builderMode === 'visual' ? (
-                     <div className="border border-[var(--color-border)] rounded-md shadow-sm h-[500px]">
-                        <CircuitPlayground framework={framework} onCodeChange={setCircuitCode} />
+                     <div className="border border-[var(--color-border)] rounded-2xl bg-[var(--color-background)] flex flex-col items-center justify-center gap-4 p-10 text-center" style={{minHeight: '220px'}}>
+                       <div className="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
+                         <LuCpu size={28} className="text-cyan-400" />
+                       </div>
+                       <div>
+                         <p className="font-bold text-sm text-[var(--color-text)]">Use the Quantum Circuit Playground</p>
+                         <p className="text-xs text-[var(--color-muted)] mt-1">Build your circuit visually with 26+ gates, then paste the generated code in the Code Editor tab.</p>
+                       </div>
+                       <a
+                         href="/playground"
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-black text-xs font-bold flex items-center gap-2 transition-colors shadow"
+                       >
+                         <LuZap size={13} /> Open Circuit Playground →
+                       </a>
                      </div>
                   ) : (
                     <div className="rounded-md border border-[var(--color-border)] overflow-hidden shadow-sm">
