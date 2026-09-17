@@ -7,7 +7,7 @@ import {
   LuCode, LuSettings2, LuBrain, LuArrowLeft, LuRefreshCcw, LuDownload,
   LuActivity, LuCpu, LuZap, LuDatabase,
 } from 'react-icons/lu';
-import { apiFetch } from '../../services/api';
+import { apiFetch } from '../../../services/api';
 import NewExperimentWizard from './NewExperimentWizard';
 
 const BACKENDS = [
