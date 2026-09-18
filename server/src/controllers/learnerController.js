@@ -4,43 +4,150 @@ export const getLearnerDashboard = async (req, res) => {
   try {
     const { id, name, email, role } = req.user;
 
-    const profile = await prisma.learnerProfile.findUnique({
-      where: { userId: id }
-    });
+    // ── Parallel queries ─────────────────────────────────────────────────────
+    const [profile, goals, enrollments, simRuns, userBadges] = await Promise.all([
+      prisma.learnerProfile.findUnique({ where: { userId: id } }),
 
-    const goals = await prisma.dailyGoal.findMany({
-      where: { userId: id, date: new Date().toISOString().slice(0, 10) }
-    });
+      prisma.dailyGoal.findMany({
+        where: { userId: id, date: new Date().toISOString().slice(0, 10) },
+        orderBy: { createdAt: 'asc' },
+      }),
 
-    const courses = await prisma.course.findMany({
-      take: 3
-    });
+      prisma.enrollment.findMany({
+        where: { userId: id },
+        include: {
+          course: {
+            select: {
+              id: true, title: true, difficulty: true, totalLessons: true,
+              category: true, description: true,
+              modules: { select: { id: true, title: true, order: true }, orderBy: { order: 'asc' }, take: 1 }
+            }
+          }
+        },
+        orderBy: { updatedAt: 'desc' },
+      }),
+
+      prisma.simulationRun.findMany({
+        where: { userId: id },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { id: true, backend: true, status: true, shots: true, createdAt: true, fidelity: true }
+      }),
+
+      prisma.userBadge.findMany({
+        where: { userId: id },
+        include: { badge: { select: { title: true, icon: true, xp: true } } },
+        orderBy: { earnedAt: 'desc' },
+        take: 5,
+      }),
+    ]);
+
+    // ── Compute stats ─────────────────────────────────────────────────────────
+    const completedEnrollments = enrollments.filter(e => e.status === 'Completed' || e.progress >= 100);
+    const activeEnrollments    = enrollments.filter(e => e.status !== 'Completed' && e.progress < 100);
+
+    // Current course = most recently updated active enrollment
+    const currentEnrollment = activeEnrollments[0] || enrollments[0];
+    const currentCourse = currentEnrollment ? {
+      id:       currentEnrollment.course.id,
+      title:    currentEnrollment.course.title,
+      module:   currentEnrollment.course.modules?.[0]?.title || 'Module 1',
+      lesson:   `Lesson ${Math.ceil((currentEnrollment.progress / 100) * (currentEnrollment.course.totalLessons || 10)) + 1}`,
+      progress: Math.round(currentEnrollment.progress || 0),
+      difficulty: currentEnrollment.course.difficulty,
+    } : { title: 'No active course', module: '—', lesson: '—', progress: 0 };
+
+    // Total lessons (approx 10 per course)
+    const totalLessons     = enrollments.reduce((s, e) => s + (e.course.totalLessons || 10), 0);
+    const completedLessons = enrollments.reduce((s, e) => s + Math.floor((e.progress / 100) * (e.course.totalLessons || 10)), 0);
+
+    // XP thresholds
+    const level      = profile?.level || 1;
+    const xp         = profile?.xp || 0;
+    const nextLevelXp = level * 500;
+
+    // Recent activity — merge sim runs + completed courses
+    const recentActivity = [
+      ...simRuns.map(r => ({
+        id: r.id,
+        type: 'simulation',
+        label: `Ran simulation on ${r.backend} (${r.shots} shots)`,
+        meta: r.fidelity ? `Fidelity: ${(r.fidelity * 100).toFixed(1)}%` : r.status,
+        time: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        timestamp: r.createdAt,
+      })),
+      ...completedEnrollments.slice(0, 3).map(e => ({
+        id: e.id,
+        type: 'course',
+        label: `Completed: ${e.course.title}`,
+        meta: '100% progress',
+        time: new Date(e.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        timestamp: e.updatedAt,
+      })),
+    ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 8);
+
+    // AI recommendation — least-progressed active enrolled course
+    const recEnrollment = [...activeEnrollments].sort((a, b) => a.progress - b.progress)[1] || activeEnrollments[0];
+    const recommendation = recEnrollment ? {
+      courseId:   recEnrollment.course.id,
+      title:      recEnrollment.course.title,
+      reason:     `You're ${Math.round(recEnrollment.progress)}% through this course — keep the momentum going!`,
+      module:     recEnrollment.course.modules?.[0]?.title || 'Module 1',
+      difficulty: recEnrollment.course.difficulty || 'Beginner',
+      duration:   '20–35 min',
+      category:   recEnrollment.course.category,
+    } : {
+      title: 'Start Your First Course',
+      reason: 'Browse the course catalog and enroll to begin your quantum journey.',
+      module: 'Getting Started',
+      difficulty: 'Beginner',
+      duration: '5 min',
+    };
+
+    // If no daily goals exist, generate smart defaults
+    const todayGoals = goals.length > 0 ? goals : [
+      { id: 'g1', type: 'lesson', label: 'Complete one lesson', done: false },
+      { id: 'g2', type: 'simulation', label: 'Run a quantum simulation', done: simRuns.some(r => new Date(r.createdAt).toDateString() === new Date().toDateString()) },
+      { id: 'g3', type: 'challenge', label: 'Attempt one challenge', done: false },
+    ];
 
     return res.status(200).json({
       success: true,
       message: 'Learner dashboard data fetched successfully.',
       data: {
         user: { id, name, email, role },
-        level: profile?.level || 1,
-        xp: profile?.xp || 0,
+        level,
+        xp,
+        nextLevelXp,
         streak: profile?.streak || 0,
-        todayGoals: goals,
+        longestStreak: profile?.longestStreak || 0,
+        currentCourse,
+        todayGoals,
         stats: {
-          courses: { enrolled: 0, completed: 0 },
-          lessons: { total: 0, completed: 0 },
-          challenges: { attempted: 0, solved: 0 },
-          quizScore: 0,
-          learningHours: profile?.learningHours || 0
+          courses: {
+            enrolled:  enrollments.length,
+            completed: completedEnrollments.length,
+            active:    activeEnrollments.length,
+          },
+          lessons: {
+            total:     totalLessons,
+            completed: completedLessons,
+          },
+          challenges:   { attempted: 0, solved: 0 },
+          simulations:  { total: simRuns.length, thisWeek: simRuns.filter(r => Date.now() - new Date(r.createdAt) < 7 * 86400000).length },
+          quizScore:    0,
+          learningHours: profile?.learningHours || 0,
         },
-        recentActivity: [],
-        recommendation: {
-          title: courses[0]?.title || 'Course',
-          reason: 'Recommended based on your activity.',
-          module: 'Module 1',
-          difficulty: 'Beginner',
-          duration: '35 min',
+        recentActivity,
+        recommendation,
+        quickStats: {
+          rank:       profile?.rank || 0,
+          badges:     userBadges.length,
+          badgeList:  userBadges.map(ub => ({ title: ub.badge.title, icon: ub.badge.icon, xp: ub.badge.xp })),
+          daysActive: profile?.streak || 0,
+          xpThisWeek: 0,
+          simulations: simRuns.length,
         },
-        quickStats: { rank: profile?.rank || 0, badges: 0, daysActive: profile?.streak || 0, xpThisWeek: 0 }
       },
     });
   } catch (error) {
@@ -48,6 +155,7 @@ export const getLearnerDashboard = async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to fetch dashboard data' });
   }
 };
+
 
 export const getLearnerCourses = async (req, res) => {
   try {
