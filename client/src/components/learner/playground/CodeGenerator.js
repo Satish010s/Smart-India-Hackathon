@@ -3,13 +3,17 @@
  */
 export function analyzeCircuit(circuit, numQubits) {
   const issues = [];
-  const measurementIndices = new Array(numQubits).fill(-1);
+  if (!circuit || !Array.isArray(circuit) || circuit.length === 0) return issues;
+
+  const actualQubits = Math.min(numQubits || 0, circuit.length);
+  const measurementIndices = new Array(actualQubits).fill(-1);
   const numSteps = circuit[0]?.length || 0;
 
   for (let s = 0; s < numSteps; s++) {
     const stepGates = [];
-    for (let q = 0; q < numQubits; q++) {
-      if (circuit[q][s]) stepGates.push({ qubit: q, gate: circuit[q][s] });
+    for (let q = 0; q < actualQubits; q++) {
+      const g = circuit[q]?.[s];
+      if (g) stepGates.push({ qubit: q, gate: g });
     }
 
     for (const { qubit, gate } of stepGates) {
@@ -40,10 +44,10 @@ export function analyzeCircuit(circuit, numQubits) {
     }
   }
 
-  for (let q = 0; q < numQubits; q++) {
+  for (let q = 0; q < actualQubits; q++) {
     let lastGate = null, lastStep = -1;
     for (let s = 0; s < numSteps; s++) {
-      const gate = circuit[q][s];
+      const gate = circuit[q]?.[s];
       if (gate && !['CX','CY','CZ','CH','CCX','CSWAP','CP','M','RESET','SWAP'].includes(gate.type)) {
         if (lastGate && lastGate.type === gate.type && s === lastStep + 1) {
           issues.push({ type: 'info', message: `Two consecutive ${gate.type} gates on qubit ${q} detected.`, suggestion: 'These may cancel each other out. Check if intentional.' });
@@ -62,10 +66,11 @@ export function analyzeCircuit(circuit, numQubits) {
  * generateCode — translates circuit grid to a quantum framework script
  */
 export function generateCode(circuit, numQubits, framework, shots = 1024) {
-  if (!circuit || !circuit.length) return '';
+  if (!circuit || !Array.isArray(circuit) || circuit.length === 0) return '';
   const hasGates = circuit.some(row => row?.some(g => g !== null && g !== undefined));
   if (!hasGates) return '';
 
+  const actualQubits = Math.min(numQubits || 0, circuit.length);
   const numSteps = circuit[0]?.length || 0;
 
   function fmtAngle(rad) {
@@ -89,11 +94,11 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
 
   // ─── QISKIT ───────────────────────────────────────────────────────────────
   if (framework === 'qiskit') {
-    let code = `from qiskit import QuantumCircuit\nfrom qiskit_aer import AerSimulator\nimport math\n\n# Initialize circuit\nqc = QuantumCircuit(${numQubits}, ${numQubits})\n\n# Circuit construction\n`;
+    let code = `from qiskit import QuantumCircuit\nfrom qiskit_aer import AerSimulator\nimport math\n\n# Initialize circuit\nqc = QuantumCircuit(${actualQubits}, ${actualQubits})\n\n# Circuit construction\n`;
     let measured = false;
     for (let s = 0; s < numSteps; s++) {
-      for (let q = 0; q < numQubits; q++) {
-        const g = circuit[q][s];
+      for (let q = 0; q < actualQubits; q++) {
+        const g = circuit[q]?.[s];
         if (!g) continue;
         switch (g.type) {
           case 'H':    code += `qc.h(${q})\n`; break;
@@ -130,11 +135,11 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
 
   // ─── CIRQ ─────────────────────────────────────────────────────────────────
   if (framework === 'cirq') {
-    let code = `import cirq\nimport math\n\n# Initialize qubits\nqubits = [cirq.LineQubit(i) for i in range(${numQubits})]\ncircuit = cirq.Circuit()\n\n# Circuit construction\n`;
+    let code = `import cirq\nimport math\n\n# Initialize qubits\nqubits = [cirq.LineQubit(i) for i in range(${actualQubits})]\ncircuit = cirq.Circuit()\n\n# Circuit construction\n`;
     let measuredQubits = [];
     for (let s = 0; s < numSteps; s++) {
-      for (let q = 0; q < numQubits; q++) {
-        const g = circuit[q][s];
+      for (let q = 0; q < actualQubits; q++) {
+        const g = circuit[q]?.[s];
         if (!g) continue;
         switch (g.type) {
           case 'H':    code += `circuit.append(cirq.H(qubits[${q}]))\n`; break;
@@ -173,12 +178,12 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
 
   // ─── PENNYLANE ────────────────────────────────────────────────────────────
   if (framework === 'pennylane') {
-    let code = `import pennylane as qml\nimport math\n\ndev = qml.device('default.qubit', wires=${numQubits}, shots=${shots})\n\n@qml.qnode(dev)\ndef circuit():\n`;
+    let code = `import pennylane as qml\nimport math\n\ndev = qml.device('default.qubit', wires=${actualQubits}, shots=${shots})\n\n@qml.qnode(dev)\ndef circuit():\n`;
     let measuredQubits = [];
     let hasOps = false;
     for (let s = 0; s < numSteps; s++) {
-      for (let q = 0; q < numQubits; q++) {
-        const g = circuit[q][s];
+      for (let q = 0; q < actualQubits; q++) {
+        const g = circuit[q]?.[s];
         if (!g) continue;
         hasOps = true;
         switch (g.type) {
@@ -219,8 +224,8 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
   if (framework === 'braket') {
     let code = `from braket.circuits import Circuit\nfrom braket.devices import LocalSimulator\nimport math\n\ncircuit = Circuit()\n\n# Circuit construction\n`;
     for (let s = 0; s < numSteps; s++) {
-      for (let q = 0; q < numQubits; q++) {
-        const g = circuit[q][s];
+      for (let q = 0; q < actualQubits; q++) {
+        const g = circuit[q]?.[s];
         if (!g) continue;
         switch (g.type) {
           case 'H':    code += `circuit.h(${q})\n`; break;
@@ -252,10 +257,10 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
 
   // ─── OPENQASM ─────────────────────────────────────────────────────────────
   if (framework === 'openqasm') {
-    let code = `OPENQASM 2.0;\ninclude "qelib1.inc";\n\nqreg q[${numQubits}];\ncreg c[${numQubits}];\n\n`;
+    let code = `OPENQASM 2.0;\ninclude "qelib1.inc";\n\nqreg q[${actualQubits}];\ncreg c[${actualQubits}];\n\n`;
     for (let s = 0; s < numSteps; s++) {
-      for (let q = 0; q < numQubits; q++) {
-        const g = circuit[q][s];
+      for (let q = 0; q < actualQubits; q++) {
+        const g = circuit[q]?.[s];
         if (!g) continue;
         const a = fmtAngle(g.angle);
         switch (g.type) {
