@@ -206,10 +206,13 @@ export const updateCourse = async (req, res) => {
               await prisma.lesson.create({
                 data: {
                   title: lesson.title,
-                  type: lesson.type,
+                  type: lesson.type || 'lesson',
+                  contentType: (lesson.type === 'video lecture') ? 'video' : 'lesson',
                   duration: lesson.duration || '10 min',
                   status: lesson.status || 'Draft',
                   order: lesIndex + 1,
+                  videoUrl: lesson.videoUrl || null,
+                  videoThumbnail: lesson.videoThumbnail || null,
                   moduleId: moduleId
                 }
               });
@@ -218,9 +221,13 @@ export const updateCourse = async (req, res) => {
                 where: { id: lesson.id },
                 data: {
                   title: lesson.title,
+                  type: lesson.type || undefined,
+                  contentType: lesson.type ? (lesson.type === 'video lecture' ? 'video' : 'lesson') : undefined,
                   duration: lesson.duration,
                   status: lesson.status,
-                  order: lesIndex + 1
+                  order: lesIndex + 1,
+                  videoUrl: lesson.videoUrl !== undefined ? lesson.videoUrl : undefined,
+                  videoThumbnail: lesson.videoThumbnail !== undefined ? lesson.videoThumbnail : undefined,
                 }
               });
             }

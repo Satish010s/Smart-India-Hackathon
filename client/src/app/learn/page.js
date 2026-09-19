@@ -218,7 +218,7 @@ function LearningPathCard({ path }) {
   );
 }
 
-function CoursesGrid({ courses, onSelect, filter }) {
+function CoursesGrid({ courses, onSelect, filter, loading }) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
@@ -260,7 +260,12 @@ function CoursesGrid({ courses, onSelect, filter }) {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="py-16 text-center space-y-3">
+          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-[var(--color-muted)]">Loading courses...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-[var(--color-muted)]">
           <LuSearch size={32} className="mx-auto mb-3 opacity-40" />
           <p>No courses found matching your criteria.</p>
@@ -501,9 +506,8 @@ export default function LearnPage() {
                   </div>
                 )}
 
-                {/* Courses tab */}
                 {activeTab === 'courses' && (
-                  <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="all" />
+                  <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="all" loading={loading} />
                 )}
 
                 {/* My Courses tab */}
@@ -512,7 +516,7 @@ export default function LearnPage() {
                     <div className="text-sm text-[var(--color-muted)]">
                       You are enrolled in <span className="text-[var(--color-text)] font-semibold">{courses.filter(c => c.enrolled).length} courses</span>.
                     </div>
-                    <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="my" />
+                    <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="my" loading={loading} />
                   </div>
                 )}
 

@@ -131,6 +131,9 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
 
 export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) {
   const [lessonTitle, setLessonTitle] = useState('Untitled Lesson');
+  const [lessonType, setLessonType] = useState('lesson');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoThumbnail, setVideoThumbnail] = useState('');
   const [blocks, setBlocks] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
@@ -147,6 +150,9 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
           if (res?.success && res.data?.lesson) {
             const l = res.data.lesson;
             setLessonTitle(l.title || '');
+            setLessonType(l.type || 'lesson');
+            setVideoUrl(l.videoUrl || '');
+            setVideoThumbnail(l.videoThumbnail || '');
             if (l.blocks && Array.isArray(l.blocks)) setBlocks(l.blocks);
             setStatus(l.status || 'Draft');
           }
@@ -173,7 +179,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const payload = { title: lessonTitle, status, blocks, moduleId, courseId };
+      const payload = { title: lessonTitle, status, blocks, moduleId, courseId, type: lessonType, videoUrl, videoThumbnail };
       if (lessonId) {
         await apiFetch(`/instructor/lessons/${lessonId}`, { method: 'PUT', body: JSON.stringify(payload) });
       } else if (moduleId) {
@@ -245,6 +251,66 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
             <span className="text-xs font-mono text-[var(--color-muted)]">Learner Preview — {lessonTitle}</span>
           </div>
         )}
+
+        {/* Video Lecture Section */}
+        {lessonType === 'video lecture' && (() => {
+          let ytId = null;
+          if (videoUrl) {
+            const ytMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            if (ytMatch) {
+              ytId = ytMatch[1];
+            } else if (videoUrl.includes('youtube.com/embed/')) {
+              ytId = videoUrl.split('youtube.com/embed/')[1].split('?')[0];
+            }
+          }
+          return (
+            <div className="mb-8">
+              {previewMode ? (
+                <div className="aspect-video w-full rounded-2xl overflow-hidden border border-[var(--color-border)] mb-6 bg-black">
+                  {ytId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${ytId}`}
+                      title={lessonTitle}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                  ) : videoUrl ? (
+                    <video controls poster={videoThumbnail || undefined} className="w-full h-full" src={videoUrl}>
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center w-full h-full text-[var(--color-muted)]">
+                      <LuVideo size={32} className="opacity-50 mb-2" />
+                      <span className="text-sm">No video URL provided</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+              <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-3 mb-6">
+                <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 mb-2">
+                  <LuPlay size={14} /> Video Lecture Settings
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Video URL (YouTube or MP4)</label>
+                  <input
+                    type="text" value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
+                    placeholder="e.g. https://youtube.com/watch?v=..."
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Thumbnail URL (Optional)</label>
+                  <input
+                    type="text" value={videoThumbnail} onChange={e => setVideoThumbnail(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )})()}
 
         {blocks.map((block, i) => (
           <ContentBlock
