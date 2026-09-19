@@ -103,12 +103,19 @@ function VideoPlayer({ videoUrl, videoThumbnail, title }) {
   }
 
   // Detect YouTube
-  const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  let ytId = null;
+  const ytMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
   if (ytMatch) {
+    ytId = ytMatch[1];
+  } else if (videoUrl.includes('youtube.com/embed/')) {
+    ytId = videoUrl.split('youtube.com/embed/')[1].split('?')[0];
+  }
+
+  if (ytId) {
     return (
       <div className="aspect-video w-full rounded-2xl overflow-hidden border border-[var(--color-border)]">
         <iframe
-          src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+          src={`https://www.youtube.com/embed/${ytId}`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
