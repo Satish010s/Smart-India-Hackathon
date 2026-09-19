@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
 import RoleGuard from '../../components/auth/RoleGuard';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -26,6 +26,7 @@ const TAB_CONFIG = {
 
 function LearnerDashboardInner() {
   const { user } = useAuthStore();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tab = searchParams?.get('tab') || 'overview';
 
@@ -33,6 +34,20 @@ function LearnerDashboardInner() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Auto-redirect Instructors and Admins to their designated portals if they land on /dashboard
+  useEffect(() => {
+    if (!user) return;
+    const role = (user.role || '').toUpperCase();
+    const isPreview = searchParams?.get('preview') === 'true';
+    if (!isPreview) {
+      if (role === 'ADMIN') {
+        router.replace('/admin');
+      } else if (role === 'INSTRUCTOR') {
+        router.replace('/instructor');
+      }
+    }
+  }, [user, router, searchParams]);
 
   const tabConfig = TAB_CONFIG[tab] || TAB_CONFIG.overview;
   const isOverview = tab === 'overview' || !TAB_CONFIG[tab];

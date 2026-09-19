@@ -11,11 +11,14 @@ import { apiFetch } from '../services/api';
  * - Tokens are kept exclusively inside HttpOnly Secure SameSite cookies managed by the browser.
  * - Store manages only: user profile, role, authentication status, loading flag, and error feedback.
  */
+let checkAuthPromise = null;
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   role: null,
   isAuthenticated: false,
-  isLoading: true, // Initial loading true while verifying session on bootstrap
+  isCheckingAuth: true, // Initial loading true while verifying session on bootstrap
+  isLoading: false,     // True only during active form submissions (login/signup/reset)
   error: null,
   cooldownRemaining: 0,
 
@@ -40,28 +43,39 @@ export const useAuthStore = create((set, get) => ({
   },
 
   /**
-   * Verify session on app mount by querying /api/auth/me
+   * Verify session on app mount by querying /api/auth/me (deduplicated)
    */
   checkAuth: async () => {
-    try {
-      set({ isLoading: true, error: null });
-      const res = await apiFetch('/auth/me');
-      if (res?.success && res.data?.user) {
-        set({
-          user: res.data.user,
-          role: res.data.user.role,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-        return res.data.user;
-      }
-      set({ user: null, role: null, isAuthenticated: false, isLoading: false });
-      return null;
-    } catch (err) {
-      // 401 simply means no active session cookie
-      set({ user: null, role: null, isAuthenticated: false, isLoading: false });
-      return null;
+    if (checkAuthPromise) {
+      return checkAuthPromise;
     }
+
+    checkAuthPromise = (async () => {
+      try {
+        set({ isCheckingAuth: true, error: null });
+        const res = await apiFetch('/auth/me');
+        if (res?.success && res.data?.user) {
+          set({
+            user: res.data.user,
+            role: res.data.user.role,
+            isAuthenticated: true,
+            isCheckingAuth: false,
+            isLoading: false,
+          });
+          return res.data.user;
+        }
+        set({ user: null, role: null, isAuthenticated: false, isCheckingAuth: false, isLoading: false });
+        return null;
+      } catch (err) {
+        // 401 simply means no active session cookie
+        set({ user: null, role: null, isAuthenticated: false, isCheckingAuth: false, isLoading: false });
+        return null;
+      } finally {
+        checkAuthPromise = null;
+      }
+    })();
+
+    return checkAuthPromise;
   },
 
   /**
@@ -80,6 +94,7 @@ export const useAuthStore = create((set, get) => ({
           user: res.data.user,
           role: res.data.user.role,
           isAuthenticated: true,
+          isCheckingAuth: false,
           isLoading: false,
           error: null,
         });

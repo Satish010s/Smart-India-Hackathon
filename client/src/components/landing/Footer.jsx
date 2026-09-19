@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { LuCpu, LuArrowRight } from "react-icons/lu";
+import QubitMindLogo from "../common/QubitMindLogo";
+import { LuArrowRight } from "react-icons/lu";
 
 export default function Footer() {
   return (
@@ -36,13 +37,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
           
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white">
-                <LuCpu size={20} />
-              </div>
-              <span className="font-heading font-bold text-xl text-[var(--color-text)]">
-                QubitMind
-              </span>
+            <div className="mb-6">
+              <QubitMindLogo iconSize={36} subtitle="Quantum Learning Lab" />
             </div>
             <p className="text-sm text-[var(--color-muted)]">
               Built for the next generation of quantum learners.

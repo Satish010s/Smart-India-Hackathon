@@ -295,3 +295,137 @@ export function generateCode(circuit, numQubits, framework, shots = 1024) {
 
   return '# Unsupported framework';
 }
+
+/**
+ * parseQasmToCircuit — parses OpenQASM string into graphical circuit grid
+ */
+export function parseQasmToCircuit(qasmText) {
+  if (!qasmText || typeof qasmText !== 'string') return null;
+
+  const lines = qasmText.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//') && !l.startsWith('OPENQASM') && !l.startsWith('include'));
+
+  let numQubits = 3;
+  const gatesList = [];
+
+  for (const l of lines) {
+    const qregMatch = l.match(/qreg\s+([a-zA-Z0-9_]+)\[(\d+)\];/);
+    if (qregMatch) {
+      numQubits = Math.max(2, Math.min(8, parseInt(qregMatch[2], 10)));
+    }
+  }
+
+  const parseQubitIndex = (str) => {
+    const m = str.match(/\[(\d+)\]/);
+    return m ? parseInt(m[1], 10) : 0;
+  };
+
+  const parseAngle = (str) => {
+    const m = str.match(/\(([^)]+)\)/);
+    if (!m) return Math.PI / 2;
+    const raw = m[1].replace(/math\./g, '').trim();
+    if (raw === 'pi' || raw === 'math.pi') return Math.PI;
+    if (raw === 'pi/2' || raw === 'math.pi/2') return Math.PI / 2;
+    if (raw === 'pi/4' || raw === 'math.pi/4') return Math.PI / 4;
+    if (raw === '3*pi/4' || raw === '3*math.pi/4') return 3 * Math.PI / 4;
+    if (raw === '2*pi' || raw === '2*math.pi') return 2 * Math.PI;
+    const num = parseFloat(raw);
+    return isNaN(num) ? Math.PI / 2 : num;
+  };
+
+  for (const l of lines) {
+    if (l.startsWith('qreg') || l.startsWith('creg')) continue;
+    const cleanLine = l.replace(/;$/, '').trim();
+
+    if (cleanLine.startsWith('h ')) {
+      gatesList.push({ type: 'H', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('x ')) {
+      gatesList.push({ type: 'X', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('y ')) {
+      gatesList.push({ type: 'Y', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('z ')) {
+      gatesList.push({ type: 'Z', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('s ')) {
+      gatesList.push({ type: 'S', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('sdg ')) {
+      gatesList.push({ type: 'SDG', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('t ')) {
+      gatesList.push({ type: 'T', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('tdg ')) {
+      gatesList.push({ type: 'TDG', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('sx ')) {
+      gatesList.push({ type: 'SX', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('rx')) {
+      gatesList.push({ type: 'RX', target: parseQubitIndex(cleanLine), angle: parseAngle(cleanLine) });
+    } else if (cleanLine.startsWith('ry')) {
+      gatesList.push({ type: 'RY', target: parseQubitIndex(cleanLine), angle: parseAngle(cleanLine) });
+    } else if (cleanLine.startsWith('rz')) {
+      gatesList.push({ type: 'RZ', target: parseQubitIndex(cleanLine), angle: parseAngle(cleanLine) });
+    } else if (cleanLine.startsWith('p(')) {
+      gatesList.push({ type: 'P', target: parseQubitIndex(cleanLine), angle: parseAngle(cleanLine) });
+    } else if (cleanLine.startsWith('cx ')) {
+      const parts = cleanLine.substring(3).split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'CX', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]) });
+      }
+    } else if (cleanLine.startsWith('cy ')) {
+      const parts = cleanLine.substring(3).split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'CY', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]) });
+      }
+    } else if (cleanLine.startsWith('cz ')) {
+      const parts = cleanLine.substring(3).split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'CZ', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]) });
+      }
+    } else if (cleanLine.startsWith('ch ')) {
+      const parts = cleanLine.substring(3).split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'CH', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]) });
+      }
+    } else if (cleanLine.startsWith('cp')) {
+      const angle = parseAngle(cleanLine);
+      const rest = cleanLine.replace(/cp\([^)]*\)/, '').trim();
+      const parts = rest.split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'CP', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]), angle });
+      }
+    } else if (cleanLine.startsWith('swap ')) {
+      const parts = cleanLine.substring(5).split(',');
+      if (parts.length >= 2) {
+        gatesList.push({ type: 'SWAP', target: parseQubitIndex(parts[0]), target2: parseQubitIndex(parts[1]) });
+      }
+    } else if (cleanLine.startsWith('ccx ')) {
+      const parts = cleanLine.substring(4).split(',');
+      if (parts.length >= 3) {
+        gatesList.push({ type: 'CCX', target: parseQubitIndex(parts[2]), control: parseQubitIndex(parts[0]), control2: parseQubitIndex(parts[1]) });
+      }
+    } else if (cleanLine.startsWith('cswap ')) {
+      const parts = cleanLine.substring(6).split(',');
+      if (parts.length >= 3) {
+        gatesList.push({ type: 'CSWAP', target: parseQubitIndex(parts[1]), control: parseQubitIndex(parts[0]), target2: parseQubitIndex(parts[2]) });
+      }
+    } else if (cleanLine.startsWith('measure ')) {
+      gatesList.push({ type: 'M', target: parseQubitIndex(cleanLine) });
+    } else if (cleanLine.startsWith('reset ')) {
+      gatesList.push({ type: 'RESET', target: parseQubitIndex(cleanLine) });
+    }
+  }
+
+  const numSteps = Math.max(8, Math.min(16, gatesList.length || 8));
+  const newCircuit = Array(numQubits).fill(null).map(() => Array(numSteps).fill(null));
+
+  let currentStep = 0;
+  for (const g of gatesList) {
+    if (currentStep >= numSteps) break;
+    const tgt = Math.min(numQubits - 1, Math.max(0, g.target));
+    newCircuit[tgt][currentStep] = g;
+    currentStep++;
+  }
+
+  return {
+    numQubits,
+    numSteps,
+    circuit: newCircuit,
+  };
+}
+

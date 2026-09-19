@@ -23,6 +23,7 @@ import {
   LuCircuitBoard,
   LuBrain,
   LuKeyRound,
+  LuGlobe,
 } from 'react-icons/lu';
 
 export const ROLE_NAV_ITEMS = {
@@ -36,24 +37,33 @@ export const ROLE_NAV_ITEMS = {
       label: 'Learn',
       href: '/learn',
       icon: LuBookOpen,
-      badge: '12',
     },
     {
       label: 'Playground',
-      href: '/playground',
+      href: '/playground?tab=circuit',
       icon: LuCpu,
+      subItems: [
+        {
+          label: 'Build Circuit',
+          href: '/playground?tab=circuit',
+          icon: LuCircuitBoard,
+        },
+        {
+          label: '3D Bloch Sphere',
+          href: '/playground?tab=bloch',
+          icon: LuGlobe,
+        },
+      ]
     },
     {
       label: 'Challenges',
       href: '/challenges',
       icon: LuTrophy,
-      badge: 'XP',
     },
     {
       label: 'AI Tutor',
       href: '/ai-tutor',
       icon: LuBot,
-      badge: 'NEW',
     },
     {
       label: 'Experiments',
@@ -64,7 +74,6 @@ export const ROLE_NAV_ITEMS = {
       label: 'Backend Compare',
       href: '/dashboard?tab=backend-compare',
       icon: LuGitCompare,
-      badge: '4 Backends',
     },
     {
       label: 'Sim History',
@@ -98,19 +107,16 @@ export const ROLE_NAV_ITEMS = {
       label: 'Dashboard',
       href: '/instructor',
       icon: LuLayoutDashboard,
-      badge: 'Faculty',
     },
     {
       label: 'My Courses',
       href: '/instructor?tab=courses',
       icon: LuBookOpen,
-      badge: '3',
     },
     {
       label: 'Students',
       href: '/instructor?tab=students',
       icon: LuUsers,
-      badge: '142',
     },
     {
       label: 'Analytics',
@@ -134,7 +140,6 @@ export const ROLE_NAV_ITEMS = {
       label: 'Dashboard',
       href: '/admin',
       icon: LuShieldAlert,
-      badge: 'Live',
     },
     {
       label: 'Users',
@@ -145,7 +150,6 @@ export const ROLE_NAV_ITEMS = {
       label: 'Roles & Permissions',
       href: '/admin?tab=roles',
       icon: LuKeyRound,
-      badge: '3 Roles',
     },
     {
       label: 'Content Governance',
@@ -156,13 +160,11 @@ export const ROLE_NAV_ITEMS = {
       label: 'AI Management',
       href: '/admin?tab=ai',
       icon: LuBrain,
-      badge: 'FastAPI',
     },
     {
       label: 'Quantum Backends',
       href: '/admin?tab=backends',
       icon: LuCpu,
-      badge: '4 QPU',
     },
     {
       label: 'Platform Analytics',

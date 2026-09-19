@@ -6,12 +6,16 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import ProblemSolution from "./ProblemSolution";
 import Features from "./Features";
+import HowItWorks from "./HowItWorks";
 import InteractiveBuilder from "./InteractiveBuilder";
 import SimulationVisuals from "./SimulationVisuals";
 import AITutor from "./AITutor";
 import LearningPath from "./LearningPath";
 import ChallengesAndEcosystem from "./ChallengesAndEcosystem";
-import HowItWorks from "./HowItWorks";
+import ForInstructors from "./ForInstructors";
+import Backends from "./Backends";
+import SocialProof from "./SocialProof";
+import FAQ from "./FAQ";
 import Footer from "./Footer";
 
 export default function LandingPage() {
@@ -28,8 +32,13 @@ export default function LandingPage() {
         <AITutor />
         <LearningPath />
         <ChallengesAndEcosystem />
+        <ForInstructors />
+        <Backends />
+        <SocialProof />
+        <FAQ />
       </main>
       <Footer />
     </div>
   );
 }
+

@@ -11,7 +11,7 @@ import { LuLoaderCircle, LuShieldAlert } from 'react-icons/lu';
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { isAuthenticated, isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
     // Re-verify session on mount
@@ -19,12 +19,12 @@ export default function ProtectedRoute({ children }) {
   }, [checkAuth]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isCheckingAuth && !isAuthenticated) {
       router.replace(`/login?returnUrl=${encodeURIComponent(pathname)}`);
     }
-  }, [isLoading, isAuthenticated, router, pathname]);
+  }, [isCheckingAuth, isAuthenticated, router, pathname]);
 
-  if (isLoading) {
+  if (isCheckingAuth) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)] px-4">
         <div className="relative flex items-center justify-center">

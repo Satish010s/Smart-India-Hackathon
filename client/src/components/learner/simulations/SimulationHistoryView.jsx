@@ -8,6 +8,7 @@ import {
   LuFlaskConical,
 } from 'react-icons/lu';
 import { apiFetch } from '../../../services/api';
+import QuantumHistogram from '../playground/QuantumHistogram';
 
 const BACKENDS = ['qiskit_aer', 'pennylane', 'cirq', 'qbraid'];
 const FRAMEWORKS = ['qiskit', 'pennylane', 'cirq', 'qbraid'];
@@ -108,19 +109,18 @@ function RunDetailPanel({ run, onClose, onRerun, onDelete }) {
             })}
           </div>
 
-          {/* Probabilities */}
+          {/* Probabilities histogram */}
           {r.probabilities && (
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-[var(--color-text)]">Measurement Probabilities ({(run.shots || r.shots || 1024).toLocaleString()} shots)</h4>
-              {Object.entries(r.probabilities).map(([state, prob]) => (
-                <div key={state} className="flex items-center gap-3">
-                  <span className="font-mono text-xs text-[var(--color-muted)] w-8 flex-shrink-0">|{state}⟩</span>
-                  <div className="flex-1 h-2 bg-[var(--color-border)]/30 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] rounded-full" style={{ width: `${prob * 100}%` }} />
-                  </div>
-                  <span className="font-mono text-xs text-[var(--color-muted)] w-12 text-right flex-shrink-0">{(prob * 100).toFixed(1)}%</span>
-                </div>
-              ))}
+            <div>
+              <h4 className="text-xs font-semibold text-[var(--color-text)] mb-3">
+                Measurement Probabilities ({(run.shots || r.shots || 1024).toLocaleString()} shots)
+              </h4>
+              <QuantumHistogram
+                data={{ probabilities: r.probabilities, counts: r.counts }}
+                shots={run.shots || r.shots || 1024}
+                title=""
+                height={200}
+              />
             </div>
           )}
 

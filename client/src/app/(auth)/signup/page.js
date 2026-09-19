@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import QubitMindLogo from '../../../components/common/QubitMindLogo';
 import { useAuthStore } from '../../../store/useAuthStore';
 import {
   LuCpu,
@@ -91,15 +92,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--color-background)]">
       <div className="w-full max-w-lg space-y-8">
         {/* Logo & Header */}
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white shadow-lg shadow-[var(--color-primary)]/20 transition-transform group-hover:scale-105">
-              <LuCpu size={24} />
-            </div>
-            <span className="font-heading font-bold text-2xl tracking-tight text-[var(--color-text)]">
-              QubitMind
-            </span>
-          </Link>
+        <div className="flex flex-col items-center justify-center text-center space-y-2">
+          <QubitMindLogo iconSize={42} subtitle="Quantum Learning Lab" />
           <h2 className="text-3xl font-heading font-bold text-[var(--color-text)]">
             Create your account
           </h2>

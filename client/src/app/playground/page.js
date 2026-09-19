@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
 import { LearnerSidebar } from '../../components/sidebar';
 import DashboardNavbar from '../../components/navbar/DashboardNavbar';
@@ -9,14 +10,18 @@ import {
   LuCpu, LuPlay, LuLayers, LuActivity, LuTriangleAlert, LuInfo,
   LuCircleAlert, LuTrash2, LuCode, LuCopy, LuCheck, LuPlus, LuMinus,
   LuRotateCcw, LuZap, LuAtom, LuSparkles, LuBookmark, LuShare2,
-  LuClock, LuSlidersHorizontal, LuHelpCircle, LuMaximize2, LuEye
+  LuClock, LuSlidersHorizontal, LuHelpCircle, LuMaximize2, LuEye,
+  LuGlobe, LuCircuitBoard, LuDownload, LuUpload, LuRefreshCw, LuTerminal
 } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import { apiFetch } from '../../services/api';
-import { analyzeCircuit, generateCode } from '../../components/learner/playground/CodeGenerator';
+import { analyzeCircuit, generateCode, parseQasmToCircuit } from '../../components/learner/playground/CodeGenerator';
 import { simulateCircuitRealTime } from '../../components/learner/playground/QuantumSimulatorEngine';
 import QuirkBlochSphere from '../../components/learner/playground/QuirkBlochSphere';
 import { CIRCUIT_PRESETS } from '../../components/learner/playground/CircuitPresets';
+import BlochSphereSimulator3D from '../../components/learner/playground/BlochSphereSimulator3D';
+import QuantumHistogram from '../../components/learner/playground/QuantumHistogram';
+import AmplitudePhasePanel from '../../components/learner/playground/AmplitudePhasePanel';
 
 // ─── Gate Palette Categories (Quirk + Modern IDE) ─────────────────────────────
 const GATE_CATEGORIES = [
@@ -108,10 +113,14 @@ function fmtAngle(rad) {
     [3 * pi / 4, '3π/4'], [3 * pi / 2, '3π/2'], [2 * pi, '2π'],
   ];
   for (const [v, s] of map) if (Math.abs(rad - v) < 1e-6) return s;
-  return rad.toFixed(2);
+  return Number(rad).toFixed(2);
 }
 
-export default function CircuitPlaygroundPage() {
+function CircuitPlaygroundContent() {
+  const searchParams = useSearchParams();
+  const urlTab = searchParams ? searchParams.get('tab') : null;
+  const mainTab = urlTab === 'bloch' ? 'bloch' : 'circuit';
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -128,8 +137,6 @@ export default function CircuitPlaygroundPage() {
 
   const [selectedGate, setSelectedGate] = useState(null);
   const [pendingAngle, setPendingAngle] = useState(Math.PI / 2);
-  const [showAngleModal, setShowAngleModal] = useState(false);
-  const [angleTargetCell, setAngleTargetCell] = useState(null);
 
   const [pendingWire, setPendingWire] = useState(null);
   const [selectedStepIndex, setSelectedStepIndex] = useState(null);
@@ -140,6 +147,12 @@ export default function CircuitPlaygroundPage() {
   const [selectedEngine, setSelectedEngine] = useState('qiskit');
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('realtime'); // 'realtime' | 'code' | 'cloud'
+
+  // Code editor buffer
+  const [editableCode, setEditableCode] = useState('');
+  const [isUserEditingCode, setIsUserEditingCode] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   const handleIncreaseQubits = () => {
     if (numQubits >= 8) return;
@@ -194,6 +207,13 @@ export default function CircuitPlaygroundPage() {
   const issues = analyzeCircuit(circuit, numQubits);
   const activeEngineCode = generateCode(circuit, numQubits, selectedEngine, parseInt(shots) || 1024);
 
+  // Sync active generated code to editor buffer unless user is typing custom edits
+  useEffect(() => {
+    if (!isUserEditingCode) {
+      setEditableCode(activeEngineCode);
+    }
+  }, [activeEngineCode, isUserEditingCode]);
+
   // Handle Drag and Drop
   const handleDragStart = (e, gate) => {
     e.dataTransfer.setData('text/plain', JSON.stringify(gate));
@@ -209,6 +229,26 @@ export default function CircuitPlaygroundPage() {
       const dataStr = e.dataTransfer.getData('text/plain');
       if (!dataStr) return;
       const gateData = JSON.parse(dataStr);
+
+      // Check if dragging an existing gate within the circuit grid
+      if (gateData.srcQ !== undefined && gateData.srcS !== undefined) {
+        setCircuit(prev => {
+          const nc = prev.map(r => [...r]);
+          nc[gateData.srcQ][gateData.srcS] = null;
+          nc[q][s] = {
+            type: gateData.type,
+            target: q,
+            angle: gateData.angle,
+            control: gateData.control,
+            control2: gateData.control2,
+            target2: gateData.target2
+          };
+          return nc;
+        });
+        toast.success(`Moved gate to q[${q}], step ${s + 1}`);
+        return;
+      }
+
       placeGate(gateData, q, s);
     } catch {}
   };
@@ -227,7 +267,6 @@ export default function CircuitPlaygroundPage() {
   };
 
   const handleCellClick = (q, s) => {
-    // Resolve pending control wire
     if (pendingWire) {
       const { type: wireType, qubit: srcQ, step: srcS } = pendingWire;
       if (wireType === 'control' && q !== srcQ && s === srcS) {
@@ -264,7 +303,6 @@ export default function CircuitPlaygroundPage() {
     const gateDef = GATE_MAP[selectedGate];
     if (!gateDef) return;
 
-    // If cell occupied, remove or replace
     if (circuit[q]?.[s] != null) {
       removeGate(q, s);
       return;
@@ -284,6 +322,7 @@ export default function CircuitPlaygroundPage() {
   const clearCircuit = () => {
     setCircuit(Array(numQubits).fill(null).map(() => Array(numSteps).fill(null)));
     setCloudResults(null);
+    setIsUserEditingCode(false);
     toast.success('Circuit canvas cleared.');
   };
 
@@ -293,6 +332,7 @@ export default function CircuitPlaygroundPage() {
     setInitialStates(Array(preset.qubits).fill('|0⟩'));
     setCircuit(preset.build());
     setCloudResults(null);
+    setIsUserEditingCode(false);
     toast.success(`Loaded preset: ${preset.title}`);
   };
 
@@ -345,10 +385,62 @@ export default function CircuitPlaygroundPage() {
     }
   };
 
-  const handleCopyCode = async () => {
-    if (!activeEngineCode) return;
+  // Code tab actions: Sync edited code back to visual circuit grid
+  const handleSyncCodeToCanvas = () => {
     try {
-      await navigator.clipboard.writeText(activeEngineCode);
+      const parsed = parseQasmToCircuit(editableCode);
+      if (!parsed || !parsed.circuit) {
+        toast.error('Could not parse OpenQASM syntax. Ensure valid qreg and gate statements.');
+        return;
+      }
+      setNumQubits(parsed.numQubits);
+      setNumSteps(parsed.numSteps);
+      setInitialStates(Array(parsed.numQubits).fill('|0⟩'));
+      setCircuit(parsed.circuit);
+      setIsUserEditingCode(false);
+      toast.success(`Synced code into visual circuit grid (${parsed.numQubits} qubits, ${parsed.numSteps} steps)!`);
+      setActiveTab('realtime');
+    } catch (err) {
+      toast.error('Parsing failed: ' + err.message);
+    }
+  };
+
+  // Execute edited code directly
+  const handleRunCustomCode = async () => {
+    if (!editableCode.trim()) {
+      toast.error('Code buffer is empty.');
+      return;
+    }
+    setIsSimulating(true);
+    setCloudResults(null);
+    const loadToast = toast.loading('Executing code on Qiskit Aer simulator...');
+    try {
+      const response = await apiFetch('/learner/simulations/run', {
+        method: 'POST',
+        body: JSON.stringify({ circuitCode: editableCode, backend: 'qiskit_aer', shots: parseInt(shots) || 1024 })
+      });
+      toast.dismiss(loadToast);
+      const simRun = response?.data?.simulationRun;
+      if (simRun?.results?.counts) {
+        setCloudResults(simRun.results.counts);
+        setFidelity(simRun.fidelity ? `${(simRun.fidelity * 100).toFixed(2)}%` : '99.4%');
+        setActiveTab('cloud');
+        toast.success('Custom code execution finished!');
+      } else {
+        toast.error('Simulation finished without returning distribution counts.');
+      }
+    } catch (err) {
+      toast.dismiss(loadToast);
+      toast.error(err?.message || 'Execution failed.');
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
+  const handleCopyCode = async () => {
+    if (!editableCode) return;
+    try {
+      await navigator.clipboard.writeText(editableCode);
       setCopied(true);
       toast.success(`Copied ${QUANTUM_ENGINES.find(e => e.id === selectedEngine)?.name} code to clipboard!`);
       setTimeout(() => setCopied(false), 2000);
@@ -357,7 +449,67 @@ export default function CircuitPlaygroundPage() {
     }
   };
 
-  // Bloch vectors & probabilities for active view
+  // Export Circuit to File (JSON or QASM)
+  const handleExportJson = () => {
+    const payload = JSON.stringify({ numQubits, numSteps, initialStates, circuit }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `quantum_circuit_${numQubits}q.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Downloaded circuit as JSON file');
+  };
+
+  const handleExportQasm = () => {
+    const qasm = generateCode(circuit, numQubits, 'openqasm', parseInt(shots) || 1024);
+    const blob = new Blob([qasm], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `quantum_circuit_${numQubits}q.qasm`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Downloaded circuit as OpenQASM file');
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const content = evt.target?.result;
+      if (!content) return;
+      try {
+        if (file.name.endsWith('.json')) {
+          const parsed = JSON.parse(content);
+          if (parsed.circuit && Array.isArray(parsed.circuit)) {
+            setNumQubits(parsed.numQubits || parsed.circuit.length);
+            setNumSteps(parsed.numSteps || parsed.circuit[0]?.length || 8);
+            if (parsed.initialStates) setInitialStates(parsed.initialStates);
+            setCircuit(parsed.circuit);
+            toast.success('Imported circuit from JSON');
+            return;
+          }
+        }
+        const parsed = parseQasmToCircuit(content);
+        if (parsed && parsed.circuit) {
+          setNumQubits(parsed.numQubits);
+          setNumSteps(parsed.numSteps);
+          setCircuit(parsed.circuit);
+          toast.success('Imported circuit from OpenQASM file');
+        } else {
+          toast.error('Could not parse file format.');
+        }
+      } catch (err) {
+        toast.error('Failed to import file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   const activeStepSnapshot = (selectedStepIndex !== null && simResults?.stepStates?.[selectedStepIndex + 1])
     ? simResults.stepStates[selectedStepIndex + 1]
     : simResults?.finalState;
@@ -378,15 +530,27 @@ export default function CircuitPlaygroundPage() {
 
         <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
           <DashboardNavbar
-            title="Interactive Circuit Composer"
+            title={mainTab === 'bloch' ? "3D Bloch Sphere Simulator" : "Build Circuit Studio"}
             isCollapsed={isCollapsed}
             onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
             onMobileMenuClick={() => setIsMobileOpen(true)}
           />
 
+          {/* ── 3D Bloch Sphere Tab ───────────────────────────────────── */}
+          {mainTab === 'bloch' && (
+            <div className="flex-1 w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col p-0">
+              <BlochSphereSimulator3D
+                externalVectors={simResults?.finalState?.blochVectors}
+                numCircuitQubits={numQubits}
+              />
+            </div>
+          )}
+
+          {/* ── Build Circuit Tab ─────────────────────────────────────── */}
+          {mainTab === 'circuit' && (
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1700px] mx-auto w-full">
             
-            {/* Header: Title, Controls, Algorithm Presets */}
+            {/* Header: Title, Controls, Algorithm Presets, Export/Import */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[var(--color-surface)] p-5 rounded-3xl border border-[var(--color-border)] shadow-sm">
               <div>
                 <div className="flex items-center gap-3">
@@ -395,14 +559,23 @@ export default function CircuitPlaygroundPage() {
                   </div>
                   <div>
                     <h1 className="text-xl sm:text-2xl font-black font-heading text-[var(--color-text)]">
-                      Quirk-Style Quantum Playground
+                      Quantum Circuit Studio
                     </h1>
                     <p className="text-xs text-[var(--color-muted)]">
-                      Drag and drop gates, observe live statevector telemetry, and compile to any quantum engine.
+                      Graphical Drag-and-Drop &amp; Code-Based Quantum Designer
                     </p>
                   </div>
                 </div>
               </div>
+
+              {/* Hidden file input for import */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,.qasm"
+                onChange={handleImportFile}
+                className="hidden"
+              />
 
               {/* Action Toolbar */}
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -442,6 +615,37 @@ export default function CircuitPlaygroundPage() {
                   </div>
                 </div>
 
+                {/* Import / Export Circuit File */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] hover:border-cyan-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                  title="Import JSON or OpenQASM file"
+                >
+                  <LuUpload size={14} className="text-indigo-400" />
+                  <span>Import</span>
+                </button>
+
+                <div className="relative group">
+                  <button className="px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] hover:border-cyan-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
+                    <LuDownload size={14} className="text-emerald-400" />
+                    <span>Export</span>
+                  </button>
+                  <div className="absolute right-0 top-full mt-2 w-44 p-2 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-50 space-y-1">
+                    <button
+                      onClick={handleExportQasm}
+                      className="w-full text-left p-2 rounded-xl hover:bg-[var(--color-background)] text-xs font-bold font-mono text-[var(--color-text)] flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>OpenQASM (.qasm)</span>
+                    </button>
+                    <button
+                      onClick={handleExportJson}
+                      className="w-full text-left p-2 rounded-xl hover:bg-[var(--color-background)] text-xs font-bold font-mono text-[var(--color-text)] flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>Circuit JSON (.json)</span>
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   onClick={clearCircuit}
                   className="p-2 rounded-xl border border-[var(--color-border)] hover:bg-rose-500/10 hover:text-rose-500 text-[var(--color-muted)] transition-all cursor-pointer"
@@ -462,13 +666,13 @@ export default function CircuitPlaygroundPage() {
               </div>
             </div>
 
-            {/* 1. Quirk Interactive Gate Palette */}
+            {/* 1. Graphical Gate Palette */}
             <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <LuLayers size={16} className="text-cyan-400" />
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted)] font-mono">
-                    Quantum Gate Toolbox (Drag onto grid or click to select)
+                    Graphical Quantum Gate Palette (Drag onto grid or click to select)
                   </span>
                 </div>
                 {selectedGate && (
@@ -518,15 +722,15 @@ export default function CircuitPlaygroundPage() {
               </div>
             </div>
 
-            {/* 2. Quirk Interactive Circuit Grid with Live Wire Probes */}
+            {/* 2. Drag-and-Drop Circuit Grid */}
             <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-6 shadow-sm overflow-x-auto">
               <div className="flex items-center justify-between min-w-[700px]">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-[var(--color-text)] font-mono uppercase tracking-wider">
-                    Quantum Register Wire Grid
+                    Interactive Drag-and-Drop Quantum Circuit Grid
                   </span>
                   <span className="text-[10px] text-[var(--color-muted)] font-mono">
-                    (Click wire input to toggle initial state $|0\rangle, |1\rangle, |+\rangle...$)
+                    (Drag gates on wires, click input to set $|0\rangle, |1\rangle, |+\rangle$)
                   </span>
                 </div>
 
@@ -567,18 +771,15 @@ export default function CircuitPlaygroundPage() {
                           const gate = circuit[qIndex]?.[sIndex];
                           const isHoveredCol = selectedStepIndex === sIndex;
 
-                          // Check if there are controls in this column for vertical connecting lines
-                          const columnControls = [];
-                          for (let cq = 0; cq < numQubits; cq++) {
-                            const cg = circuit[cq]?.[sIndex];
-                            if (cg && (cg.type === 'CONTROL' || cg.type === '●' || cg.type === 'ANTI_CONTROL' || cg.type === '○' || cg.control === qIndex || cg.control2 === qIndex)) {
-                              columnControls.push(cq);
-                            }
-                          }
-
                           return (
                             <div
                               key={sIndex}
+                              draggable={!!gate}
+                              onDragStart={(e) => {
+                                if (gate) {
+                                  e.dataTransfer.setData('text/plain', JSON.stringify({ ...gate, srcQ: qIndex, srcS: sIndex }));
+                                }
+                              }}
                               onDragOver={handleDragOver}
                               onDrop={(e) => handleDrop(e, qIndex, sIndex)}
                               onClick={() => handleCellClick(qIndex, sIndex)}
@@ -586,7 +787,7 @@ export default function CircuitPlaygroundPage() {
                               onMouseLeave={() => setSelectedStepIndex(null)}
                               className={`relative z-10 w-12 h-12 rounded-2xl border flex items-center justify-center text-xs font-mono font-bold cursor-pointer transition-all duration-200 select-none ${
                                 gate
-                                  ? `${GATE_MAP[gate.type]?.color || 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'} shadow-md hover:scale-105`
+                                  ? `${GATE_MAP[gate.type]?.color || 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'} shadow-md hover:scale-105 cursor-grab active:cursor-grabbing`
                                   : isHoveredCol
                                   ? 'bg-cyan-500/10 border-cyan-500/40'
                                   : 'bg-[var(--color-surface)] border-[var(--color-border)]/70 hover:border-cyan-500/40 hover:bg-[var(--color-background)]'
@@ -627,7 +828,7 @@ export default function CircuitPlaygroundPage() {
                         })}
                       </div>
 
-                      {/* Right: Live Chance Probe Display (Quirk Feature!) */}
+                      {/* Right: Live Chance Probe Display */}
                       <div className="w-32 flex-shrink-0 p-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] space-y-1">
                         <div className="flex justify-between items-center text-[10px] font-mono">
                           <span className="text-[var(--color-muted)]">Chance |1⟩</span>
@@ -661,19 +862,18 @@ export default function CircuitPlaygroundPage() {
               </div>
             </div>
 
-            {/* 3. Live Statevector, Bloch Spheres & Telemetry Deck */}
+            {/* 3. Code-Based & Real-time Telemetry Deck */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Left 2 Cols: Real-time Quirk Telemetry & Bloch Spheres */}
               <div className="lg:col-span-2 space-y-6">
                 
-                {/* Visualizer Tabs */}
+                {/* Visualizer & Code Editor Tabs */}
                 <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-5 shadow-sm">
                   <div className="flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-2.5">
                       <LuActivity size={18} className="text-cyan-400" />
                       <h3 className="font-bold text-sm text-[var(--color-text)] font-mono uppercase tracking-wider">
-                        Real-Time State Telemetry
+                        Circuit Telemetry &amp; Code Studio
                       </h3>
                     </div>
 
@@ -684,7 +884,7 @@ export default function CircuitPlaygroundPage() {
                           activeTab === 'realtime' ? 'bg-cyan-500 text-white shadow-sm' : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
                         }`}
                       >
-                        Statevector & Bloch
+                        Statevector &amp; Bloch
                       </button>
                       <button
                         onClick={() => setActiveTab('code')}
@@ -692,7 +892,7 @@ export default function CircuitPlaygroundPage() {
                           activeTab === 'code' ? 'bg-indigo-600 text-white shadow-sm' : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
                         }`}
                       >
-                        Export Code
+                        Code Studio (Qiskit / OpenQASM)
                       </button>
                       <button
                         onClick={() => setActiveTab('cloud')}
@@ -726,66 +926,31 @@ export default function CircuitPlaygroundPage() {
                         </div>
                       </div>
 
-                      {/* Statevector Probability Distribution */}
+                      {/* Statevector & Phase Visualization */}
                       <div>
                         <div className="text-xs font-mono font-bold text-[var(--color-muted)] mb-3 uppercase tracking-wider flex items-center gap-2">
                           <LuSlidersHorizontal size={14} className="text-indigo-400" />
-                          Multi-Qubit State Amplitudes & Phases ({currentAmplitudes.length} Basis States)
+                          Statevector &amp; Phase Disk ({currentAmplitudes.length} Basis States)
                         </div>
-
-                        <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                          {currentAmplitudes.map((amp) => {
-                            const pct = (amp.prob * 100).toFixed(1);
-                            const hue = ((amp.phase * 180 / Math.PI) + 360) % 360;
-
-                            return (
-                              <div
-                                key={amp.binary}
-                                className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs font-mono gap-3"
-                              >
-                                <div className="flex items-center gap-3 w-28 flex-shrink-0">
-                                  <span className="font-bold text-cyan-400">{amp.state}</span>
-                                  {/* Complex phase color dot */}
-                                  <div
-                                    className="w-3 h-3 rounded-full border border-white/20 flex-shrink-0"
-                                    style={{ backgroundColor: amp.prob > 0.001 ? `hsl(${hue}, 85%, 60%)` : '#334155' }}
-                                    title={`Phase: ${(amp.phase * 180 / Math.PI).toFixed(1)}°`}
-                                  />
-                                </div>
-
-                                {/* Probability bar */}
-                                <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full rounded-full transition-all duration-300"
-                                    style={{
-                                      width: `${pct}%`,
-                                      backgroundColor: `hsl(${hue}, 80%, 55%)`
-                                    }}
-                                  />
-                                </div>
-
-                                <div className="w-24 text-right flex-shrink-0">
-                                  <span className="font-bold text-[var(--color-text)]">{pct}%</span>
-                                  <span className="text-[10px] text-[var(--color-muted)] ml-1">({amp.formatted})</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <AmplitudePhasePanel amplitudes={currentAmplitudes} />
                       </div>
 
                     </div>
                   )}
 
+                  {/* CODE-BASED QUANTUM CIRCUIT DESIGN TOOL */}
                   {activeTab === 'code' && (
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         {/* Framework Engine Switcher */}
                         <div className="flex gap-1.5 flex-wrap">
                           {QUANTUM_ENGINES.map(eng => (
                             <button
                               key={eng.id}
-                              onClick={() => setSelectedEngine(eng.id)}
+                              onClick={() => {
+                                setSelectedEngine(eng.id);
+                                setIsUserEditingCode(false);
+                              }}
                               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
                                 selectedEngine === eng.id
                                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
@@ -797,18 +962,60 @@ export default function CircuitPlaygroundPage() {
                           ))}
                         </div>
 
-                        <button
-                          onClick={handleCopyCode}
-                          className="px-3 py-1.5 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-background)] text-xs font-mono flex items-center gap-1.5 transition-all"
-                        >
-                          {copied ? <LuCheck size={14} className="text-emerald-400" /> : <LuCopy size={14} />}
-                          <span>{copied ? 'Copied' : 'Copy Code'}</span>
-                        </button>
+                        {/* Action buttons: Copy, Sync to Grid, Run Code */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleSyncCodeToCanvas}
+                            className="px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500/30 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                            title="Parse OpenQASM code into the visual drag-and-drop circuit grid"
+                          >
+                            <LuRefreshCw size={13} />
+                            <span>Sync to Visual Grid</span>
+                          </button>
+
+                          <button
+                            onClick={handleRunCustomCode}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                          >
+                            <LuPlay size={13} />
+                            <span>Run Code</span>
+                          </button>
+
+                          <button
+                            onClick={handleCopyCode}
+                            className="px-3 py-1.5 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-background)] text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer"
+                          >
+                            {copied ? <LuCheck size={14} className="text-emerald-400" /> : <LuCopy size={14} />}
+                            <span>{copied ? 'Copied' : 'Copy'}</span>
+                          </button>
+                        </div>
                       </div>
 
-                      <pre className="p-4 rounded-2xl bg-[#080a1c] border border-white/10 text-emerald-300 font-mono text-xs overflow-x-auto max-h-96">
-                        <code>{activeEngineCode || '# Circuit is currently empty.'}</code>
-                      </pre>
+                      {/* Interactive Code Editor */}
+                      <div className="relative rounded-2xl bg-[#080a1c] border border-white/10 overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/80 border-b border-white/10 text-[10px] font-mono text-slate-400">
+                          <div className="flex items-center gap-2">
+                            <LuTerminal size={12} className="text-cyan-400" />
+                            <span>Code Editor — {QUANTUM_ENGINES.find(e => e.id === selectedEngine)?.name}</span>
+                          </div>
+                          {isUserEditingCode && (
+                            <span className="text-amber-400 font-bold flex items-center gap-1">
+                              • Custom code edited (click "Sync to Visual Grid" to update canvas)
+                            </span>
+                          )}
+                        </div>
+
+                        <textarea
+                          value={editableCode}
+                          onChange={(e) => {
+                            setEditableCode(e.target.value);
+                            setIsUserEditingCode(true);
+                          }}
+                          className="w-full h-80 p-4 bg-transparent text-emerald-300 font-mono text-xs focus:outline-none resize-none leading-relaxed"
+                          placeholder="// Write or paste OpenQASM / Qiskit python code here..."
+                          spellCheck={false}
+                        />
+                      </div>
                     </div>
                   )}
 
@@ -817,7 +1024,7 @@ export default function CircuitPlaygroundPage() {
                       {!cloudResults ? (
                         <div className="py-12 text-center text-slate-400 space-y-3 font-mono text-xs">
                           <LuPlay size={32} className="mx-auto text-indigo-400 opacity-60" />
-                          <p>No cloud execution results yet. Click "Cloud Run (Aer)" to simulate.</p>
+                          <p>No cloud execution results yet. Click "Cloud Run (Aer)" or "Run Code" to simulate.</p>
                         </div>
                       ) : (
                         <div className="space-y-4">
@@ -826,21 +1033,11 @@ export default function CircuitPlaygroundPage() {
                             <span>Fidelity: {fidelity}</span>
                           </div>
 
-                          <div className="space-y-2">
-                            {Object.entries(cloudResults).map(([state, count]) => {
-                              const total = parseInt(shots) || 1024;
-                              const pct = Math.round((count / total) * 100);
-                              return (
-                                <div key={state} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs font-mono gap-3">
-                                  <span className="font-bold text-cyan-400 w-20">|{state}⟩</span>
-                                  <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
-                                  </div>
-                                  <span className="font-bold text-[var(--color-text)] w-16 text-right">{count} ({pct}%)</span>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <QuantumHistogram
+                            data={{ counts: cloudResults }}
+                            shots={parseInt(shots) || 1024}
+                            title="Measurement Counts"
+                          />
                         </div>
                       )}
                     </div>
@@ -849,7 +1046,7 @@ export default function CircuitPlaygroundPage() {
                 </div>
               </div>
 
-              {/* Right Column: Circuit Analysis, Angle Presets & Quick Guides */}
+              {/* Right Column: Circuit Analysis & Rotation Angle Configurator */}
               <div className="space-y-6">
                 
                 {/* Circuit Health & Lint Analysis */}
@@ -863,7 +1060,7 @@ export default function CircuitPlaygroundPage() {
 
                   {!issues.length ? (
                     <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-2">
-                      <LuCheck size={15} /> Circuit is syntactically valid & ready.
+                      <LuCheck size={15} /> Circuit is syntactically valid &amp; ready.
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -922,12 +1119,12 @@ export default function CircuitPlaygroundPage() {
                 {/* Quick Shortcuts */}
                 <div className="rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-[var(--color-surface)] to-cyan-500/10 p-6 space-y-3 shadow-sm">
                   <h4 className="text-xs font-bold text-indigo-400 font-mono uppercase tracking-wider">
-                    Quirk Pro Tips
+                    Quantum Designer Guide
                   </h4>
                   <ul className="text-xs text-[var(--color-muted)] space-y-1.5 list-disc pl-4 leading-relaxed">
-                    <li>Place a control <strong className="text-indigo-300">●</strong> and target <strong className="text-emerald-300">⊕</strong> in the same column to build a CNOT gate.</li>
-                    <li>Hover over any step index (S1..S8) to inspect intermediate Bloch vectors.</li>
-                    <li>Toggle qubit input states ($|0\rangle, |1\rangle, |+\rangle$) to test different basis configurations.</li>
+                    <li><strong>Drag &amp; Drop:</strong> Drag gates from the palette or move placed gates directly on wire cells.</li>
+                    <li><strong>Code Studio:</strong> Write or edit OpenQASM script, then click <span className="text-cyan-300">Sync to Visual Grid</span> for bi-directional editing!</li>
+                    <li><strong>Import / Export:</strong> Load or save circuits as <code className="text-emerald-400">.qasm</code> or <code className="text-emerald-400">.json</code> files.</li>
                   </ul>
                 </div>
 
@@ -936,8 +1133,17 @@ export default function CircuitPlaygroundPage() {
             </div>
 
           </main>
+          )}
         </div>
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function CircuitPlaygroundPage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-[var(--color-background)] flex items-center justify-center font-mono text-cyan-400 text-sm">Loading Quantum Playground...</div>}>
+      <CircuitPlaygroundContent />
+    </Suspense>
   );
 }
