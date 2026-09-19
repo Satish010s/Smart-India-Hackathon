@@ -4,6 +4,7 @@ import {
   getLearnerCourses,
   getCourseById,
   enrollCourse,
+  getLessonContent,
   completeLesson,
   getLearnerProgress,
   getLearnerAchievements,
@@ -54,7 +55,8 @@ router.get('/courses', getLearnerCourses);
 router.get('/courses/:courseId', getCourseById);
 router.post('/courses/:courseId/enroll', enrollCourse);
 
-// ─── Lessons ────────────────────────────────────────────────────────────────
+// ─── Lessons ─────────────────────────────────────────────────────
+router.get('/lessons/:lessonId', getLessonContent);
 router.patch('/lessons/:lessonId/complete', completeLesson);
 
 // ─── Progress ───────────────────────────────────────────────────────────────

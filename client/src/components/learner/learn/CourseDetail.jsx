@@ -52,7 +52,7 @@ function CurriculumItem({ item, onSelectLesson }) {
   );
 }
 
-function ModuleSection({ module, onSelectLesson }) {
+function ModuleSection({ module, onSelectLesson, curriculum }) {
   const [open, setOpen] = useState(!module.locked && module.progress > 0);
 
   return (
@@ -101,7 +101,7 @@ function ModuleSection({ module, onSelectLesson }) {
             </div>
           )}
           {module.items.map(item => (
-            <CurriculumItem key={item.id} item={item} onSelectLesson={onSelectLesson} />
+            <CurriculumItem key={item.id} item={item} onSelectLesson={(i) => onSelectLesson && onSelectLesson(i, curriculum)} />
           ))}
         </div>
       )}
@@ -206,7 +206,7 @@ export default function CourseDetail({ course: initialCourse, onClose, onSelectL
           <div className="flex items-center gap-3 pt-1">
             {nextItem && (
               <button
-                onClick={() => onSelectLesson && onSelectLesson(nextItem)}
+                onClick={() => onSelectLesson && onSelectLesson(nextItem, curriculumData)}
                 className="px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-[var(--color-primary)]/20"
               >
                 <LuPlay size={14} className="ml-0.5" />
@@ -230,7 +230,7 @@ export default function CourseDetail({ course: initialCourse, onClose, onSelectL
           </div>
         ) : (
           curriculumData.map(module => (
-            <ModuleSection key={module.id} module={module} onSelectLesson={onSelectLesson} />
+            <ModuleSection key={module.id} module={module} onSelectLesson={onSelectLesson} curriculum={curriculumData} />
           ))
         )}
       </div>

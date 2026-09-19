@@ -288,14 +288,19 @@ export default function LearnPage() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('paths');
-  const [courses, setCourses] = useState(COURSES);
+  const [courses, setCourses] = useState([]);
   const [paths, setPaths] = useState(LEARNING_PATHS);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [apiLoaded, setApiLoaded] = useState(false);
 
   // Drill-down state
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [showExperiment, setShowExperiment] = useState(false);
+
+  // Navigation state: flat lesson list within a course for prev/next
+  const [courseLessons, setCourseLessons] = useState([]);
+  const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -303,9 +308,10 @@ export default function LearnPage() {
       try {
         setLoading(true);
         const res = await apiFetch('/learner/courses');
-        if (mounted && res?.data?.courses?.length) {
-          setCourses(res.data.courses);
-          if (res.data.paths?.length) {
+        if (mounted) {
+          // Always use API data — even an empty array is valid (no published courses)
+          setCourses(res?.data?.courses || []);
+          if (res?.data?.paths?.length) {
             setPaths(res.data.paths.map(p => ({
               ...p,
               icon: p.id === 'p1' ? LuBookOpen : p.id === 'p2' ? LuBrain : p.id === 'p3' ? LuSparkles : LuTrendingUp,
@@ -314,9 +320,12 @@ export default function LearnPage() {
                      p.id === 'p3' ? 'from-violet-500 to-rose-500' : 'from-emerald-500 to-cyan-500',
             })));
           }
+          setApiLoaded(true);
         }
       } catch (err) {
-        console.warn('LearnPage using fallback static data:', err.message);
+        console.warn('LearnPage: API unavailable, using demo data:', err.message);
+        // Keep existing COURSES state as fallback
+        if (mounted) setApiLoaded(true);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -328,8 +337,24 @@ export default function LearnPage() {
   async function handleEnroll(courseId) {
     try {
       await apiFetch(`/learner/courses/${courseId}/enroll`, { method: 'POST' });
-    } catch {}
-    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, enrolled: true, progress: 0 } : c));
+      setCourses(prev => prev.map(c => c.id === courseId ? { ...c, enrolled: true, progress: 0 } : c));
+    } catch (err) {
+      console.warn('Enroll failed:', err.message);
+    }
+  }
+
+  function handleSelectLesson(item, curriculum) {
+    // Build flat lesson list from the full curriculum for prev/next navigation
+    const allLessons = (curriculum || []).flatMap(mod => mod.items || []);
+    const idx = allLessons.findIndex(l => l.id === item.id);
+    setCourseLessons(allLessons);
+    setCurrentLessonIdx(idx >= 0 ? idx : 0);
+
+    if (item.type === 'experiment') {
+      setShowExperiment(true);
+    } else {
+      setSelectedLesson(item);
+    }
   }
 
   // View stack: 'list' | 'course' | 'lesson' | 'experiment'
@@ -341,11 +366,22 @@ export default function LearnPage() {
     if (selectedCourse) { setSelectedCourse(null); return; }
   }
 
-  function handleSelectLesson(item) {
-    if (item.type === 'experiment') {
-      setShowExperiment(true);
+  function handlePrevLesson() {
+    const idx = currentLessonIdx - 1;
+    if (idx >= 0) {
+      setCurrentLessonIdx(idx);
+      setSelectedLesson(courseLessons[idx]);
+    }
+  }
+
+  function handleNextLesson() {
+    const idx = currentLessonIdx + 1;
+    if (idx < courseLessons.length) {
+      setCurrentLessonIdx(idx);
+      setSelectedLesson(courseLessons[idx]);
     } else {
-      setSelectedLesson(item);
+      // End of course
+      setSelectedLesson(null);
     }
   }
 
@@ -396,10 +432,10 @@ export default function LearnPage() {
               <LessonView
                 lesson={selectedLesson}
                 onClose={goBack}
-                onNext={() => setSelectedLesson(null)}
-                onPrev={() => setSelectedLesson(null)}
-                lessonIndex={3}
-                totalLessons={6}
+                onNext={currentLessonIdx < courseLessons.length - 1 ? handleNextLesson : null}
+                onPrev={currentLessonIdx > 0 ? handlePrevLesson : null}
+                lessonIndex={currentLessonIdx + 1}
+                totalLessons={courseLessons.length || 1}
               />
             )}
 
@@ -407,7 +443,7 @@ export default function LearnPage() {
               <CourseDetail
                 course={selectedCourse}
                 onClose={goBack}
-                onSelectLesson={handleSelectLesson}
+                onSelectLesson={(item, curriculum) => handleSelectLesson(item, curriculum)}
               />
             )}
 
