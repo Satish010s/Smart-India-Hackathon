@@ -143,6 +143,10 @@ function ModuleBlock({ module, isActive, onSelect, onUpdate, onDeleteModule, cou
   const [title, setTitle] = useState(module.title);
   const [completionRule, setCompletionRule] = useState(module.completionRule || 'All lessons');
 
+  useEffect(() => {
+    setLessons(module.lessons || []);
+  }, [module.lessons]);
+
   const updateLessons = (newLessons) => {
     setLessons(newLessons);
     onUpdate({ ...module, title, completionRule, lessons: newLessons });
