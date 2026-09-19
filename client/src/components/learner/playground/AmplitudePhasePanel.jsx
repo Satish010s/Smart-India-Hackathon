@@ -2,16 +2,7 @@
 
 import React, { useMemo } from 'react';
 
-/**
- * AmplitudePhasePanel
- * Full quantum statevector visualization:
- *   • Phase polar disk — complex amplitudes plotted as vectors on unit circle
- *   • Amplitude table  — state | Re | Im | probability bar | |α|² | phase swatch
- *
- * Props:
- *   amplitudes: Array<{state, binary, re, im, prob, phase, formatted}>
- *               (output of QuantumStatevector.getStateAmplitudes())
- */
+
 export default function AmplitudePhasePanel({ amplitudes = [] }) {
   if (!amplitudes || amplitudes.length === 0) return null;
 
@@ -44,8 +35,8 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
       <div className="flex gap-3">
 
         {/* Phase Disk */}
-        <div className="flex-shrink-0 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] px-3 pt-3 pb-2">
-          <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-[var(--color-muted)] mb-2 text-center">
+        <div className="flex-shrink-0 rounded-lg border border-[var(--db-border)] bg-[var(--db-surface-2)] px-3 pt-3 pb-2">
+          <p className="text-[9px] font-mono font-semibold uppercase tracking-widest text-[var(--db-muted)] mb-2 text-center">
             Phase Disk
           </p>
           <svg width={DISK_SZ} height={DISK_SZ} overflow="visible">
@@ -53,7 +44,7 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
             {/* Concentric grid rings */}
             {[0.33, 0.66, 1].map(r => (
               <circle key={r} cx={CX} cy={CY} r={DISK_R * r}
-                fill="none" stroke="rgba(148,163,184,0.08)" strokeWidth={0.8} />
+                fill="none" stroke="var(--db-border)" strokeWidth={0.8} />
             ))}
 
             {/* Axis lines */}
@@ -64,22 +55,22 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
                   x1={CX} y1={CY}
                   x2={CX + Math.cos(rad) * (DISK_R + 6)}
                   y2={CY - Math.sin(rad) * (DISK_R + 6)}
-                  stroke="rgba(148,163,184,0.13)" strokeWidth={0.8} strokeDasharray="2 3"
+                  stroke="var(--db-border-strong)" strokeWidth={0.8} strokeDasharray="2 3"
                 />
               );
             })}
 
             {/* Axis labels */}
             <text x={CX + DISK_R + 8} y={CY + 3.5}
-              fontSize={7.5} fill="rgba(148,163,184,0.45)" fontFamily="monospace" textAnchor="start">+Re</text>
+              fontSize={7.5} fill="var(--db-muted)" fontFamily="monospace" textAnchor="start">+Re</text>
             <text x={CX - DISK_R - 8} y={CY + 3.5}
-              fontSize={7.5} fill="rgba(148,163,184,0.45)" fontFamily="monospace" textAnchor="end">-Re</text>
+              fontSize={7.5} fill="var(--db-muted)" fontFamily="monospace" textAnchor="end">-Re</text>
             <text x={CX} y={CY - DISK_R - 8}
-              fontSize={7.5} fill="rgba(148,163,184,0.45)" fontFamily="monospace" textAnchor="middle">+i</text>
+              fontSize={7.5} fill="var(--db-muted)" fontFamily="monospace" textAnchor="middle">+i</text>
             <text x={CX} y={CY + DISK_R + 14}
-              fontSize={7.5} fill="rgba(148,163,184,0.45)" fontFamily="monospace" textAnchor="middle">-i</text>
+              fontSize={7.5} fill="var(--db-muted)" fontFamily="monospace" textAnchor="middle">-i</text>
 
-            {/* Amplitude vectors */}
+            {/* Amplitude vectors — color encodes phase angle, kept intentional */}
             {amplitudes.map((amp) => {
               if (amp.prob < 0.0001) return null;
               const mag   = Math.sqrt(amp.prob);          // |alpha|
@@ -113,7 +104,7 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
               );
             })}
 
-            {/* Phase arc legend (colour wheel fragment) */}
+            {/* Phase arc legend (colour wheel fragment) — kept, it's the key to the phase color scheme */}
             {Array.from({ length: 36 }, (_, i) => {
               const a1 = (i / 36) * 2 * Math.PI;
               const a2 = ((i + 1) / 36) * 2 * Math.PI;
@@ -133,18 +124,18 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
             })}
 
             {/* Origin dot */}
-            <circle cx={CX} cy={CY} r={2.5} fill="rgba(148,163,184,0.55)" />
+            <circle cx={CX} cy={CY} r={2.5} fill="var(--db-muted)" />
           </svg>
 
           {/* Phase legend label */}
-          <p className="text-[8px] text-center font-mono text-[var(--color-muted)] mt-1">
+          <p className="text-[8px] text-center font-mono text-[var(--db-muted)] mt-1">
             colour = phase angle
           </p>
         </div>
 
         {/* Amplitude summary bars */}
-        <div className="flex-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] p-4">
-          <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-[var(--color-muted)] mb-3">
+        <div className="flex-1 rounded-lg border border-[var(--db-border)] bg-[var(--db-surface-2)] p-4">
+          <p className="text-[9px] font-mono font-semibold uppercase tracking-widest text-[var(--db-muted)] mb-3">
             Top Amplitudes
           </p>
           <div className="space-y-2.5">
@@ -156,45 +147,45 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
                 <div key={amp.state} className="flex items-center gap-2.5">
                   {/* Phase swatch */}
                   <div
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-black/20"
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-[var(--db-border-strong)]"
                     style={{ background: color }}
                   />
                   {/* State */}
-                  <span className="font-mono text-xs font-bold text-cyan-400 w-12 flex-shrink-0">
+                  <span className="font-mono text-xs font-semibold text-[var(--db-accent)] w-12 flex-shrink-0">
                     {amp.state}
                   </span>
                   {/* Probability bar */}
-                  <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-[var(--db-border)] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(100, (amp.prob / maxProb) * 100)}%`, background: color }}
                     />
                   </div>
                   {/* Percent */}
-                  <span className="text-[10px] font-mono text-[var(--color-muted)] w-10 text-right flex-shrink-0">
+                  <span className="text-[10px] font-mono text-[var(--db-muted)] w-10 text-right flex-shrink-0">
                     {pct}%
                   </span>
                 </div>
               );
             })}
             {nonZero.length === 0 && (
-              <p className="text-xs text-[var(--color-muted)] text-center py-4">All amplitudes zero</p>
+              <p className="text-xs text-[var(--db-muted)] text-center py-4">All amplitudes zero</p>
             )}
           </div>
 
           {/* Entanglement indicator */}
-          <div className="mt-4 pt-3 border-t border-[var(--color-border)]">
-            <div className="flex items-center justify-between text-[9px] font-mono text-[var(--color-muted)]">
+          <div className="mt-4 pt-3 border-t border-[var(--db-border)]">
+            <div className="flex items-center justify-between text-[9px] font-mono text-[var(--db-muted)]">
               <span>Non-zero states</span>
-              <span className="text-cyan-400 font-bold">{nonZero.length} / {amplitudes.length}</span>
+              <span className="text-[var(--db-accent)] font-semibold">{nonZero.length} / {amplitudes.length}</span>
             </div>
-            <div className="mt-1.5 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="mt-1.5 h-1.5 bg-[var(--db-border)] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full transition-all duration-500"
+                className="h-full bg-[var(--db-accent)] rounded-full transition-all duration-500"
                 style={{ width: `${(nonZero.length / amplitudes.length) * 100}%` }}
               />
             </div>
-            <p className="text-[8px] text-[var(--color-muted)] mt-1">
+            <p className="text-[8px] text-[var(--db-muted)] mt-1">
               {nonZero.length <= 1 ? 'Product state (separable)' : nonZero.length <= 2 ? 'Likely entangled' : 'Multi-component superposition'}
             </p>
           </div>
@@ -202,17 +193,17 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
       </div>
 
       {/* ── Amplitude Table ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] overflow-hidden">
+      <div className="rounded-lg border border-[var(--db-border)] bg-[var(--db-surface-2)] overflow-hidden">
         {/* Table header */}
-        <div className="grid gap-1 px-4 py-2 bg-[var(--color-surface)] border-b border-[var(--color-border)]"
+        <div className="grid gap-1 px-4 py-2 bg-[var(--db-surface)] border-b border-[var(--db-border)]"
           style={{ gridTemplateColumns: '72px 72px 80px 1fr 56px 32px' }}>
           {['State', 'Re(α)', 'Im(α)', 'Probability', '|α|²', 'φ'].map(h => (
-            <span key={h} className="text-[9px] font-mono font-bold uppercase tracking-wider text-[var(--color-muted)]">{h}</span>
+            <span key={h} className="text-[9px] font-mono font-semibold uppercase tracking-wider text-[var(--db-muted)]">{h}</span>
           ))}
         </div>
 
         {/* Rows */}
-        <div className="max-h-52 overflow-y-auto divide-y divide-[var(--color-border)]/30">
+        <div className="max-h-52 overflow-y-auto divide-y divide-[var(--db-border)]">
           {amplitudes.map((amp) => {
             const hue   = phaseHue(amp.phase);
             const color = phaseColor(amp.phase, amp.prob);
@@ -222,30 +213,30 @@ export default function AmplitudePhasePanel({ amplitudes = [] }) {
             return (
               <div
                 key={amp.state}
-                className="grid gap-1 px-4 py-2.5 items-center transition-colors hover:bg-[var(--color-surface)]/30"
+                className="grid gap-1 px-4 py-2.5 items-center transition-colors hover:bg-[var(--db-surface)]"
                 style={{ gridTemplateColumns: '72px 72px 80px 1fr 56px 32px', opacity: dim ? 0.3 : 1 }}
               >
-                <span className="font-mono text-xs font-bold text-cyan-400">{amp.state}</span>
-                <span className="font-mono text-xs text-emerald-400">
+                <span className="font-mono text-xs font-semibold text-[var(--db-accent)]">{amp.state}</span>
+                <span className="font-mono text-xs text-[var(--db-neutral)]">
                   {amp.re >= 0 ? '+' : ''}{amp.re.toFixed(3)}
                 </span>
-                <span className="font-mono text-xs text-violet-400">
+                <span className="font-mono text-xs text-[var(--db-neutral)]">
                   {amp.im >= 0 ? '+' : ''}{amp.im.toFixed(3)}i
                 </span>
                 {/* Probability mini-bar */}
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-[var(--db-border)] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(100, (amp.prob / maxProb) * 100)}%`, background: color }}
                     />
                   </div>
                 </div>
-                <span className="font-mono text-[10px] text-[var(--color-muted)] text-right">{pct}%</span>
+                <span className="font-mono text-[10px] text-[var(--db-muted)] text-right">{pct}%</span>
                 {/* Phase swatch */}
                 <div
-                  className="w-4 h-4 rounded-full border border-black/20 justify-self-center"
-                  style={{ background: dim ? '#1e293b' : color }}
+                  className="w-4 h-4 rounded-full border border-[var(--db-border-strong)] justify-self-center"
+                  style={{ background: dim ? 'var(--db-border-strong)' : color }}
                   title={`Phase: ${((amp.phase * 180) / Math.PI).toFixed(1)}°`}
                 />
               </div>

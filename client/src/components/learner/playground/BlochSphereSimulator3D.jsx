@@ -400,13 +400,20 @@ function GateButton({ gateKey, base, sub, sup, onClick, isLight }) {
     <button
       onClick={() => onClick(gateKey)}
       title={gateKey}
-      className={`py-2 px-1.5 rounded-xl border transition-all duration-150 text-center select-none active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer ${
-        isLight
-          ? 'bg-slate-50 text-slate-800 border-slate-300 hover:border-cyan-600 hover:bg-cyan-50 hover:text-cyan-800 shadow-sm font-bold'
-          : 'bg-[#141930] text-slate-200 border-slate-700/50 hover:text-cyan-300 hover:border-cyan-500/60'
-      }`}
+      className="py-2 px-1.5 rounded-md border transition-all duration-150 text-center select-none active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer"
       style={{
         fontFamily: "'Courier New', monospace", fontSize: 11, fontWeight: 700,
+        background: isLight ? '#ffffff' : '#0f1318',
+        color: isLight ? '#111418' : '#e8ecf1',
+        borderColor: isLight ? '#e4e4e7' : '#1f2730',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = isLight ? '#0f766e' : '#5eead4';
+        e.currentTarget.style.color = isLight ? '#0f766e' : '#5eead4';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = isLight ? '#e4e4e7' : '#1f2730';
+        e.currentTarget.style.color = isLight ? '#111418' : '#e8ecf1';
       }}
     >
       <span>{base}</span>
@@ -672,20 +679,41 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
     const col = `hsl(${hue},82%,60%)`;
     return (
       <svg width={size} height={size} className="overflow-visible">
-        <circle cx={cx2} cy={cy2} r={r} fill="none" stroke={isLight ? "rgba(2,132,199,0.30)" : "rgba(56,189,248,0.20)"} strokeWidth={1}/>
-        <line x1={cx2} y1={cy2-r*0.88} x2={cx2} y2={cy2+r*0.88} stroke={isLight ? "rgba(217,119,6,0.35)" : "rgba(250,204,21,0.25)"} strokeWidth={0.8}/>
-        <line x1={cx2-r} y1={cy2} x2={cx2+r} y2={cy2} stroke={isLight ? "rgba(220,38,38,0.35)" : "rgba(248,113,113,0.22)"} strokeWidth={0.8}/>
-        {mag>0.02 && (<><line x1={cx2} y1={cy2} x2={tx} y2={ty} stroke={col} strokeWidth={2} strokeLinecap="round"/><circle cx={tx} cy={ty} r={3} fill={col}/></>)}
-        <circle cx={cx2} cy={cy2} r={2} fill={isLight ? "rgba(71,85,105,0.40)" : "rgba(148,163,184,0.40)"}/>
+        <circle
+          cx={cx2} cy={cy2} r={r}
+          fill="none"
+          stroke={isLight ? '#d4d4d8' : '#2b3540'}
+          strokeWidth={1}
+        />
+        <line
+          x1={cx2} y1={cy2-r*0.88} x2={cx2} y2={cy2+r*0.88}
+          stroke={isLight ? '#e4e4e7' : '#1f2730'}
+          strokeWidth={0.8}
+        />
+        <line
+          x1={cx2-r} y1={cy2} x2={cx2+r} y2={cy2}
+          stroke={isLight ? '#e4e4e7' : '#1f2730'}
+          strokeWidth={0.8}
+        />
+        {mag>0.02 && (
+          <>
+            <line x1={cx2} y1={cy2} x2={tx} y2={ty} stroke={col} strokeWidth={2} strokeLinecap="round"/>
+            <circle cx={tx} cy={ty} r={3} fill={col}/>
+          </>
+        )}
+        <circle cx={cx2} cy={cy2} r={2} fill={isLight ? '#5b6572' : '#8a95a3'}/>
       </svg>
     );
   };
 
-  return (
+
+return (
     <div
-      className={`w-full h-full flex-1 flex overflow-hidden transition-colors duration-300 ${
-        isLight ? 'bg-slate-50 text-slate-900' : 'bg-[#070913] text-slate-100'
-      }`}
+      className="w-full h-full flex-1 flex overflow-hidden transition-colors duration-300"
+      style={{
+        background: isLight ? '#fafaf9' : '#0a0c0f',
+        color: isLight ? '#111418' : '#e8ecf1',
+      }}
     >
       {/* ── 3-D Interactive Canvas Area ────────────────────────────────────── */}
       <div
@@ -697,40 +725,64 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
 
         {/* Orbit Hint */}
         <div className="absolute top-4 left-4 pointer-events-none z-10">
-          <span className={`text-[10px] font-mono tracking-widest uppercase opacity-80 ${isLight ? 'text-slate-700 font-bold' : 'text-slate-400'}`}>
-            ✦ Drag to orbit 3D camera
+          <span
+            className="text-[10px] font-mono tracking-widest uppercase font-medium"
+            style={{ color: isLight ? '#5b6572' : '#8a95a3' }}
+          >
+            Drag to orbit 3D camera
           </span>
         </div>
 
         {/* Animating Indicator */}
         {isAnimating && (
-          <div className="absolute top-14 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md"
+          <div
+            className="absolute top-14 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{
-              background: isLight ? 'rgba(2, 132, 199, 0.15)' : 'rgba(56, 189, 248, 0.12)',
-              border: isLight ? '1px solid rgba(2, 132, 199, 0.40)' : '1px solid rgba(56, 189, 248, 0.35)'
-            }}>
-            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
-            <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isLight ? 'text-cyan-800' : 'text-cyan-300'}`}>smooth rotation</span>
+              background: isLight ? '#ffffff' : '#0f1318',
+              border: `1px solid ${isLight ? '#e4e4e7' : '#1f2730'}`,
+            }}
+          >
+            <div
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ background: isLight ? '#0f766e' : '#5eead4' }}
+            />
+            <span
+              className="text-[10px] font-mono font-semibold uppercase tracking-wider"
+              style={{ color: isLight ? '#0f766e' : '#5eead4' }}
+            >
+              smooth rotation
+            </span>
           </div>
         )}
 
         {/* Quick State Shortcuts */}
         <div className="absolute top-14 left-4 flex flex-col gap-1.5 pointer-events-auto">
-          <span className={`text-[9px] font-mono uppercase tracking-widest mb-0.5 ${isLight ? 'text-slate-700 font-bold' : 'text-slate-500'}`}>States</span>
+          <span
+            className="text-[9px] font-mono uppercase tracking-widest mb-0.5 font-medium"
+            style={{ color: isLight ? '#5b6572' : '#8a95a3' }}
+          >
+            States
+          </span>
           {[
-            ['|0⟩',  0,   0,       isLight ? 'text-amber-800' : 'text-yellow-400'],
-            ['|1⟩',  PI,  0,       isLight ? 'text-rose-800' : 'text-rose-400'],
-            ['|+⟩',  PI/2,0,       isLight ? 'text-sky-800' : 'text-cyan-400'],
-            ['|-⟩',  PI/2,PI,      isLight ? 'text-amber-900' : 'text-amber-400'],
-            ['|i⟩',  PI/2,PI/2,    isLight ? 'text-emerald-800' : 'text-emerald-400'],
-            ['|-i⟩', PI/2,3*PI/2,  isLight ? 'text-teal-800' : 'text-teal-400'],
-          ].map(([lbl, t, p, clr]) => (
-            <button key={lbl} onClick={() => resetTo(t, p)}
-              className={`px-3 py-1 rounded-xl text-xs font-mono font-bold ${clr} active:scale-95 transition-all shadow-sm cursor-pointer ${
-                isLight
-                  ? 'bg-white/95 border border-slate-300 hover:border-cyan-500 hover:bg-cyan-50 text-slate-800'
-                  : 'bg-[#0c1022]/90 border border-cyan-500/20'
-              }`}>
+            ['|0⟩',  0,    0],
+            ['|1⟩',  PI,   0],
+            ['|+⟩',  PI/2, 0],
+            ['|-⟩',  PI/2, PI],
+            ['|i⟩',  PI/2, PI/2],
+            ['|-i⟩', PI/2, 3*PI/2],
+          ].map(([lbl, t, p]) => (
+            <button
+              key={lbl}
+              onClick={() => resetTo(t, p)}
+              className="px-3 py-1 rounded-md text-xs font-mono font-semibold active:scale-95 transition-all cursor-pointer border"
+              style={{
+                background: isLight ? '#ffffff' : '#0f1318',
+                borderColor: isLight ? '#e4e4e7' : '#1f2730',
+                color: isLight ? '#111418' : '#e8ecf1',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = isLight ? '#0f766e' : '#5eead4'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = isLight ? '#e4e4e7' : '#1f2730'; }}
+            >
               {lbl}
             </button>
           ))}
@@ -738,82 +790,97 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
 
         {/* Bottom HUD Bar */}
         <div
-          className={`absolute bottom-0 left-0 right-0 grid grid-cols-3 px-8 py-3.5 font-mono text-xs backdrop-blur-md border-t transition-colors ${
-            isLight
-              ? 'bg-white/95 text-slate-900 border-slate-300 shadow-lg'
-              : 'bg-[#04060e]/95 text-slate-100 border-slate-900'
-          }`}
+          className="absolute bottom-0 left-0 right-0 grid grid-cols-3 px-8 py-3.5 font-mono text-xs border-t transition-colors"
+          style={{
+            background: isLight ? '#ffffff' : '#0f1318',
+            borderColor: isLight ? '#e4e4e7' : '#1f2730',
+            color: isLight ? '#111418' : '#e8ecf1',
+            boxShadow: isLight
+              ? '0 20px 50px -20px rgba(15,23,42,.22)'
+              : '0 24px 60px -20px rgba(0,0,0,.75)',
+          }}
         >
           {/* Angles */}
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className={isLight ? "text-slate-600 font-bold" : "text-slate-500"}>θ:</span>
-              <span className={`font-bold ${isLight ? 'text-amber-700' : 'text-yellow-300'}`}>{(theta*180/PI).toFixed(1)}°</span>
-              <span className={`text-[10px] ${isLight ? 'text-slate-500 font-medium' : 'text-slate-600'}`}>({(theta/PI).toFixed(2)}π)</span>
+              <span style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>θ:</span>
+              <span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>{(theta*180/PI).toFixed(1)}°</span>
+              <span className="text-[10px]" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>({(theta/PI).toFixed(2)}π)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className={isLight ? "text-slate-600 font-bold" : "text-slate-500"}>φ:</span>
-              <span className={`font-bold ${isLight ? 'text-sky-700' : 'text-cyan-300'}`}>{(phi*180/PI).toFixed(1)}°</span>
-              <span className={`text-[10px] ${isLight ? 'text-slate-500 font-medium' : 'text-slate-600'}`}>({(phi/PI).toFixed(2)}π)</span>
+              <span style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>φ:</span>
+              <span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>{(phi*180/PI).toFixed(1)}°</span>
+              <span className="text-[10px]" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>({(phi/PI).toFixed(2)}π)</span>
             </div>
           </div>
 
           {/* State amplitudes */}
-          <div className={`space-y-1 text-center border-x px-4 ${isLight ? 'border-slate-300' : 'border-slate-800/60'}`}>
-            <div className={`text-[11px] font-bold ${isLight ? 'text-slate-900' : 'text-slate-300'}`}>
-              |ψ⟩ = <span className={isLight ? "text-amber-700 font-black" : "text-yellow-300"}>{fmt(alpha)}</span>|0⟩ + <span className={isLight ? "text-sky-700 font-black" : "text-cyan-300"}>({fmt(bReal)}{bImag>=0?'+':''}{bImag.toFixed(4)}i)</span>|1⟩
+          <div
+            className="space-y-1 text-center border-x px-4"
+            style={{ borderColor: isLight ? '#e4e4e7' : '#1f2730' }}
+          >
+            <div className="text-[11px] font-semibold" style={{ color: isLight ? '#111418' : '#e8ecf1' }}>
+              |ψ⟩ = <span style={{ color: isLight ? '#0f766e' : '#5eead4' }}>{fmt(alpha)}</span>|0⟩ + <span style={{ color: isLight ? '#0f766e' : '#5eead4' }}>({fmt(bReal)}{bImag>=0?'+':''}{bImag.toFixed(4)}i)</span>|1⟩
             </div>
             <div className="flex justify-center gap-4 text-[10px]">
-              <span className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>P(|0⟩) = {prob0}%</span>
-              <span className={`font-bold ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>P(|1⟩) = {prob1}%</span>
+              <span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>P(|0⟩) = {prob0}%</span>
+              <span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>P(|1⟩) = {prob1}%</span>
             </div>
           </div>
 
           {/* Bloch Vector Coordinates */}
           <div className="space-y-0.5 text-right">
-            <div><span className={isLight ? "text-slate-600 font-bold" : "text-slate-500"}>X: </span><span className={`font-bold ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>{fmt(vec[0])}</span></div>
-            <div><span className={isLight ? "text-slate-600 font-bold" : "text-slate-500"}>Y: </span><span className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{fmt(vec[1])}</span></div>
-            <div><span className={isLight ? "text-slate-600 font-bold" : "text-slate-500"}>Z: </span><span className={`font-bold ${isLight ? 'text-amber-700' : 'text-yellow-400'}`}>{fmt(vec[2])}</span></div>
+            <div><span style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>X: </span><span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>{fmt(vec[0])}</span></div>
+            <div><span style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>Y: </span><span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>{fmt(vec[1])}</span></div>
+            <div><span style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>Z: </span><span className="font-semibold" style={{ color: isLight ? '#475569' : '#cbd5e1' }}>{fmt(vec[2])}</span></div>
           </div>
         </div>
       </div>
 
       {/* ── Control Panel Toolbox ──────────────────────────────────────────── */}
       <div
-        className={`w-[290px] flex-shrink-0 flex flex-col border-l transition-colors ${
-          isLight ? 'bg-white border-slate-300 text-slate-900 shadow-lg' : 'bg-[#0b0e20] border-slate-800 text-slate-100'
-        }`}
+        className="w-[290px] flex-shrink-0 flex flex-col border-l transition-colors"
+        style={{
+          background: isLight ? '#ffffff' : '#0f1318',
+          borderColor: isLight ? '#e4e4e7' : '#1f2730',
+          color: isLight ? '#111418' : '#e8ecf1',
+          boxShadow: isLight
+            ? '0 20px 50px -20px rgba(15,23,42,.22)'
+            : '0 24px 60px -20px rgba(0,0,0,.75)',
+        }}
       >
         {/* Header Tabs */}
-        <div className={`flex border-b ${isLight ? 'bg-slate-100 border-slate-300' : 'bg-[#080a18] border-slate-800'}`}>
-          <button
-            onClick={() => setActiveTab('gates')}
-            className={`flex-1 py-3 text-xs font-mono font-bold transition-all border-b-2 cursor-pointer ${
-              activeTab === 'gates'
-                ? (isLight ? 'text-sky-700 border-sky-600 bg-white shadow-sm' : 'text-cyan-400 border-cyan-400 bg-cyan-950/20')
-                : (isLight ? 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50' : 'text-slate-400 border-transparent hover:text-slate-200')
-            }`}
-          >
-            Gates
-          </button>
-          <button
-            onClick={() => setActiveTab('sliders')}
-            className={`flex-1 py-3 text-xs font-mono font-bold transition-all border-b-2 cursor-pointer ${
-              activeTab === 'sliders'
-                ? (isLight ? 'text-sky-700 border-sky-600 bg-white shadow-sm' : 'text-cyan-400 border-cyan-400 bg-cyan-950/20')
-                : (isLight ? 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50' : 'text-slate-400 border-transparent hover:text-slate-200')
-            }`}
-          >
-            Angles
-          </button>
+        <div
+          className="flex border-b"
+          style={{ background: isLight ? '#f4f4f5' : '#141a21', borderColor: isLight ? '#e4e4e7' : '#1f2730' }}
+        >
+          {['gates', 'sliders'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className="flex-1 py-3 text-xs font-mono font-semibold transition-all border-b-2 cursor-pointer"
+              style={{
+                color: activeTab === tab
+                  ? (isLight ? '#0f766e' : '#5eead4')
+                  : (isLight ? '#5b6572' : '#8a95a3'),
+                borderColor: activeTab === tab ? (isLight ? '#0f766e' : '#5eead4') : 'transparent',
+                background: activeTab === tab ? (isLight ? '#ffffff' : '#0f1318') : 'transparent',
+              }}
+            >
+              {tab === 'gates' ? 'Gates' : 'Angles'}
+            </button>
+          ))}
           {externalVectors && externalVectors.length > 0 && (
             <button
               onClick={() => setActiveTab('circuit')}
-              className={`flex-1 py-3 text-xs font-mono font-bold transition-all border-b-2 cursor-pointer ${
-                activeTab === 'circuit'
-                  ? (isLight ? 'text-sky-700 border-sky-600 bg-white shadow-sm' : 'text-cyan-400 border-cyan-400 bg-cyan-950/20')
-                  : (isLight ? 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50' : 'text-slate-400 border-transparent hover:text-slate-200')
-              }`}
+              className="flex-1 py-3 text-xs font-mono font-semibold transition-all border-b-2 cursor-pointer"
+              style={{
+                color: activeTab === 'circuit'
+                  ? (isLight ? '#0f766e' : '#5eead4')
+                  : (isLight ? '#5b6572' : '#8a95a3'),
+                borderColor: activeTab === 'circuit' ? (isLight ? '#0f766e' : '#5eead4') : 'transparent',
+                background: activeTab === 'circuit' ? (isLight ? '#ffffff' : '#0f1318') : 'transparent',
+              }}
             >
               Circuit ({externalVectors.length})
             </button>
@@ -829,61 +896,66 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
               {/* Half-Turn (180°) */}
               <section>
                 <div className="flex items-center justify-between mb-2">
-                  <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>Pauli &amp; Hadamard</p>
-                  <span className={`text-[9px] font-mono ${isLight ? 'text-slate-600 font-bold' : 'text-slate-500'}`}>180° rotation</span>
+                  <p className="text-[10px] font-mono font-semibold uppercase tracking-widest" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>Pauli &amp; Hadamard</p>
+                  <span className="text-[9px] font-mono" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>180° rotation</span>
                 </div>
-                <GRow keys={[['Px','X','',''],['Py','Y','',''],['Pz','Z','','']]} />
+                <GRow keys={[['Px','X','',''],['Py','Y','',''],['Pz','Z','','']]} isLight={isLight} />
                 <div className="mt-1.5"><GateButton gateKey="H" base="H (Hadamard)" sub="" sup="" onClick={applyGate} isLight={isLight} /></div>
               </section>
 
               {/* Quarter-Turn (90°) */}
               <section>
                 <div className="flex items-center justify-between mb-2">
-                  <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>Quarter Pulses (90°)</p>
-                  <span className={`text-[9px] font-mono ${isLight ? 'text-slate-600 font-bold' : 'text-slate-500'}`}>π/2</span>
+                  <p className="text-[10px] font-mono font-semibold uppercase tracking-widest" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>Quarter Pulses (90°)</p>
+                  <span className="text-[9px] font-mono" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>π/2</span>
                 </div>
-                <GRow keys={[['Px½','X','½',''],['Py½','Y','½',''],['Pz½','Z','½','']]} />
+                <GRow keys={[['Px½','X','½',''],['Py½','Y','½',''],['Pz½','Z','½','']]} isLight={isLight} />
                 <div className="mt-1.5">
-                  <GRow keys={[['Px-½','X','-½',''],['Py-½','Y','-½',''],['Pz-½','Z','-½','']]} />
+                  <GRow keys={[['Px-½','X','-½',''],['Py-½','Y','-½',''],['Pz-½','Z','-½','']]} isLight={isLight} />
                 </div>
                 <div className="mt-1.5">
-                  <GRow keys={[['S','S','',''],['S-1','S','','†'],['T','T','',''],['T-1','T','','†']]} />
+                  <GRow keys={[['S','S','',''],['S-1','S','','†'],['T','T','',''],['T-1','T','','†']]} isLight={isLight} />
                 </div>
               </section>
 
               {/* Eighth-Turn (45°) */}
               <section>
                 <div className="flex items-center justify-between mb-2">
-                  <p className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>Eighth Pulses (45°)</p>
-                  <span className={`text-[9px] font-mono ${isLight ? 'text-slate-600 font-bold' : 'text-slate-500'}`}>π/4</span>
+                  <p className="text-[10px] font-mono font-semibold uppercase tracking-widest" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>Eighth Pulses (45°)</p>
+                  <span className="text-[9px] font-mono" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>π/4</span>
                 </div>
-                <GRow keys={[['Px¼','X','¼',''],['Py¼','Y','¼',''],['Pz¼','Z','¼','']]} />
+                <GRow keys={[['Px¼','X','¼',''],['Py¼','Y','¼',''],['Pz¼','Z','¼','']]} isLight={isLight} />
                 <div className="mt-1.5">
-                  <GRow keys={[['Px-¼','X','-¼',''],['Py-¼','Y','-¼',''],['Pz-¼','Z','-¼','']]} />
+                  <GRow keys={[['Px-¼','X','-¼',''],['Py-¼','Y','-¼',''],['Pz-¼','Z','-¼','']]} isLight={isLight} />
                 </div>
               </section>
 
               {/* Parametric Z Rotation (Lambda) */}
-              <section className={`p-3.5 rounded-2xl border ${isLight ? 'border-slate-300 bg-slate-50 shadow-sm' : 'border-slate-800 bg-[#10142a]'}`}>
-                <p className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-2 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
+              <section
+                className="p-3.5 rounded-lg border"
+                style={{ borderColor: isLight ? '#e4e4e7' : '#1f2730', background: isLight ? '#f4f4f5' : '#141a21' }}
+              >
+                <p className="text-[10px] font-mono font-semibold uppercase tracking-widest mb-2" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>
                   Parametric Rz(λ) Gate
                 </p>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className={`text-xs font-mono ${isLight ? 'text-slate-700 font-medium' : 'text-slate-300'}`}>Phase λ:</span>
-                  <span className={`text-xs font-mono font-bold ${isLight ? 'text-sky-700' : 'text-cyan-400'}`}>{lambdaAngle}°</span>
+                  <span className="text-xs font-mono font-medium" style={{ color: isLight ? '#111418' : '#e8ecf1' }}>Phase λ:</span>
+                  <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#0f766e' : '#5eead4' }}>{lambdaAngle}°</span>
                 </div>
                 <input
                   type="range" min={0} max={360} step={5} value={lambdaAngle}
                   onChange={e => setLambdaAngle(Number(e.target.value))}
-                  className={`w-full h-1.5 rounded-full cursor-pointer mb-3 ${isLight ? 'accent-sky-600 bg-slate-200' : 'accent-cyan-500'}`}
+                  className="w-full h-1.5 rounded-full cursor-pointer mb-3"
+                  style={{ accentColor: isLight ? '#0f766e' : '#5eead4', background: isLight ? '#e4e4e7' : '#1f2730' }}
                 />
                 <button
                   onClick={() => applyMat(rotZ(lambdaAngle * PI / 180))}
-                  className={`w-full py-2 rounded-xl text-xs font-mono font-bold tracking-wider transition-all active:scale-95 cursor-pointer ${
-                    isLight
-                      ? 'text-sky-800 border border-sky-400 bg-sky-100/80 hover:bg-sky-200 shadow-sm'
-                      : 'text-cyan-300 border border-cyan-500/30 bg-cyan-950/40 hover:bg-cyan-900/50'
-                  }`}
+                  className="w-full py-2 rounded-md text-xs font-mono font-semibold tracking-wider transition-all active:scale-95 cursor-pointer border"
+                  style={{
+                    color: isLight ? '#0f766e' : '#5eead4',
+                    borderColor: isLight ? '#0f766e' : '#5eead4',
+                    background: isLight ? 'rgba(15,118,110,.09)' : 'rgba(94,234,212,.10)',
+                  }}
                 >
                   APPLY Rz({lambdaAngle}°)
                 </button>
@@ -894,36 +966,44 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
           {/* ── TAB 2: ANGLE SLIDERS ───────────────────────────────────────── */}
           {activeTab === 'sliders' && (
             <div className="space-y-5">
-              <section className={`p-3.5 rounded-2xl border space-y-3 ${isLight ? 'border-slate-300 bg-slate-50 shadow-sm' : 'border-slate-800 bg-[#10142a]'}`}>
+              <section
+                className="p-3.5 rounded-lg border space-y-3"
+                style={{ borderColor: isLight ? '#e4e4e7' : '#1f2730', background: isLight ? '#f4f4f5' : '#141a21' }}
+              >
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-mono font-bold ${isLight ? 'text-amber-800' : 'text-yellow-400'}`}>Polar Angle θ (Latitude)</span>
-                  <span className={`text-xs font-mono font-bold ${isLight ? 'text-amber-700' : 'text-yellow-300'}`}>{(theta * 180 / PI).toFixed(1)}°</span>
+                  <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#111418' : '#e8ecf1' }}>Polar Angle θ (Latitude)</span>
+                  <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#0f766e' : '#5eead4' }}>{(theta * 180 / PI).toFixed(1)}°</span>
                 </div>
                 <input
                   type="range" min={0} max={180} step={1}
                   value={Math.round(theta * 180 / PI)}
                   onChange={e => setDirectAngles(Number(e.target.value), phi * 180 / PI)}
-                  className={`w-full h-2 rounded-full cursor-pointer ${isLight ? 'accent-amber-600 bg-slate-200' : 'accent-amber-500'}`}
+                  className="w-full h-2 rounded-full cursor-pointer"
+                  style={{ accentColor: isLight ? '#0f766e' : '#5eead4', background: isLight ? '#e4e4e7' : '#1f2730' }}
                 />
-                <div className={`flex justify-between text-[9px] font-mono ${isLight ? 'text-slate-600 font-medium' : 'text-slate-500'}`}>
+                <div className="flex justify-between text-[9px] font-mono font-medium" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>
                   <span>0° (|0⟩)</span>
                   <span>90° (Equator)</span>
                   <span>180° (|1⟩)</span>
                 </div>
               </section>
 
-              <section className={`p-3.5 rounded-2xl border space-y-3 ${isLight ? 'border-slate-300 bg-slate-50 shadow-sm' : 'border-slate-800 bg-[#10142a]'}`}>
+              <section
+                className="p-3.5 rounded-lg border space-y-3"
+                style={{ borderColor: isLight ? '#e4e4e7' : '#1f2730', background: isLight ? '#f4f4f5' : '#141a21' }}
+              >
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-mono font-bold ${isLight ? 'text-sky-800' : 'text-cyan-400'}`}>Azimuthal Angle φ (Longitude)</span>
-                  <span className={`text-xs font-mono font-bold ${isLight ? 'text-sky-700' : 'text-cyan-300'}`}>{(phi * 180 / PI).toFixed(1)}°</span>
+                  <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#111418' : '#e8ecf1' }}>Azimuthal Angle φ (Longitude)</span>
+                  <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#0f766e' : '#5eead4' }}>{(phi * 180 / PI).toFixed(1)}°</span>
                 </div>
                 <input
                   type="range" min={0} max={360} step={1}
                   value={Math.round(phi * 180 / PI)}
                   onChange={e => setDirectAngles(theta * 180 / PI, Number(e.target.value))}
-                  className={`w-full h-2 rounded-full cursor-pointer ${isLight ? 'accent-sky-600 bg-slate-200' : 'accent-cyan-500'}`}
+                  className="w-full h-2 rounded-full cursor-pointer"
+                  style={{ accentColor: isLight ? '#0f766e' : '#5eead4', background: isLight ? '#e4e4e7' : '#1f2730' }}
                 />
-                <div className={`flex justify-between text-[9px] font-mono ${isLight ? 'text-slate-600 font-medium' : 'text-slate-500'}`}>
+                <div className="flex justify-between text-[9px] font-mono font-medium" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>
                   <span>0° (+X)</span>
                   <span>90° (+Y)</span>
                   <span>180° (-X)</span>
@@ -936,7 +1016,7 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
           {/* ── TAB 3: CIRCUIT QUBIT VECTORS ───────────────────────────────── */}
           {activeTab === 'circuit' && externalVectors && (
             <div className="space-y-3">
-              <p className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
+              <p className="text-[10px] font-mono font-semibold uppercase tracking-widest mb-1" style={{ color: isLight ? '#5b6572' : '#8a95a3' }}>
                 Multi-Qubit Circuit State
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -948,15 +1028,14 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
                     <button
                       key={idx}
                       onClick={() => resetTo(t2, p2)}
-                      className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all active:scale-95 select-none cursor-pointer ${
-                        isLight
-                          ? 'bg-slate-50 border-slate-300 hover:border-sky-500 shadow-sm'
-                          : 'bg-[#0e132a] border-cyan-500/25 hover:border-cyan-500/60'
-                      }`}
+                      className="flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all active:scale-95 select-none cursor-pointer"
+                      style={{ background: isLight ? '#f4f4f5' : '#141a21', borderColor: isLight ? '#e4e4e7' : '#1f2730' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = isLight ? '#0f766e' : '#5eead4'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = isLight ? '#e4e4e7' : '#1f2730'; }}
                     >
                       <MiniBloch vec={v} size={56} />
-                      <span className={`text-xs font-mono font-bold ${isLight ? 'text-slate-800' : 'text-slate-200'}`}>q[{idx}]</span>
-                      <span className={`text-[9px] font-mono ${isLight ? 'text-sky-700 font-bold' : 'text-cyan-400'}`}>
+                      <span className="text-xs font-mono font-semibold" style={{ color: isLight ? '#111418' : '#e8ecf1' }}>q[{idx}]</span>
+                      <span className="text-[9px] font-mono font-semibold" style={{ color: isLight ? '#0f766e' : '#5eead4' }}>
                         P₁ = {(((v.prob1 ?? 0) * 100).toFixed(0))}%
                       </span>
                     </button>
@@ -967,10 +1046,15 @@ export default function BlochSphereSimulator3D({ externalVectors = null, numCirc
           )}
 
           {/* Reset Button */}
-          <section className={`pt-2 border-t ${isLight ? 'border-slate-300' : 'border-slate-800'}`}>
+          <section className="pt-2 border-t" style={{ borderColor: isLight ? '#e4e4e7' : '#1f2730' }}>
             <button
               onClick={() => resetTo(0, 0)}
-              className="w-full py-2.5 rounded-xl text-xs font-mono font-bold transition-all active:scale-95 text-rose-500 border border-rose-400/40 bg-rose-500/10 hover:bg-rose-500/20 cursor-pointer"
+              className="w-full py-2.5 rounded-md text-xs font-mono font-semibold transition-all active:scale-95 cursor-pointer border"
+              style={{
+                color: isLight ? '#be123c' : '#fb7185',
+                borderColor: isLight ? '#be123c' : '#fb7185',
+                background: isLight ? 'rgba(190,18,60,.06)' : 'rgba(251,113,133,.08)',
+              }}
             >
               Reset to Ground State |0⟩
             </button>

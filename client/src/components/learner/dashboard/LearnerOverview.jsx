@@ -6,12 +6,11 @@ import {
   LuAtom, LuCpu, LuSparkles, LuFlame, LuZap, LuTrophy, LuMedal,
   LuTarget, LuBrain, LuFlaskConical, LuPlay, LuCheck, LuClock,
   LuBookOpen, LuLayers, LuTrendingUp, LuArrowRight, LuChevronRight,
-  LuCalendar, LuShield, LuActivity, LuTerminal, LuExternalLink,
-  LuRefreshCw, LuBot, LuCircleCheck, LuChevronDown
+  LuShield, LuActivity, LuBot, LuCircleCheck
 } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 
-// ─── User Quantum Rank Titles ────────────────────────────────────────────────
+// ─── User Rank Titles ────────────────────────────────────────────────────────
 const getRankTitle = (level = 1) => {
   if (level >= 10) return 'Quantum Grandmaster';
   if (level >= 7) return 'Qubit Architect';
@@ -20,7 +19,7 @@ const getRankTitle = (level = 1) => {
   return 'Quantum Explorer';
 };
 
-// ─── 1. Refined Modern Welcome Hero ───────────────────────────────────────────
+// ─── 1. Welcome Header ────────────────────────────────────────────────────────
 function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
   const xp = user.xp || 0;
   const nextXp = user.nextLevelXp || 1000;
@@ -34,24 +33,18 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
   const firstName = user.name ? user.name.split(' ')[0] : 'Learner';
 
   return (
-    <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8 shadow-sm transition-all">
-      {/* Subtle Ambient Glow */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-indigo-500/10 via-cyan-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-violet-500/5 rounded-full blur-2xl pointer-events-none" />
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 
-      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        
         {/* Left: Avatar + User Info */}
         <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
-          
+
           {/* Avatar with Level Badge */}
           <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-md shadow-indigo-500/20">
-              <div className="w-full h-full rounded-[14px] bg-[var(--color-surface)] flex items-center justify-center text-[var(--color-primary)] font-black text-2xl font-mono">
-                {firstName.charAt(0).toUpperCase()}
-              </div>
+            <div className="w-16 h-16 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] flex items-center justify-center text-[var(--color-text)] font-semibold text-2xl font-mono">
+              {firstName.charAt(0).toUpperCase()}
             </div>
-            <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-500 text-white text-[10px] font-black font-mono shadow-sm">
+            <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-md bg-teal-700 dark:bg-teal-500 text-white text-[10px] font-semibold font-mono">
               L{level}
             </div>
           </div>
@@ -59,26 +52,26 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
           {/* Details & XP Bar */}
           <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 dark:bg-cyan-500/15 px-2.5 py-0.5 rounded-md border border-cyan-500/20 flex items-center gap-1.5">
-                <LuAtom size={13} className="text-cyan-500" />
+              <span className="text-[11px] font-mono font-medium text-[var(--color-muted)] bg-[var(--color-background)] px-2.5 py-0.5 rounded-md border border-[var(--color-border)] flex items-center gap-1.5">
+                <LuAtom size={13} />
                 {rankTitle}
               </span>
-              
+
               {streak > 0 && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold font-mono text-rose-500 bg-rose-500/10 dark:bg-rose-500/15 px-2.5 py-0.5 rounded-md border border-rose-500/20">
-                  <LuFlame size={13} className="text-rose-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium font-mono text-[var(--color-muted)] bg-[var(--color-background)] px-2.5 py-0.5 rounded-md border border-[var(--color-border)]">
+                  <LuFlame size={13} />
                   {streak}d streak
                 </span>
               )}
             </div>
 
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[var(--color-text)]">
-                {greeting}, <span className="text-[var(--color-primary)]">{firstName}</span> 👋
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[var(--color-text)]">
+                {greeting}, {firstName}
               </h1>
               <p className="text-xs sm:text-sm text-[var(--color-muted)] mt-0.5">
                 {currentCourse?.title && currentCourse.title !== 'No active course' ? (
-                  <>Continue mastering <span className="font-semibold text-[var(--color-text)]">{currentCourse.title}</span></>
+                  <>Continue with <span className="font-medium text-[var(--color-text)]">{currentCourse.title}</span></>
                 ) : (
                   'Ready to explore quantum computing algorithms and simulations?'
                 )}
@@ -88,14 +81,14 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
             {/* XP Progress Indicator */}
             <div className="pt-1 max-w-md space-y-1.5">
               <div className="flex justify-between items-center text-xs font-mono">
-                <span className="text-[var(--color-text)] font-semibold flex items-center gap-1">
-                  <LuZap size={12} className="text-amber-500" /> {xp.toLocaleString()} <span className="text-[var(--color-muted)] font-normal">/ {nextXp.toLocaleString()} XP</span>
+                <span className="text-[var(--color-text)] font-medium flex items-center gap-1">
+                  <LuZap size={12} /> {xp.toLocaleString()} <span className="text-[var(--color-muted)] font-normal">/ {nextXp.toLocaleString()} XP</span>
                 </span>
-                <span className="text-xs font-bold text-[var(--color-primary)] font-mono">{xpPct}%</span>
+                <span className="text-xs font-medium text-teal-700 dark:text-teal-400 font-mono">{xpPct}%</span>
               </div>
-              <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-[var(--color-background)] border border-[var(--color-border)] rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-cyan-400 transition-all duration-700"
+                  className="h-full rounded-full bg-teal-600 dark:bg-teal-500 transition-all duration-500"
                   style={{ width: `${xpPct}%` }}
                 />
               </div>
@@ -108,13 +101,13 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
           <div className="flex items-center gap-2">
             <Link
               href="/playground"
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold font-mono transition-all flex items-center gap-2 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30"
+              className="px-4 py-2.5 rounded-md bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-medium font-mono transition-colors flex items-center gap-2"
             >
               <LuCpu size={15} /> Circuit Sandbox
             </Link>
             <Link
               href="/learn"
-              className="px-4 py-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-background)] hover:bg-[var(--color-border)]/50 text-[var(--color-text)] text-xs font-semibold font-mono transition-all flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-md border border-[var(--color-border)] bg-[var(--color-background)] hover:bg-[var(--color-border)]/40 text-[var(--color-text)] text-xs font-medium font-mono transition-colors flex items-center gap-1.5"
             >
               <LuBookOpen size={14} /> Courses
             </Link>
@@ -122,9 +115,9 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
 
           <div className="text-[11px] font-mono text-[var(--color-muted)] flex items-center gap-1.5">
             <span>Global Rank:</span>
-            <span className="font-bold text-[var(--color-text)]">#{quickStats.rank || 1}</span>
-            <span className="text-slate-400">·</span>
-            <span className="text-emerald-500 font-semibold">{quickStats.badges || 0} Badges</span>
+            <span className="font-medium text-[var(--color-text)]">#{quickStats.rank || 1}</span>
+            <span className="text-[var(--color-border)]">·</span>
+            <span className="font-medium text-[var(--color-text)]">{quickStats.badges || 0} Badges</span>
           </div>
         </div>
 
@@ -133,7 +126,7 @@ function QuantumHero({ user = {}, currentCourse = {}, quickStats = {} }) {
   );
 }
 
-// ─── 2. Clean Modern Stats Grid ───────────────────────────────────────────────
+// ─── 2. Stats Grid ────────────────────────────────────────────────────────────
 function QuantumMetricsGrid({ stats = {}, quickStats = {} }) {
   const cards = [
     {
@@ -141,40 +134,28 @@ function QuantumMetricsGrid({ stats = {}, quickStats = {} }) {
       value: stats.courses?.enrolled || 0,
       sub: `${stats.courses?.completed || 0} completed`,
       icon: LuBookOpen,
-      iconColor: 'text-blue-500',
-      iconBg: 'bg-blue-500/10 border-blue-500/20',
       pillText: stats.courses?.enrolled ? `${Math.round((stats.courses.completed / stats.courses.enrolled) * 100)}% done` : 'Enrolled',
-      pillColor: 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
     },
     {
       title: 'Lessons Completed',
       value: stats.lessons?.completed || 0,
       sub: `of ${stats.lessons?.total || 0} total units`,
       icon: LuLayers,
-      iconColor: 'text-indigo-500',
-      iconBg: 'bg-indigo-500/10 border-indigo-500/20',
       pillText: `${stats.lessons?.total ? Math.round((stats.lessons.completed / stats.lessons.total) * 100) : 0}% progress`,
-      pillColor: 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
     },
     {
       title: 'Circuits Simulated',
       value: stats.simulations?.total || 0,
       sub: `${stats.simulations?.thisWeek || 0} this week`,
       icon: LuFlaskConical,
-      iconColor: 'text-cyan-500',
-      iconBg: 'bg-cyan-500/10 border-cyan-500/20',
       pillText: 'Aer Simulator',
-      pillColor: 'text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
     },
     {
       title: 'Badges & Honors',
       value: quickStats.badges || 0,
       sub: `Rank #${quickStats.rank || '—'} Global`,
       icon: LuTrophy,
-      iconColor: 'text-amber-500',
-      iconBg: 'bg-amber-500/10 border-amber-500/20',
       pillText: 'Top 10%',
-      pillColor: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
     },
   ];
 
@@ -185,22 +166,22 @@ function QuantumMetricsGrid({ stats = {}, quickStats = {} }) {
         return (
           <div
             key={i}
-            className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm hover:border-[var(--color-primary)]/40 hover:shadow-md transition-all group flex flex-col justify-between"
+            className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 hover:border-teal-600/40 dark:hover:border-teal-500/40 transition-colors flex flex-col justify-between"
           >
             <div className="flex items-center justify-between gap-2">
-              <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${c.iconBg} ${c.iconColor} group-hover:scale-105 transition-transform`}>
-                <Icon size={20} />
+              <div className="w-9 h-9 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+                <Icon size={18} />
               </div>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${c.pillColor}`}>
+              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border border-[var(--color-border)] text-[var(--color-muted)]">
                 {c.pillText}
               </span>
             </div>
 
             <div className="mt-4 space-y-0.5">
-              <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-[var(--color-text)]">
+              <div className="text-2xl sm:text-3xl font-semibold font-mono tracking-tight text-[var(--color-text)]">
                 {typeof c.value === 'number' ? c.value.toLocaleString() : c.value}
               </div>
-              <div className="text-xs sm:text-sm font-bold text-[var(--color-text)]">{c.title}</div>
+              <div className="text-xs sm:text-sm font-medium text-[var(--color-text)]">{c.title}</div>
               <div className="text-[11px] text-[var(--color-muted)] font-mono">{c.sub}</div>
             </div>
           </div>
@@ -210,30 +191,28 @@ function QuantumMetricsGrid({ stats = {}, quickStats = {} }) {
   );
 }
 
-
-
-// ─── 3. Dynamic "Continue Learning" Quantum Station ───────────────────────────
+// ─── 3. Continue Learning ─────────────────────────────────────────────────────
 function ContinueLearningStation({ currentCourse = {} }) {
   const hasCourse = currentCourse?.title && currentCourse.title !== 'No active course';
 
   if (!hasCourse) {
     return (
-      <div className="rounded-3xl border border-dashed border-indigo-500/30 bg-gradient-to-br from-indigo-500/5 via-[var(--color-surface)] to-cyan-500/5 p-6 sm:p-8 text-center transition-all hover:border-indigo-500/50">
+      <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8 text-center">
         <div className="max-w-md mx-auto space-y-4">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <LuAtom size={28} className="animate-spin" style={{ animationDuration: '10s' }} />
+          <div className="w-12 h-12 mx-auto rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuAtom size={24} />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-[var(--color-text)]">Begin Your Quantum Journey</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text)]">Begin Your Quantum Journey</h3>
             <p className="text-xs text-[var(--color-muted)] mt-1">
-              Explore foundational quantum mechanics, Superposition, Entanglement, and Quantum Logic Gates with interactive simulations.
+              Explore foundational quantum mechanics, superposition, entanglement, and quantum logic gates with interactive simulations.
             </p>
           </div>
           <Link
             href="/learn"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-medium transition-colors"
           >
-            Explore Courses Catalog <LuArrowRight size={14} />
+            Explore Course Catalog <LuArrowRight size={14} />
           </Link>
         </div>
       </div>
@@ -243,29 +222,27 @@ function ContinueLearningStation({ currentCourse = {} }) {
   const progress = currentCourse.progress || 0;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 group">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 hover:border-teal-600/40 dark:hover:border-teal-500/40 transition-colors">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        
+
         {/* Left Info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white flex-shrink-0 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <LuPlay size={24} className="ml-1" />
+          <div className="w-12 h-12 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text)] flex-shrink-0">
+            <LuPlay size={20} className="ml-0.5" />
           </div>
           <div className="flex-1 min-w-0 space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-500 bg-cyan-500/10 px-2.5 py-0.5 rounded-md border border-cyan-500/20">
+              <span className="text-[10px] font-mono font-medium text-teal-700 dark:text-teal-400 bg-teal-700/10 dark:bg-teal-500/10 px-2.5 py-0.5 rounded-md border border-teal-700/20 dark:border-teal-500/20">
                 Active Pathway
               </span>
               {currentCourse.difficulty && (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md border border-[var(--color-border)] text-[var(--color-muted)]">
                   {currentCourse.difficulty}
                 </span>
               )}
             </div>
 
-            <h2 className="text-lg font-bold text-[var(--color-text)] truncate">
+            <h2 className="text-lg font-semibold text-[var(--color-text)] truncate">
               {currentCourse.title}
             </h2>
 
@@ -273,19 +250,19 @@ function ContinueLearningStation({ currentCourse = {} }) {
               <span className="font-mono text-[11px] text-[var(--color-text)] font-medium">
                 {currentCourse.module || 'Module 1'}
               </span>
-              <LuChevronRight size={12} className="text-[var(--color-muted)]" />
+              <LuChevronRight size={12} />
               <span className="truncate">{currentCourse.lesson || 'Current Lesson'}</span>
             </div>
 
             {/* Progress line */}
             <div className="flex items-center gap-3 pt-1 max-w-lg">
-              <div className="flex-1 h-2 bg-slate-800/20 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-[var(--color-background)] border border-[var(--color-border)] rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-700"
+                  className="h-full rounded-full bg-teal-600 dark:bg-teal-500 transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-xs font-mono font-bold text-[var(--color-text)]">{progress}%</span>
+              <span className="text-xs font-mono font-medium text-[var(--color-text)]">{progress}%</span>
             </div>
           </div>
         </div>
@@ -294,7 +271,7 @@ function ContinueLearningStation({ currentCourse = {} }) {
         <div className="flex-shrink-0 w-full md:w-auto">
           <Link
             href="/learn"
-            className="w-full md:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold tracking-wide uppercase font-mono transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 hover:gap-3"
+            className="w-full md:w-auto px-6 py-2.5 rounded-md bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-medium font-mono transition-colors flex items-center justify-center gap-2"
           >
             Resume Lesson <LuArrowRight size={14} />
           </Link>
@@ -305,7 +282,7 @@ function ContinueLearningStation({ currentCourse = {} }) {
   );
 }
 
-// ─── 4. Daily Quantum Protocol & Missions (Today's Goals) ──────────────────────
+// ─── 4. Daily Protocol & Missions ────────────────────────────────────────────
 function DailyQuantumProtocol({ goals = [] }) {
   const [goalStates, setGoalStates] = useState(goals.map(g => !!g.done));
   const completedCount = goalStates.filter(Boolean).length;
@@ -335,14 +312,14 @@ function DailyQuantumProtocol({ goals = [] }) {
   };
 
   return (
-    <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-5 shadow-sm">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <LuTarget size={20} />
+          <div className="w-9 h-9 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuTarget size={18} />
           </div>
           <div>
-            <h3 className="font-bold text-base text-[var(--color-text)]">Daily Quantum Protocol</h3>
+            <h3 className="font-semibold text-base text-[var(--color-text)]">Daily Quantum Protocol</h3>
             <p className="text-xs text-[var(--color-muted)]">
               {completedCount} of {goals.length} objectives accomplished
             </p>
@@ -351,19 +328,17 @@ function DailyQuantumProtocol({ goals = [] }) {
 
         {/* Completion Pill */}
         <div className="flex items-center gap-2">
-          <div className="text-right">
-            <span className="text-sm font-mono font-black text-amber-400">{progressPct}%</span>
-          </div>
-          <div className="w-10 h-10 rounded-full border-2 border-amber-500/30 flex items-center justify-center relative">
-            <svg className="w-8 h-8 rotate-[-90deg]">
-              <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="2.5" fill="none" className="text-slate-700/30" />
+          <span className="text-sm font-mono font-semibold text-teal-700 dark:text-teal-400">{progressPct}%</span>
+          <div className="w-9 h-9 rounded-full border border-[var(--color-border)] flex items-center justify-center relative">
+            <svg className="w-7 h-7 rotate-[-90deg]">
+              <circle cx="14" cy="14" r="12" stroke="currentColor" strokeWidth="2" fill="none" className="text-[var(--color-border)]" />
               <circle
-                cx="16" cy="16" r="13"
-                stroke="currentColor" strokeWidth="2.5" fill="none"
-                strokeDasharray={`${2 * Math.PI * 13}`}
-                strokeDashoffset={`${2 * Math.PI * 13 * (1 - progressPct / 100)}`}
+                cx="14" cy="14" r="12"
+                stroke="currentColor" strokeWidth="2" fill="none"
+                strokeDasharray={`${2 * Math.PI * 12}`}
+                strokeDashoffset={`${2 * Math.PI * 12 * (1 - progressPct / 100)}`}
                 strokeLinecap="round"
-                className="text-amber-400 transition-all duration-700"
+                className="text-teal-600 dark:text-teal-500 transition-all duration-500"
               />
             </svg>
           </div>
@@ -371,7 +346,7 @@ function DailyQuantumProtocol({ goals = [] }) {
       </div>
 
       {/* Goal Check List */}
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {goals.map((g, idx) => {
           const isDone = goalStates[idx];
           const Icon = getGoalIcon(g.type);
@@ -380,33 +355,33 @@ function DailyQuantumProtocol({ goals = [] }) {
             <div
               key={g.id || idx}
               onClick={() => toggleGoal(idx)}
-              className={`group flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer transition-all duration-200 ${
+              className={`group flex items-center justify-between p-3.5 rounded-lg border cursor-pointer transition-colors ${
                 isDone
-                  ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400'
-                  : 'bg-[var(--color-background)]/60 border-[var(--color-border)] hover:border-indigo-500/40 hover:bg-indigo-500/5'
+                  ? 'bg-[var(--color-background)] border-teal-700/30 dark:border-teal-500/30'
+                  : 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-teal-600/40 dark:hover:border-teal-500/40'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div
-                  className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
                     isDone
-                      ? 'bg-emerald-500 border-emerald-500 text-white'
-                      : 'border-[var(--color-border)] group-hover:border-indigo-400'
+                      ? 'bg-teal-700 border-teal-700 dark:bg-teal-500 dark:border-teal-500 text-white'
+                      : 'border-[var(--color-border)]'
                   }`}
                 >
-                  {isDone && <LuCheck size={14} className="stroke-[3]" />}
+                  {isDone && <LuCheck size={13} className="stroke-[3]" />}
                 </div>
 
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Icon size={16} className={isDone ? 'text-emerald-400' : 'text-slate-400 group-hover:text-indigo-400'} />
-                  <span className={`text-xs font-semibold truncate ${isDone ? 'line-through text-slate-400' : 'text-[var(--color-text)]'}`}>
+                  <Icon size={16} className="text-[var(--color-muted)]" />
+                  <span className={`text-xs font-medium truncate ${isDone ? 'line-through text-[var(--color-muted)]' : 'text-[var(--color-text)]'}`}>
                     {g.label}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border border-[var(--color-border)] text-[var(--color-muted)]">
                   +{g.xp || 50} XP
                 </span>
               </div>
@@ -416,8 +391,8 @@ function DailyQuantumProtocol({ goals = [] }) {
       </div>
 
       {completedCount === goals.length && goals.length > 0 && (
-        <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center justify-center gap-2 animate-bounce">
-          <LuSparkles size={16} /> All daily quantum protocols fulfilled! +150 Bonus XP awarded.
+        <div className="p-3 rounded-lg bg-[var(--color-background)] border border-teal-700/30 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 text-xs font-medium flex items-center justify-center gap-2">
+          <LuSparkles size={15} /> All daily quantum protocols fulfilled — +150 Bonus XP awarded.
         </div>
       )}
     </div>
@@ -427,40 +402,38 @@ function DailyQuantumProtocol({ goals = [] }) {
 // ─── 5. AI Quantum Tutor Spotlight ───────────────────────────────────────────
 function AIQuantumCopilot({ rec = {} }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 via-[var(--color-surface)] to-indigo-500/10 p-6 space-y-4 shadow-lg shadow-cyan-500/5">
-      <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-cyan-500/20 blur-2xl pointer-events-none" />
-
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-inner">
-            <LuBot size={18} />
+          <div className="w-8 h-8 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuBot size={16} />
           </div>
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
+            <span className="text-[10px] font-mono font-medium text-[var(--color-muted)]">
               AI Quantum Tutor
             </span>
-            <h4 className="text-xs font-bold text-[var(--color-text)]">Adaptive Recommendation</h4>
+            <h4 className="text-xs font-semibold text-[var(--color-text)]">Adaptive Recommendation</h4>
           </div>
         </div>
-        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-teal-700/30 dark:border-teal-500/30 text-teal-700 dark:text-teal-400">
           Personalized
         </span>
       </div>
 
-      <div className="space-y-2 bg-[var(--color-background)]/80 p-4 rounded-2xl border border-[var(--color-border)]">
-        <div className="text-xs font-bold text-[var(--color-text)]">{rec.title || 'Superposition & Hadamard Transform'}</div>
+      <div className="space-y-2 bg-[var(--color-background)] p-4 rounded-lg border border-[var(--color-border)]">
+        <div className="text-xs font-semibold text-[var(--color-text)]">{rec.title || 'Superposition & Hadamard Transform'}</div>
         <p className="text-[11px] text-[var(--color-muted)] leading-relaxed">
           {rec.reason || 'Based on your recent simulation history, master single-qubit rotations and statevector visualization next.'}
         </p>
-        
+
         <div className="flex items-center gap-2 pt-2 flex-wrap text-[10px] font-mono">
-          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-cyan-300 border border-cyan-500/20">
+          <span className="px-2 py-0.5 rounded-md border border-[var(--color-border)] text-[var(--color-muted)]">
             {rec.module || 'Core Principles'}
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          <span className="px-2 py-0.5 rounded-md border border-[var(--color-border)] text-[var(--color-muted)]">
             {rec.difficulty || 'Intermediate'}
           </span>
-          <span className="text-slate-400 flex items-center gap-1">
+          <span className="text-[var(--color-muted)] flex items-center gap-1">
             <LuClock size={11} /> {rec.duration || '12 min'}
           </span>
         </div>
@@ -468,7 +441,7 @@ function AIQuantumCopilot({ rec = {} }) {
 
       <Link
         href="/learn"
-        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold font-mono tracking-wide transition-all flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20"
+        className="w-full py-2.5 rounded-md bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-medium font-mono transition-colors flex items-center justify-center gap-2"
       >
         <LuZap size={14} /> Start Recommended Unit
       </Link>
@@ -476,112 +449,104 @@ function AIQuantumCopilot({ rec = {} }) {
   );
 }
 
-// ─── 6. Quantum Circuit Sandbox Quick-Launcher ────────────────────────────────
+// ─── 6. Circuit Sandbox Quick-Launcher ───────────────────────────────────────
 function CircuitLabTeaser() {
   return (
-    <div className="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-[#0c0f2b] to-[#141238] p-6 text-white space-y-4 shadow-xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/10 blur-3xl pointer-events-none" />
-
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <LuCpu size={18} />
+          <div className="w-8 h-8 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuCpu size={16} />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono">Interactive Lab</h4>
-            <p className="text-[11px] text-slate-400">Quantum Circuit Builder</p>
+            <h4 className="text-xs font-semibold text-[var(--color-text)]">Interactive Lab</h4>
+            <p className="text-[11px] text-[var(--color-muted)]">Quantum Circuit Builder</p>
           </div>
         </div>
-        <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-muted)]">
           v2.0 Online
         </span>
       </div>
 
       {/* Mini Circuit Schematic Preview */}
-      <div className="bg-[#080a1c] p-3 rounded-2xl border border-white/10 font-mono text-[11px] space-y-1.5 text-slate-300">
-        <div className="flex items-center justify-between text-[10px] text-slate-500 border-b border-white/5 pb-1">
+      <div className="bg-[var(--color-background)] p-3 rounded-lg border border-[var(--color-border)] font-mono text-[11px] space-y-1.5 text-[var(--color-muted)]">
+        <div className="flex items-center justify-between text-[10px] border-b border-[var(--color-border)] pb-1">
           <span>q[0]: |0⟩ ─[ H ]─●─[ M ]</span>
-          <span className="text-cyan-400">Bell State |Φ+⟩</span>
+          <span className="text-teal-700 dark:text-teal-400">Bell State |Φ+⟩</span>
         </div>
-        <div className="flex items-center justify-between text-[10px] text-slate-500">
+        <div className="flex items-center justify-between text-[10px]">
           <span>q[1]: |0⟩ ────┼─[ M ]</span>
-          <span className="text-emerald-400">P(|00⟩)=50% P(|11⟩)=50%</span>
+          <span>P(|00⟩)=50% P(|11⟩)=50%</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <Link
           href="/playground"
-          className="py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold font-mono text-center transition-all flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/30"
+          className="py-2.5 rounded-md bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-medium font-mono text-center transition-colors flex items-center justify-center gap-1.5"
         >
           <LuPlay size={13} /> Open Canvas
         </Link>
         <Link
           href="/challenges"
-          className="py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold font-mono text-center transition-all flex items-center justify-center gap-1.5 border border-white/10"
+          className="py-2.5 rounded-md border border-[var(--color-border)] text-[var(--color-text)] text-xs font-medium font-mono text-center transition-colors hover:bg-[var(--color-background)] flex items-center justify-center gap-1.5"
         >
-          <LuTrophy size={13} className="text-amber-400" /> Challenges
+          <LuTrophy size={13} /> Challenges
         </Link>
       </div>
     </div>
   );
 }
 
-// ─── 7. Recent Quantum Telemetry & Activity Feed ──────────────────────────────
+// ─── 7. Recent Activity Feed ──────────────────────────────────────────────────
 function QuantumActivityFeed({ activities = [] }) {
-  const getActivityMeta = (type) => {
+  const getActivityIcon = (type) => {
     switch (type) {
-      case 'simulation':
-        return { icon: LuFlaskConical, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20' };
-      case 'circuit':
-        return { icon: LuCpu, color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/20' };
-      case 'course':
-        return { icon: LuCircleCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' };
-      case 'ai':
-        return { icon: LuBot, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10 border-fuchsia-500/20' };
-      default:
-        return { icon: LuActivity, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' };
+      case 'simulation': return LuFlaskConical;
+      case 'circuit': return LuCpu;
+      case 'course': return LuCircleCheck;
+      case 'ai': return LuBot;
+      default: return LuActivity;
     }
   };
 
   return (
-    <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4 shadow-sm">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <LuActivity size={20} />
+          <div className="w-9 h-9 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuActivity size={18} />
           </div>
           <div>
-            <h3 className="font-bold text-base text-[var(--color-text)]">Recent Telemetry & Activity</h3>
-            <p className="text-xs text-[var(--color-muted)]">Live execution trace and course completions</p>
+            <h3 className="font-semibold text-base text-[var(--color-text)]">Recent Activity</h3>
+            <p className="text-xs text-[var(--color-muted)]">Execution trace and course completions</p>
           </div>
         </div>
         <Link
           href="/progress"
-          className="text-xs font-mono text-indigo-500 hover:text-indigo-400 flex items-center gap-1 font-semibold"
+          className="text-xs font-mono text-teal-700 dark:text-teal-400 hover:underline flex items-center gap-1 font-medium"
         >
           View Full Log <LuChevronRight size={13} />
         </Link>
       </div>
 
       {!activities.length ? (
-        <div className="py-8 text-center text-slate-400 text-xs font-mono">
-          No experiments recorded yet. Simulate your first circuit in the playground!
+        <div className="py-8 text-center text-[var(--color-muted)] text-xs font-mono">
+          No experiments recorded yet. Simulate your first circuit in the playground.
         </div>
       ) : (
-        <div className="divide-y divide-[var(--color-border)]/50">
+        <div className="divide-y divide-[var(--color-border)]">
           {activities.slice(0, 5).map((act, i) => {
-            const meta = getActivityMeta(act.type);
-            const Icon = meta.icon;
+            const Icon = getActivityIcon(act.type);
 
             return (
-              <div key={act.id || i} className="py-3 flex items-center justify-between gap-3 group">
+              <div key={act.id || i} className="py-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-8 h-8 rounded-xl border flex items-center justify-center flex-shrink-0 ${meta.bg} ${meta.color}`}>
+                  <div className="w-8 h-8 rounded-lg border border-[var(--color-border)] flex items-center justify-center flex-shrink-0 text-[var(--color-muted)]">
                     <Icon size={15} />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-[var(--color-text)] truncate group-hover:text-indigo-400 transition-colors">
+                    <div className="text-xs font-medium text-[var(--color-text)] truncate">
                       {act.label}
                     </div>
                     {act.meta && (
@@ -605,39 +570,37 @@ function QuantumActivityFeed({ activities = [] }) {
 // ─── 8. Badges Shelf & Honors ────────────────────────────────────────────────
 function QuantumBadgesShelf({ badgeList = [], total = 0 }) {
   return (
-    <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4 shadow-sm">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <LuMedal size={18} />
+          <div className="w-8 h-8 rounded-lg border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+            <LuMedal size={16} />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider font-mono">
-              Badges & Honors
-            </h4>
+            <h4 className="text-xs font-semibold text-[var(--color-text)]">Badges & Honors</h4>
             <p className="text-[11px] text-[var(--color-muted)]">{total} Unlocked</p>
           </div>
         </div>
-        <Link href="/achievement" className="text-xs text-amber-500 hover:underline font-semibold font-mono">
+        <Link href="/achievement" className="text-xs text-teal-700 dark:text-teal-400 hover:underline font-medium font-mono">
           All Badges
         </Link>
       </div>
 
       {!badgeList.length ? (
         <div className="py-6 text-center text-xs text-[var(--color-muted)]">
-          Complete courses and circuit challenges to unlock rare badges!
+          Complete courses and circuit challenges to unlock badges.
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2.5">
           {badgeList.slice(0, 4).map((b, i) => (
             <div
               key={i}
-              className="p-3 rounded-2xl bg-[var(--color-background)]/70 border border-[var(--color-border)] flex items-center gap-2.5 hover:border-amber-500/40 transition-all group"
+              className="p-3 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] flex items-center gap-2.5"
             >
-              <span className="text-2xl group-hover:scale-110 transition-transform">{b.icon || '🏅'}</span>
+              <span className="text-xl">{b.icon || '🏅'}</span>
               <div className="min-w-0">
-                <div className="text-xs font-bold text-[var(--color-text)] truncate">{b.title}</div>
-                <div className="text-[10px] font-mono text-amber-400">+{b.xp || 50} XP</div>
+                <div className="text-xs font-semibold text-[var(--color-text)] truncate">{b.title}</div>
+                <div className="text-[10px] font-mono text-[var(--color-muted)]">+{b.xp || 50} XP</div>
               </div>
             </div>
           ))}
@@ -647,13 +610,13 @@ function QuantumBadgesShelf({ badgeList = [], total = 0 }) {
   );
 }
 
-// ─── 9. Quantum Quick Shortcuts Grid ──────────────────────────────────────────
+// ─── 9. Quick Shortcuts Grid ──────────────────────────────────────────────────
 function QuantumShortcuts() {
   const links = [
-    { title: 'AI Copilot', desc: 'Ask quantum queries', href: '/ai-tutor', icon: LuBrain, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10' },
-    { title: 'Challenges', desc: 'Solve circuit puzzles', href: '/challenges', icon: LuTrophy, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { title: 'Leaderboard', desc: 'View global rankings', href: '/achievement', icon: LuTrendingUp, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { title: 'My Profile', desc: 'Manage credentials', href: '/profile', icon: LuShield, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+    { title: 'AI Copilot', desc: 'Ask quantum queries', href: '/ai-tutor', icon: LuBrain },
+    { title: 'Challenges', desc: 'Solve circuit puzzles', href: '/challenges', icon: LuTrophy },
+    { title: 'Leaderboard', desc: 'View global rankings', href: '/achievement', icon: LuTrendingUp },
+    { title: 'My Profile', desc: 'Manage credentials', href: '/profile', icon: LuShield },
   ];
 
   return (
@@ -664,13 +627,13 @@ function QuantumShortcuts() {
           <Link
             key={i}
             href={l.href}
-            className={`p-3.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-indigo-500/40 hover:shadow-md transition-all group flex flex-col gap-1.5`}
+            className="p-3.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-teal-600/40 dark:hover:border-teal-500/40 transition-colors flex flex-col gap-1.5"
           >
-            <div className={`w-8 h-8 rounded-xl ${l.bg} flex items-center justify-center ${l.color} group-hover:scale-110 transition-transform`}>
-              <Icon size={16} />
+            <div className="w-7 h-7 rounded-md border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
+              <Icon size={14} />
             </div>
             <div>
-              <div className="text-xs font-bold text-[var(--color-text)] group-hover:text-indigo-400 transition-colors">
+              <div className="text-xs font-semibold text-[var(--color-text)]">
                 {l.title}
               </div>
               <div className="text-[10px] text-[var(--color-muted)]">{l.desc}</div>
@@ -733,22 +696,22 @@ export default function LearnerOverview({ user, hubData }) {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* 1. Futuristic Hero Bento Header */}
+      {/* 1. Welcome Header */}
       <QuantumHero
         user={mergedUser}
         currentCourse={currentCourse}
         quickStats={quickStats}
       />
 
-      {/* 2. Quantum Metrics Telemetry Grid */}
+      {/* 2. Metrics Grid */}
       <QuantumMetricsGrid stats={stats} quickStats={quickStats} />
 
-      {/* 3. Continue Learning Quantum Station */}
+      {/* 3. Continue Learning */}
       <ContinueLearningStation currentCourse={currentCourse} />
 
-      {/* 4. Bento Grid: Protocol, AI Copilot, Labs & Activity */}
+      {/* 4. Grid: Protocol, AI Copilot, Labs & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Column (2/3 width) */}
         <div className="lg:col-span-2 space-y-6">
           <DailyQuantumProtocol goals={todaysGoals} />

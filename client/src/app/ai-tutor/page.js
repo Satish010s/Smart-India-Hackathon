@@ -21,11 +21,11 @@ const LEGACY_AI_URL = process.env.NEXT_PUBLIC_AI_ENGINE_URL || 'http://localhost
 const AGENTIC_PORT_LABEL = (AGENTIC_API_URL.match(/:(\d+)/) || [])[1] || '8001';
 
 const SUGGESTIONS = [
-  { label: '⚛️ Bell State Circuit', query: 'make a simple qiskit circut and excute it' },
-  { label: '📐 Superposition Concept', query: 'Explain quantum superposition with Dirac notation and a physical analogy' },
-  { label: '🎯 Quiz Me', query: 'Quiz me on quantum gates, superposition, and entanglement' },
-  { label: '🔄 Cirq GHZ Simulation', query: 'Simulate a 3-qubit GHZ state in Cirq and print measurement distribution' },
-  { label: '🛡️ Test Guardrail', query: 'What is the weather forecast for tomorrow in Tokyo?' },
+  { label: 'Bell state circuit', query: 'make a simple qiskit circut and excute it' },
+  { label: 'Superposition concept', query: 'Explain quantum superposition with Dirac notation and a physical analogy' },
+  { label: 'Quiz me', query: 'Quiz me on quantum gates, superposition, and entanglement' },
+  { label: 'Cirq GHZ simulation', query: 'Simulate a 3-qubit GHZ state in Cirq and print measurement distribution' },
+  { label: 'Test guardrail', query: 'What is the weather forecast for tomorrow in Tokyo?' },
 ];
 
 const VIDEO_PRESETS = [
@@ -42,13 +42,13 @@ const INITIAL_MESSAGES = [
     role: 'ai',
     agent: 'supervisor',
     content: (
-      "Welcome to the **Quantum Agentic Learning Studio** ⚛️🤖.\n\n"
+      "Welcome to the Quantum Agent Studio.\n\n"
       + "I coordinate a team of autonomous quantum agents to guide your learning:\n"
-      + "- **Teaching Agent 📚**: Conceptual rigor, textbook RAG, and live Tavily research.\n"
-      + "- **Coding Agent 💻**: Qiskit & Cirq circuit generation with a **5-iteration self-healing execution loop** and Matplotlib plots.\n"
-      + "- **Assessment Agent 🎯**: Topic-specific adaptive MCQs and mastery gap analysis.\n"
-      + "- **Research Agent 📄**: Academic paper breakdown and circuit implementation.\n"
-      + "- **Quantum Guardrail 🛡️**: Enforces domain focus so you stay on track.\n\n"
+      + "- **Teaching agent**: conceptual rigor, textbook RAG, and live Tavily research.\n"
+      + "- **Coding agent**: Qiskit & Cirq circuit generation with a 5-iteration self-healing execution loop and Matplotlib plots.\n"
+      + "- **Assessment agent**: topic-specific adaptive questions and mastery gap analysis.\n"
+      + "- **Research agent**: academic paper breakdown and circuit implementation.\n"
+      + "- **Quantum guardrail**: keeps the session inside the quantum domain.\n\n"
       + "What quantum topic or circuit would you like to explore today?"
     ),
     thought_log: [
@@ -84,7 +84,7 @@ function saveSessionsToStorage(sessions) {
 
 function makeSessionTitle(messages) {
   const firstUser = (messages || []).find(m => m.role === 'user');
-  if (!firstUser || !firstUser.content) return 'New Quantum Chat';
+  if (!firstUser || !firstUser.content) return 'New chat';
   const text = firstUser.content.trim();
   return text.length > 42 ? `${text.slice(0, 42)}…` : text;
 }
@@ -93,7 +93,7 @@ function createEmptySession() {
   const now = new Date().toISOString();
   return {
     id: `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    title: 'New Quantum Chat',
+    title: 'New chat',
     messages: INITIAL_MESSAGES,
     activePlots: [],
     activeCode: '',
@@ -473,7 +473,7 @@ export default function AITutorPage() {
           id: `ai-err-${Date.now()}`,
           role: 'ai',
           agent: 'supervisor',
-          content: `⚠️ **Connection Notice:** Could not reach the quantum agent engine. Please ensure the agentic server is running at \`${AGENTIC_API_URL}\` (run \`uvicorn app.main:app --port ${AGENTIC_PORT_LABEL}\`).\n\n*Error details: ${err.message}*`,
+          content: `**Can't reach the agent engine.** Start the agentic server at \`${AGENTIC_API_URL}\` with \`uvicorn app.main:app --port ${AGENTIC_PORT_LABEL}\`, then send your message again.\n\n*Error details: ${err.message}*`,
           timestamp: new Date(),
         },
       ]);
@@ -539,7 +539,7 @@ export default function AITutorPage() {
             id: `ai-paper-${Date.now()}`,
             role: 'ai',
             agent: 'researcher',
-            content: `📄 **Research Paper Ingested:** \`${file.name}\`\n\nI parsed and indexed **${data.chunks_count} sections** into the local quantum vector store. You can now ask me to explain its methodology, summarize key theorems, or implement its quantum algorithms in Qiskit!`,
+            content: `**Paper indexed:** \`${file.name}\`\n\nI parsed **${data.chunks_count} sections** into the local quantum vector store. Ask me to explain its methodology, summarize key theorems, or implement its circuits in Qiskit.`,
             timestamp: new Date(),
           },
         ]);
@@ -547,7 +547,7 @@ export default function AITutorPage() {
         const err = await res.json().catch(() => ({}));
         setUploadStatus({
           success: false,
-          message: err.detail || 'Failed to upload and parse paper.',
+          message: err.detail || 'The paper could not be parsed. Try a text-based PDF.',
         });
       }
     } catch (err) {
@@ -593,7 +593,7 @@ export default function AITutorPage() {
         />
 
         <div
-          className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ${
+          className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-200 ${
             isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
           }`}
         >
@@ -605,17 +605,20 @@ export default function AITutorPage() {
           />
 
           {/* Top Agent Studio Bar */}
-          <div className="border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur px-6 py-2.5 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30">
-                <span className="relative flex h-2 w-2">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${engineConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                  <span className={`relative inline-flex rounded-full h-2 w-2 ${engineConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                </span>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-500 font-semibold">
-                  {engineConnected ? `Agentic Engine Online (Port ${AGENTIC_PORT_LABEL})` : 'Offline / Reconnecting'}
+          <div className="border-b border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-2.5 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    engineConnected ? 'bg-[var(--qm-accent)]' : 'bg-[var(--color-muted)]'
+                  }`}
+                />
+                <span className="text-xs text-[var(--color-muted)]">
+                  {engineConnected ? `Engine online · port ${AGENTIC_PORT_LABEL}` : 'Engine offline · reconnecting'}
                 </span>
               </div>
+
+              <span className="hidden sm:block h-4 w-px bg-[var(--color-border)]" />
 
               {/* Active Agent Badge */}
               <AgentBadge agent={activeAgent} />
@@ -623,25 +626,26 @@ export default function AITutorPage() {
 
             {/* Level Selector & Capabilities */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 text-xs text-[var(--color-muted)]">
-                <span>Level:</span>
+              <div className="flex items-center gap-2 text-xs text-[var(--color-muted)]">
+                <label htmlFor="qm-level">Level</label>
                 <select
+                  id="qm-level"
                   value={studentLevel}
                   onChange={e => setStudentLevel(e.target.value)}
-                  className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg px-2.5 py-1 text-cyan-500 text-xs font-medium focus:outline-none"
+                  className="qm-focus bg-[var(--color-background)] border border-[var(--color-border)] rounded-md px-2.5 py-1 text-[var(--color-text)] text-xs"
                 >
-                  <option value="Beginner">Beginner (Intuitive)</option>
-                  <option value="Intermediate">Intermediate (Circuit Math)</option>
+                  <option value="Beginner">Beginner (intuitive)</option>
+                  <option value="Intermediate">Intermediate (circuit math)</option>
                   <option value="Advanced">Advanced (Hamiltonian & ISA)</option>
                 </select>
               </div>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-3 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-500 text-xs font-semibold flex items-center gap-1.5 transition-all"
+                className="qm-focus px-3 py-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-background)] hover:border-[var(--qm-accent)] hover:text-[var(--qm-accent)] text-[var(--color-text)] text-xs font-medium flex items-center gap-1.5 transition-colors"
               >
                 <LuUpload size={13} />
-                <span>Upload Paper (PDF)</span>
+                <span>Upload paper</span>
               </button>
               <input
                 ref={fileInputRef}
@@ -656,13 +660,13 @@ export default function AITutorPage() {
           {/* Main Studio Dual-Panel Workspace */}
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
             {/* LEFT: Multi-Agent Conversation Feed (6 cols) */}
-            <div className="lg:col-span-6 flex flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
+            <div className="lg:col-span-6 flex flex-col border-r border-[var(--color-border)] bg-[var(--color-background)] overflow-hidden">
               {/* History / New Chat Bar */}
-              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] relative z-20">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-background)] relative z-20">
                 <div className="relative">
                   <button
                     onClick={() => setShowHistoryPanel(v => !v)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+                    className="qm-focus flex items-center gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
                   >
                     <LuHistory size={14} />
                     <span>History ({sessions.length})</span>
@@ -670,7 +674,7 @@ export default function AITutorPage() {
                   </button>
 
                   {showHistoryPanel && (
-                    <div className="absolute left-0 top-full mt-2 w-72 max-h-80 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl p-2 space-y-1">
+                    <div className="absolute left-0 top-full mt-2 w-72 max-h-80 overflow-y-auto rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 space-y-0.5">
                       {sessions.length === 0 && (
                         <p className="text-xs text-[var(--color-muted)] p-3 text-center">No past chats yet.</p>
                       )}
@@ -680,16 +684,17 @@ export default function AITutorPage() {
                           onClick={() => switchToSession(s.id)}
                           role="button"
                           tabIndex={0}
-                          className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between gap-2 cursor-pointer transition-colors ${
+                          onKeyDown={e => { if (e.key === 'Enter') switchToSession(s.id); }}
+                          className={`qm-focus w-full text-left px-2.5 py-2 rounded-md text-xs flex items-center justify-between gap-2 cursor-pointer transition-colors ${
                             s.id === currentSessionId
-                              ? 'bg-cyan-500/15 text-cyan-500 font-semibold'
-                              : 'text-[var(--color-text)] hover:bg-[var(--color-background)]'
+                              ? 'bg-[var(--color-background)] text-[var(--color-text)] font-medium'
+                              : 'text-[var(--color-muted)] hover:bg-[var(--color-background)] hover:text-[var(--color-text)]'
                           }`}
                         >
                           <span className="truncate flex-1">{s.title}</span>
                           <button
                             onClick={(e) => deleteSession(s.id, e)}
-                            className="text-[var(--color-muted)] hover:text-rose-500 flex-shrink-0"
+                            className="qm-focus text-[var(--color-muted)] hover:text-rose-600 flex-shrink-0"
                             title="Delete chat"
                             aria-label="Delete chat"
                           >
@@ -703,15 +708,15 @@ export default function AITutorPage() {
 
                 <button
                   onClick={startNewChat}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-500 text-xs font-semibold transition-all"
+                  className="qm-focus flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-[var(--color-border)] hover:border-[var(--qm-accent)] hover:text-[var(--qm-accent)] text-[var(--color-text)] text-xs font-medium transition-colors"
                 >
                   <LuPlus size={13} />
-                  <span>New Chat</span>
+                  <span>New chat</span>
                 </button>
               </div>
 
               {/* Messages Scroll Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5">
                 {messages.map(msg => (
                   <MessageCard
                     key={msg.id}
@@ -728,20 +733,20 @@ export default function AITutorPage() {
               </div>
 
               {/* Suggestions Pill Bar */}
-              <div className="px-4 py-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] overflow-x-auto flex gap-2 no-scrollbar">
+              <div className="px-4 py-2 border-t border-[var(--color-border)] bg-[var(--color-background)] overflow-x-auto flex gap-2 no-scrollbar">
                 {SUGGESTIONS.map((s, idx) => (
                   <button
                     key={idx}
                     onClick={() => sendMessage(s.query)}
-                    className="whitespace-nowrap px-3 py-1 rounded-full bg-[var(--color-background)] hover:bg-cyan-500/15 border border-[var(--color-border)] hover:border-cyan-500/40 text-[11px] text-[var(--color-muted)] hover:text-cyan-500 transition-all flex items-center gap-1"
+                    className="qm-focus whitespace-nowrap px-2.5 py-1 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--qm-accent)] hover:text-[var(--qm-accent)] text-xs text-[var(--color-muted)] transition-colors"
                   >
-                    <span>{s.label}</span>
+                    {s.label}
                   </button>
                 ))}
               </div>
 
               {/* Input Area */}
-              <div className="p-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+              <div className="p-3 border-t border-[var(--color-border)] bg-[var(--color-background)]">
                 <form
                   onSubmit={e => {
                     e.preventDefault();
@@ -753,13 +758,13 @@ export default function AITutorPage() {
                     type="text"
                     value={input}
                     onChange={e => setInput(e.target.value)}
-                    placeholder="Ask a quantum question, request circuit execution, or quiz a topic..."
-                    className="flex-1 bg-[var(--color-background)] border border-[var(--color-border)] focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none transition-colors"
+                    placeholder="Ask a question, request a circuit, or start a quiz"
+                    className="qm-focus flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md px-3.5 py-2.5 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={!input.trim() || loading}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
+                    className="qm-focus px-4 py-2.5 rounded-md bg-[var(--qm-accent)] hover:bg-[var(--qm-accent-hover)] text-white font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
                   >
                     <LuSend size={15} />
                     <span>Send</span>
@@ -771,7 +776,7 @@ export default function AITutorPage() {
             {/* RIGHT: Quantum Workspace & Artifacts Studio (6 cols) */}
             <div className="lg:col-span-6 flex flex-col bg-[var(--color-background)] overflow-hidden">
               {/* Studio Tabs */}
-              <div className="flex items-center border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 pt-2 gap-1 overflow-x-auto">
+              <div className="flex items-center border-b border-[var(--color-border)] bg-[var(--color-background)] px-4 gap-1 overflow-x-auto">
                 <WorkspaceTabButton
                   active={workspaceTab === 'viz'}
                   onClick={() => setWorkspaceTab('viz')}
@@ -783,15 +788,15 @@ export default function AITutorPage() {
                   active={workspaceTab === 'code'}
                   onClick={() => setWorkspaceTab('code')}
                   icon={<LuCode size={14} />}
-                  label="Code & Debug"
-                  badge={executionHistory.length > 0 ? `${executionHistory.length} it.` : null}
+                  label="Code & debug"
+                  badge={executionHistory.length > 0 ? `${executionHistory.length}` : null}
                 />
                 <WorkspaceTabButton
                   active={workspaceTab === 'quiz'}
                   onClick={() => setWorkspaceTab('quiz')}
                   icon={<LuTarget size={14} />}
                   label="Assessment"
-                  badge={activeAssessment ? 'Active' : null}
+                  badge={activeAssessment ? '1' : null}
                 />
                 <WorkspaceTabButton
                   active={workspaceTab === 'paper'}
@@ -804,7 +809,7 @@ export default function AITutorPage() {
                   active={workspaceTab === 'video'}
                   onClick={() => setWorkspaceTab('video')}
                   icon={<LuVideo size={14} />}
-                  label="Video Studio"
+                  label="Video"
                 />
               </div>
 
@@ -850,20 +855,23 @@ export default function AITutorPage() {
                     {currentVideo ? (
                       <QuantumVideoPlayer videoData={currentVideo} onClose={() => setCurrentVideo(null)} />
                     ) : (
-                      <div className="p-8 text-center border border-[var(--color-border)] rounded-2xl bg-[var(--color-surface)]">
-                        <LuVideo className="mx-auto text-cyan-500 mb-3" size={36} />
-                        <h3 className="font-bold text-[var(--color-text)]">Interactive Quantum Storyboard Generator</h3>
-                        <p className="text-xs text-[var(--color-muted)] mt-1 max-w-md mx-auto">
-                          Transform any quantum algorithm or concept into an animated visual presentation with slides, narration, and quizzes.
+                      <div className="p-8 text-center border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]">
+                        <LuVideo className="mx-auto text-[var(--color-muted)] mb-3" size={28} />
+                        <h3 className="font-semibold text-[var(--color-text)] text-sm">Turn a topic into an animated walkthrough</h3>
+                        <p className="text-xs text-[var(--color-muted)] mt-1.5 max-w-md mx-auto leading-relaxed">
+                          Pick a topic and the studio builds slides, narration, and checkpoint questions around it.
+                          {generatingVideo ? ' Building your walkthrough now…' : ''}
                         </p>
-                        <div className="mt-4 flex justify-center gap-2 flex-wrap">
+                        <div className="mt-5 flex flex-col items-stretch gap-1.5 max-w-sm mx-auto text-left">
                           {VIDEO_PRESETS.map((p, i) => (
                             <button
                               key={i}
+                              disabled={generatingVideo}
                               onClick={() => generateVideo(p.topic)}
-                              className="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-500 text-xs font-medium"
+                              className="qm-focus px-3 py-2 rounded-md border border-[var(--color-border)] bg-[var(--color-background)] hover:border-[var(--qm-accent)] text-xs text-[var(--color-text)] disabled:opacity-50 transition-colors"
                             >
-                              {p.topic}
+                              <span className="block font-medium">{p.topic}</span>
+                              <span className="block text-[11px] text-[var(--color-muted)] mt-0.5">{p.desc} · {p.level}</span>
                             </button>
                           ))}
                         </div>
@@ -877,46 +885,65 @@ export default function AITutorPage() {
         </div>
       </div>
 
-      {/* Scoped styles for rendered markdown content (headings/lists/code inside chat bubbles) */}
+      {/* Scoped styles: accent token + rendered markdown content inside chat bubbles */}
       <style jsx global>{`
+        :root {
+          --qm-accent: #0f766e;
+          --qm-accent-hover: #115e56;
+          --qm-accent-soft: rgba(15, 118, 110, 0.08);
+        }
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --qm-accent: #2dd4bf;
+            --qm-accent-hover: #5eead4;
+            --qm-accent-soft: rgba(45, 212, 191, 0.1);
+          }
+        }
+        .qm-focus:focus-visible {
+          outline: 2px solid var(--qm-accent);
+          outline-offset: 2px;
+        }
+        input.qm-focus:focus,
+        select.qm-focus:focus {
+          outline: none;
+          border-color: var(--qm-accent);
+        }
         .qm-heading {
-          font-weight: 700;
-          margin: 0.35rem 0 0.25rem;
+          font-weight: 600;
+          margin: 0.5rem 0 0.25rem;
           color: var(--color-text);
         }
         .qm-paragraph {
-          margin: 0.15rem 0;
+          margin: 0.25rem 0;
         }
         .qm-list {
-          margin: 0.25rem 0 0.25rem 1rem;
+          margin: 0.35rem 0 0.35rem 1.1rem;
           list-style-type: disc;
           display: flex;
           flex-direction: column;
-          gap: 0.15rem;
+          gap: 0.2rem;
         }
         .qm-list-ol {
           list-style-type: decimal;
         }
         .qm-inline-code {
-          background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-          color: var(--color-secondary);
-          padding: 0.1rem 0.35rem;
-          border-radius: 0.35rem;
+          background: color-mix(in srgb, var(--color-text) 7%, transparent);
+          color: var(--color-text);
+          padding: 0.1rem 0.3rem;
+          border-radius: 0.2rem;
           font-family: var(--font-mono);
-          font-size: 0.7rem;
+          font-size: 0.72rem;
         }
         .qm-codeblock {
           background: var(--color-background);
           border: 1px solid var(--color-border);
-          border-radius: 0.75rem;
-          margin: 0.4rem 0;
+          border-radius: 0.375rem;
+          margin: 0.5rem 0;
           overflow: hidden;
         }
         .qm-codeblock-lang {
-          font-size: 0.6rem;
+          font-size: 0.65rem;
           font-family: var(--font-mono);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
           padding: 0.3rem 0.6rem;
           color: var(--color-muted);
           border-bottom: 1px solid var(--color-border);
@@ -925,8 +952,8 @@ export default function AITutorPage() {
           margin: 0;
           padding: 0.75rem;
           font-family: var(--font-mono);
-          font-size: 0.68rem;
-          color: var(--color-secondary);
+          font-size: 0.7rem;
+          color: var(--color-text);
           overflow-x: auto;
           white-space: pre;
         }
@@ -940,18 +967,19 @@ export default function AITutorPage() {
    ========================================================================== */
 function AgentBadge({ agent }) {
   const configs = {
-    supervisor: { name: 'Supervisor Agent', icon: <LuCompass size={13} />, color: 'bg-indigo-500/15 border-indigo-500/30 text-indigo-500' },
-    teacher: { name: 'Teaching Agent', icon: <LuBookOpen size={13} />, color: 'bg-blue-500/15 border-blue-500/30 text-blue-500' },
-    coder: { name: 'Coding Agent', icon: <LuCode size={13} />, color: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-500' },
-    assessor: { name: 'Assessment Agent', icon: <LuTarget size={13} />, color: 'bg-amber-500/15 border-amber-500/30 text-amber-500' },
-    researcher: { name: 'Research/Paper Agent', icon: <LuFileText size={13} />, color: 'bg-rose-500/15 border-rose-500/30 text-rose-500' },
+    supervisor: { name: 'Supervisor', icon: <LuCompass size={13} /> },
+    teacher: { name: 'Teaching agent', icon: <LuBookOpen size={13} /> },
+    coder: { name: 'Coding agent', icon: <LuCode size={13} /> },
+    assessor: { name: 'Assessment agent', icon: <LuTarget size={13} /> },
+    researcher: { name: 'Research agent', icon: <LuFileText size={13} /> },
   };
   const current = configs[agent] || configs.supervisor;
 
   return (
-    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold ${current.color}`}>
-      {current.icon}
-      <span>{current.name}</span>
+    <div className="flex items-center gap-1.5 text-xs text-[var(--color-text)]">
+      <span className="text-[var(--qm-accent)]">{current.icon}</span>
+      <span className="font-medium">{current.name}</span>
+      <span className="text-[var(--color-muted)]">active</span>
     </div>
   );
 }
@@ -963,16 +991,16 @@ function WorkspaceTabButton({ active, onClick, icon, label, badge }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-t-lg transition-all border-b-2 ${
+      className={`qm-focus flex items-center gap-2 px-3 py-3 text-xs font-medium transition-colors border-b-2 -mb-px ${
         active
-          ? 'bg-[var(--color-background)] text-cyan-500 border-cyan-400'
-          : 'text-[var(--color-muted)] hover:text-[var(--color-text)] border-transparent hover:bg-[var(--color-background)]/60'
+          ? 'text-[var(--color-text)] border-[var(--qm-accent)]'
+          : 'text-[var(--color-muted)] hover:text-[var(--color-text)] border-transparent'
       }`}
     >
       {icon}
       <span>{label}</span>
       {badge && (
-        <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-500 text-[10px] font-mono">
+        <span className="px-1.5 rounded-sm border border-[var(--color-border)] text-[10px] text-[var(--color-muted)] font-normal">
           {badge}
         </span>
       )}
@@ -999,37 +1027,36 @@ function MessageCard({ msg, onGenerateVideoForTopic, onSelectTopic }) {
   return (
     <div className={`flex gap-3 ${isAI ? '' : 'flex-row-reverse'}`}>
       {/* Avatar */}
-      <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-md ${
-        isAI
-          ? msg.guardrail_blocked
-            ? 'bg-rose-600'
-            : 'bg-gradient-to-br from-cyan-500 to-blue-600'
-          : 'bg-gradient-to-br from-violet-600 to-indigo-600'
-      }`}>
-        {isAI ? (msg.guardrail_blocked ? <LuShieldAlert size={15} /> : <LuBot size={15} />) : <LuUser size={15} />}
+      <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)]">
+        {isAI
+          ? (msg.guardrail_blocked
+              ? <LuShieldAlert size={14} className="text-rose-600" />
+              : <LuBot size={14} className="text-[var(--qm-accent)]" />)
+          : <LuUser size={14} />}
       </div>
 
       <div className={`max-w-[88%] space-y-2 ${isAI ? '' : 'items-end flex flex-col'}`}>
         {/* Guardrail Rejection Notice Box */}
         {msg.guardrail_blocked && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-500 text-xs flex items-start gap-2.5">
-            <LuShieldAlert className="text-rose-500 flex-shrink-0 mt-0.5" size={16} />
+          <div className="p-3 rounded-md border border-rose-600/40 bg-rose-600/5 text-xs flex items-start gap-2.5">
+            <LuShieldAlert className="text-rose-600 flex-shrink-0 mt-0.5" size={15} />
             <div>
-              <p className="font-bold text-rose-500">Quantum Domain Guardrail Triggered</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-rose-500/90">
-                This inquiry was identified as outside the scope of quantum computing and physics.
-                Our agents are specialized in quantum algorithms, Qiskit/Cirq simulation, and quantum hardware.
+              <p className="font-medium text-rose-600">Outside the quantum domain</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-muted)]">
+                These agents cover quantum algorithms, Qiskit and Cirq simulation, and quantum hardware.
+                Rephrase your question around one of those and I&apos;ll take it from there.
               </p>
             </div>
           </div>
         )}
 
         {/* Message Bubble (rendered as real HTML from markdown, not raw text) */}
-        <div className={`px-4 py-3 rounded-2xl text-xs leading-relaxed ${
-          isAI
-            ? 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)] rounded-tl-sm'
-            : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-tr-sm font-medium'
-        }`}
+        <div
+          className={`px-3.5 py-2.5 rounded-md text-xs leading-relaxed border ${
+            isAI
+              ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text)]'
+              : 'bg-[var(--color-surface)] border-[var(--color-border)] border-l-2 border-l-[var(--qm-accent)] text-[var(--color-text)]'
+          }`}
           dangerouslySetInnerHTML={{ __html: formatted }}
         />
 
@@ -1038,16 +1065,16 @@ function MessageCard({ msg, onGenerateVideoForTopic, onSelectTopic }) {
           <div className="w-full">
             <button
               onClick={() => setShowThoughts(!showThoughts)}
-              className="flex items-center gap-1.5 text-[10px] text-cyan-500/80 hover:text-cyan-500 font-mono transition-colors"
+              className="qm-focus flex items-center gap-1.5 text-[11px] text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
             >
               {showThoughts ? <LuChevronDown size={11} /> : <LuChevronRight size={11} />}
-              <span>Agent Workflow Trace ({msg.thought_log.length} steps)</span>
+              <span>Workflow trace ({msg.thought_log.length} steps)</span>
             </button>
             {showThoughts && (
-              <div className="mt-1.5 p-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[10px] space-y-1.5 font-mono">
+              <div className="mt-1.5 p-2.5 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] text-[11px] space-y-1.5 font-mono">
                 {msg.thought_log.map((step, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-[var(--color-text)]">
-                    <span className="text-cyan-500 font-bold">[{step.agent}]</span>
+                  <div key={idx} className="flex items-start gap-2">
+                    <span className="text-[var(--qm-accent)]">{step.agent}</span>
                     <span className="text-[var(--color-muted)]">{step.action}:</span>
                     <span className="text-[var(--color-text)]">{step.detail}</span>
                   </div>
@@ -1060,10 +1087,10 @@ function MessageCard({ msg, onGenerateVideoForTopic, onSelectTopic }) {
         {/* Citations & Sources */}
         {isAI && msg.rag_sources && msg.rag_sources.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-mono text-[var(--color-muted)]">Sources:</span>
+            <span className="text-[11px] text-[var(--color-muted)]">Sources</span>
             {msg.rag_sources.map((src, idx) => (
-              <span key={idx} className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 text-[9px] font-mono">
-                📖 {src.title} (p.{src.page})
+              <span key={idx} className="px-2 py-0.5 rounded-sm border border-[var(--color-border)] text-[var(--color-muted)] text-[10px]">
+                {src.title} · p.{src.page}
               </span>
             ))}
           </div>
@@ -1071,21 +1098,21 @@ function MessageCard({ msg, onGenerateVideoForTopic, onSelectTopic }) {
 
         {/* Bottom AI Actions */}
         {isAI && (
-          <div className="flex items-center gap-2 text-[var(--color-muted)] text-xs">
-            <button onClick={copyText} className="hover:text-cyan-500 transition-colors flex items-center gap-1 text-[10px]">
-              {copied ? <LuCheck size={11} className="text-emerald-500" /> : <LuCopy size={11} />}
+          <div className="flex items-center gap-3 text-[var(--color-muted)]">
+            <button onClick={copyText} className="qm-focus hover:text-[var(--color-text)] transition-colors flex items-center gap-1 text-[11px]">
+              {copied ? <LuCheck size={11} className="text-[var(--qm-accent)]" /> : <LuCopy size={11} />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
             {onGenerateVideoForTopic && (
               <button
                 onClick={() => onGenerateVideoForTopic(msg.content.slice(0, 50))}
-                className="hover:text-cyan-500 transition-colors flex items-center gap-1 text-[10px] font-semibold text-cyan-500"
+                className="qm-focus hover:text-[var(--color-text)] transition-colors flex items-center gap-1 text-[11px]"
               >
                 <LuVideo size={11} />
-                <span>Create Video</span>
+                <span>Make a video</span>
               </button>
             )}
-            <span className="text-[9px] font-mono text-[var(--color-muted)] ml-auto">
+            <span className="text-[10px] text-[var(--color-muted)] ml-auto">
               {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -1100,13 +1127,11 @@ function MessageCard({ msg, onGenerateVideoForTopic, onSelectTopic }) {
    ========================================================================== */
 function ThinkingIndicator({ agent }) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--color-surface)] border border-cyan-500/20 max-w-sm animate-pulse">
-      <div className="w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-500">
-        <LuCpu size={14} className="animate-spin" />
-      </div>
-      <div className="text-xs">
-        <p className="font-semibold text-cyan-500">Coordinating Multi-Agent Workflow...</p>
-        <p className="text-[10px] text-[var(--color-muted)] font-mono">Guardrails verified • Running agent state graph</p>
+    <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] max-w-sm">
+      <LuCpu size={14} className="text-[var(--qm-accent)] animate-spin motion-reduce:animate-none" />
+      <div>
+        <p className="text-xs font-medium text-[var(--color-text)]">Coordinating agents</p>
+        <p className="text-[11px] text-[var(--color-muted)]">Guardrail checked · running the agent graph</p>
       </div>
     </div>
   );
@@ -1118,17 +1143,17 @@ function ThinkingIndicator({ agent }) {
 function VisualizationPanel({ plots, onExploreSim }) {
   if (!plots || plots.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--color-muted)] border border-dashed border-[var(--color-border)] rounded-2xl">
-        <LuActivity size={40} className="text-cyan-500/40 mb-3" />
-        <h4 className="font-bold text-[var(--color-text)]">No Quantum Visualizations Generated Yet</h4>
-        <p className="text-xs text-[var(--color-muted)] mt-1 max-w-xs">
-          When the Coding Agent executes quantum circuits, measurement histograms, Bloch spheres, and state distributions render here automatically.
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]">
+        <LuActivity size={28} className="text-[var(--color-muted)] mb-3" />
+        <h4 className="font-semibold text-[var(--color-text)] text-sm">Nothing plotted yet</h4>
+        <p className="text-xs text-[var(--color-muted)] mt-1.5 max-w-xs leading-relaxed">
+          Run a circuit and the measurement histograms, Bloch spheres, and state distributions appear here.
         </p>
         <button
           onClick={onExploreSim}
-          className="mt-4 px-4 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-500 text-xs font-semibold transition-all"
+          className="qm-focus mt-4 px-3.5 py-2 rounded-md bg-[var(--qm-accent)] hover:bg-[var(--qm-accent-hover)] text-white text-xs font-medium transition-colors"
         >
-          Simulate Bell State & Plot
+          Simulate a Bell state
         </button>
       </div>
     );
@@ -1137,29 +1162,26 @@ function VisualizationPanel({ plots, onExploreSim }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-bold text-[var(--color-text)] text-sm flex items-center gap-2">
-          <LuActivity className="text-cyan-500" size={16} />
-          <span>Simulation Visualizations ({plots.length})</span>
+        <h4 className="font-semibold text-[var(--color-text)] text-sm">
+          Simulation plots ({plots.length})
         </h4>
-        <span className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-          Matplotlib Agg Engine • 130 DPI
-        </span>
+        <span className="text-[11px] text-[var(--color-muted)]">Matplotlib Agg · 130 DPI</span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {plots.map((plotUri, idx) => (
-          <div key={idx} className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-xl overflow-hidden">
+          <div key={idx} className="p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md overflow-hidden">
             <img
               src={plotUri}
-              alt={`Quantum Simulation Plot ${idx + 1}`}
-              className="w-full h-auto rounded-xl object-contain border border-[var(--color-border)] bg-white"
+              alt={`Quantum simulation plot ${idx + 1}`}
+              className="w-full h-auto rounded-sm object-contain border border-[var(--color-border)] bg-white"
             />
-            <div className="mt-2 flex items-center justify-between text-xs text-[var(--color-muted)]">
-              <span className="text-[11px] font-mono">Plot {idx + 1}: Quantum Probability Distribution</span>
+            <div className="mt-2 flex items-center justify-between text-[11px] text-[var(--color-muted)]">
+              <span>Plot {idx + 1} · probability distribution</span>
               <a
                 href={plotUri}
                 download={`quantum_plot_${idx + 1}.png`}
-                className="text-cyan-500 hover:text-cyan-400 text-[11px] font-mono underline"
+                className="qm-focus text-[var(--qm-accent)] hover:underline"
               >
                 Download PNG
               </a>
@@ -1177,11 +1199,11 @@ function VisualizationPanel({ plots, onExploreSim }) {
 function CodeDebugPanel({ code, framework, history, selectedIdx, onSelectIdx }) {
   if (!code && (!history || history.length === 0)) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--color-muted)] border border-dashed border-[var(--color-border)] rounded-2xl">
-        <LuCode size={40} className="text-emerald-500/40 mb-3" />
-        <h4 className="font-bold text-[var(--color-text)]">No Circuit Code Executed Yet</h4>
-        <p className="text-xs text-[var(--color-muted)] mt-1 max-w-xs">
-          Ask for a Qiskit or Cirq circuit to observe the Coding Agent generate code, execute it in the sandbox, and auto-fix errors.
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]">
+        <LuCode size={28} className="text-[var(--color-muted)] mb-3" />
+        <h4 className="font-semibold text-[var(--color-text)] text-sm">No circuit has run yet</h4>
+        <p className="text-xs text-[var(--color-muted)] mt-1.5 max-w-xs leading-relaxed">
+          Ask for a Qiskit or Cirq circuit. You&apos;ll see the generated code, the sandbox run, and every repair attempt.
         </p>
       </div>
     );
@@ -1194,84 +1216,87 @@ function CodeDebugPanel({ code, framework, history, selectedIdx, onSelectIdx }) 
       {/* Header & Framework Badge */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider font-mono">
-            {framework} Sandbox Execution
+          <span className="text-sm font-semibold text-[var(--color-text)]">
+            {framework} sandbox run
           </span>
           {currentAttempt && (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+            <span className={`px-2 py-0.5 rounded-sm border text-[10px] ${
               currentAttempt.success
-                ? 'bg-emerald-500/10 border border-emerald-500/40 text-emerald-500'
-                : 'bg-rose-500/10 border border-rose-500/40 text-rose-500'
+                ? 'border-[var(--qm-accent)] text-[var(--qm-accent)]'
+                : 'border-rose-600/50 text-rose-600'
             }`}>
-              {currentAttempt.success ? '✓ Succeeded' : '✗ Failed (Diagnosed)'}
+              {currentAttempt.success ? 'Succeeded' : 'Failed, diagnosed'}
             </span>
           )}
         </div>
         {currentAttempt && (
-          <span className="text-[10px] font-mono text-[var(--color-muted)]">
-            Runtime: {currentAttempt.execution_time_ms}ms
+          <span className="text-[11px] text-[var(--color-muted)] font-mono">
+            {currentAttempt.execution_time_ms}ms
           </span>
         )}
       </div>
 
       {/* Iteration Attempts Tabs (Self-Healing Visualization) */}
       {history && history.length > 1 && (
-        <div className="flex items-center gap-1.5 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl overflow-x-auto">
-          <span className="text-[10px] text-[var(--color-muted)] font-mono px-2">Debugging Loop:</span>
+        <div className="flex items-center gap-1 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md overflow-x-auto">
+          <span className="text-[11px] text-[var(--color-muted)] px-2">Repair loop</span>
           {history.map((att, idx) => (
             <button
               key={idx}
               onClick={() => onSelectIdx(idx)}
-              className={`px-3 py-1 rounded-lg text-[10px] font-mono font-semibold transition-all flex items-center gap-1.5 ${
+              className={`qm-focus px-2.5 py-1 rounded-sm text-[11px] font-medium transition-colors flex items-center gap-1.5 ${
                 selectedIdx === idx
-                  ? 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/40'
-                  : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
+                  ? 'bg-[var(--color-background)] text-[var(--color-text)] border border-[var(--color-border)]'
+                  : 'text-[var(--color-muted)] hover:text-[var(--color-text)] border border-transparent'
               }`}
             >
               <span>Attempt {att.iteration}</span>
-              {att.success ? <LuCircleCheck className="text-emerald-500" size={11} /> : <LuTriangleAlert className="text-rose-500" size={11} />}
+              {att.success
+                ? <LuCircleCheck className="text-[var(--qm-accent)]" size={11} />
+                : <LuTriangleAlert className="text-rose-600" size={11} />}
             </button>
           ))}
         </div>
       )}
 
       {/* Code Display */}
-      <div className="relative rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
-        <div className="flex items-center justify-between px-3 py-2 bg-[var(--color-background)] border-b border-[var(--color-border)] text-[10px] font-mono text-[var(--color-muted)]">
+      <div className="rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
           <span>{framework}.py</span>
           <button
             onClick={() => navigator.clipboard.writeText(currentAttempt ? currentAttempt.code : code)}
-            className="hover:text-cyan-500 flex items-center gap-1"
+            className="qm-focus hover:text-[var(--color-text)] flex items-center gap-1 transition-colors"
           >
             <LuCopy size={11} />
             <span>Copy</span>
           </button>
         </div>
-        <pre className="p-4 text-xs font-mono text-cyan-500 overflow-x-auto leading-relaxed">
+        <pre className="p-4 text-xs font-mono text-[var(--color-text)] overflow-x-auto leading-relaxed">
           <code>{currentAttempt ? currentAttempt.code : code}</code>
         </pre>
       </div>
 
       {/* Terminal Output */}
       {currentAttempt && (
-        <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
-          <div className="px-3 py-2 bg-[var(--color-background)] border-b border-[var(--color-border)] text-[10px] font-mono text-[var(--color-muted)]">
-            <span>Terminal Output (stdout / stderr)</span>
+        <div className="rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
+          <div className="px-3 py-2 border-b border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+            <span>Output (stdout / stderr)</span>
           </div>
           <div className="p-3 text-xs font-mono">
             {currentAttempt.stdout && (
-              <div className="text-emerald-500 whitespace-pre-wrap">
+              <div className="text-[var(--color-text)] whitespace-pre-wrap">
                 {currentAttempt.stdout}
               </div>
             )}
             {currentAttempt.stderr && (
-              <div className="text-rose-500 whitespace-pre-wrap mt-2">
+              <div className="text-rose-600 whitespace-pre-wrap mt-2">
                 {currentAttempt.stderr}
               </div>
             )}
             {currentAttempt.diagnostics && (
-              <div className="mt-2 p-2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-500 text-[11px]">
-                <strong>Diagnosis:</strong> {currentAttempt.diagnostics}
+              <div className="mt-2 p-2 rounded-sm border border-[var(--color-border)] text-[var(--color-text)] text-[11px] font-sans">
+                <span className="text-[var(--color-muted)]">Diagnosis: </span>
+                {currentAttempt.diagnostics}
               </div>
             )}
           </div>
@@ -1287,17 +1312,17 @@ function CodeDebugPanel({ code, framework, history, selectedIdx, onSelectIdx }) 
 function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSubmit, loading, onNewQuiz }) {
   if (!assessment) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--color-muted)] border border-dashed border-[var(--color-border)] rounded-2xl">
-        <LuTarget size={40} className="text-amber-500/40 mb-3" />
-        <h4 className="font-bold text-[var(--color-text)]">No Assessment Active</h4>
-        <p className="text-xs text-[var(--color-muted)] mt-1 max-w-xs">
-          Ask the Assessment Agent to quiz you on any quantum topic to evaluate your conceptual mastery.
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]">
+        <LuTarget size={28} className="text-[var(--color-muted)] mb-3" />
+        <h4 className="font-semibold text-[var(--color-text)] text-sm">No assessment running</h4>
+        <p className="text-xs text-[var(--color-muted)] mt-1.5 max-w-xs leading-relaxed">
+          Start a quiz on any quantum topic and the assessment agent will diagnose where your understanding breaks down.
         </p>
         <button
           onClick={onNewQuiz}
-          className="mt-4 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 text-xs font-semibold transition-all"
+          className="qm-focus mt-4 px-3.5 py-2 rounded-md bg-[var(--qm-accent)] hover:bg-[var(--qm-accent-hover)] text-white text-xs font-medium transition-colors"
         >
-          Start Concept Quiz
+          Start a quiz
         </button>
       </div>
     );
@@ -1310,19 +1335,19 @@ function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSub
       {/* Quiz Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-[10px] font-mono uppercase text-amber-500 font-bold">Topic Assessment</span>
-          <h4 className="font-bold text-[var(--color-text)] text-sm">{assessment.topic}</h4>
+          <h4 className="font-semibold text-[var(--color-text)] text-sm">{assessment.topic}</h4>
+          <p className="text-xs text-[var(--color-muted)] mt-0.5">Topic assessment</p>
         </div>
         {isEvaluated && (
-          <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-500 text-xs font-mono font-bold">
-            <LuAward size={13} />
-            <span>Mastery: {Math.round(assessment.mastery_score * 100)}%</span>
+          <div className="flex items-center gap-1.5 text-xs text-[var(--color-text)]">
+            <LuAward size={13} className="text-[var(--qm-accent)]" />
+            <span>Mastery {Math.round(assessment.mastery_score * 100)}%</span>
           </div>
         )}
       </div>
 
       {/* Question Card */}
-      <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text)] leading-relaxed font-medium">
+      <div className="p-4 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text)] leading-relaxed">
         {assessment.question}
       </div>
 
@@ -1332,15 +1357,17 @@ function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSub
           const isSelected = selectedOption === idx || assessment.student_selected === idx;
           const isCorrectOption = assessment.correct_option === idx;
 
-          let optionStyle = 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text)] hover:border-cyan-500/40';
+          let optionStyle = 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--qm-accent)]';
           if (isEvaluated) {
             if (isCorrectOption) {
-              optionStyle = 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500 font-bold';
+              optionStyle = 'bg-[var(--color-surface)] border-[var(--qm-accent)] text-[var(--color-text)]';
             } else if (isSelected && !isCorrectOption) {
-              optionStyle = 'bg-rose-500/10 border-rose-500/50 text-rose-500';
+              optionStyle = 'bg-[var(--color-surface)] border-rose-600/50 text-[var(--color-text)]';
+            } else {
+              optionStyle = 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-muted)]';
             }
           } else if (isSelected) {
-            optionStyle = 'bg-cyan-500/20 border-cyan-400 text-cyan-500 font-semibold';
+            optionStyle = 'bg-[var(--color-surface)] border-[var(--qm-accent)] text-[var(--color-text)]';
           }
 
           return (
@@ -1348,16 +1375,16 @@ function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSub
               key={idx}
               disabled={isEvaluated}
               onClick={() => onSelectOption(idx)}
-              className={`w-full p-3 rounded-xl border text-xs text-left transition-all flex items-center justify-between ${optionStyle}`}
+              className={`qm-focus w-full p-3 rounded-md border text-xs text-left transition-colors flex items-center justify-between ${optionStyle}`}
             >
               <div className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] bg-[var(--color-background)] font-bold">
+                <span className="w-5 h-5 rounded-sm flex items-center justify-center font-mono text-[10px] border border-[var(--color-border)]">
                   {String.fromCharCode(65 + idx)}
                 </span>
                 <span>{opt}</span>
               </div>
-              {isEvaluated && isCorrectOption && <LuCircleCheck className="text-emerald-500" size={16} />}
-              {isEvaluated && isSelected && !isCorrectOption && <LuTriangleAlert className="text-rose-500" size={16} />}
+              {isEvaluated && isCorrectOption && <LuCircleCheck className="text-[var(--qm-accent)]" size={15} />}
+              {isEvaluated && isSelected && !isCorrectOption && <LuTriangleAlert className="text-rose-600" size={15} />}
             </button>
           );
         })}
@@ -1368,26 +1395,24 @@ function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSub
         <button
           onClick={onSubmit}
           disabled={selectedOption === null || loading}
-          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-lg shadow-amber-500/20 disabled:opacity-40 transition-all flex items-center justify-center gap-1.5"
+          className="qm-focus w-full py-2.5 rounded-md bg-[var(--qm-accent)] hover:bg-[var(--qm-accent-hover)] text-white font-medium text-xs disabled:opacity-40 transition-colors flex items-center justify-center gap-1.5"
         >
-          {loading ? <LuRefreshCw className="animate-spin" size={14} /> : <LuCheck size={14} />}
-          <span>{loading ? 'Evaluating...' : 'Submit Answer'}</span>
+          {loading ? <LuRefreshCw className="animate-spin motion-reduce:animate-none" size={13} /> : <LuCheck size={13} />}
+          <span>{loading ? 'Checking your answer' : 'Submit answer'}</span>
         </button>
       ) : (
-        <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-3">
-          <div className="flex items-center gap-2">
-            <span className={`text-xs font-bold font-mono ${assessment.is_correct ? 'text-emerald-500' : 'text-rose-500'}`}>
-              {assessment.is_correct ? '✓ Correct Understanding' : '✗ Misconception Diagnosed'}
-            </span>
-          </div>
+        <div className="p-4 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] space-y-3">
+          <span className={`text-xs font-medium ${assessment.is_correct ? 'text-[var(--qm-accent)]' : 'text-rose-600'}`}>
+            {assessment.is_correct ? 'Correct' : 'Misconception found'}
+          </span>
           <p className="text-xs text-[var(--color-text)] leading-relaxed">
             {assessment.misconception_analysis}
           </p>
           <button
             onClick={onNewQuiz}
-            className="w-full py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-500 text-xs font-semibold transition-all"
+            className="qm-focus w-full py-2 rounded-md border border-[var(--color-border)] hover:border-[var(--qm-accent)] hover:text-[var(--qm-accent)] text-[var(--color-text)] text-xs font-medium transition-colors"
           >
-            Try Another Quantum Quiz
+            Try another question
           </button>
         </div>
       )}
@@ -1401,43 +1426,45 @@ function QuizAssessmentPanel({ assessment, selectedOption, onSelectOption, onSub
 function PaperRAGPanel({ file, uploading, status, onUploadClick, onAskPaper }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-[10px] font-mono uppercase text-rose-500 font-bold">Document RAG Engine</span>
-          <h4 className="font-bold text-[var(--color-text)] text-sm">Research Paper & Textbook Ingestion</h4>
-        </div>
+      <div>
+        <h4 className="font-semibold text-[var(--color-text)] text-sm">Papers and textbooks</h4>
+        <p className="text-xs text-[var(--color-muted)] mt-0.5">
+          {file ? `Last upload: ${file.name}` : 'Add a PDF so the agents can quote and implement it.'}
+        </p>
       </div>
 
       {/* Upload Dropzone */}
-      <div
+      <button
         onClick={onUploadClick}
-        className="p-6 border-2 border-dashed border-[var(--color-border)] hover:border-rose-500/50 rounded-2xl text-center bg-[var(--color-surface)] cursor-pointer transition-all"
+        className="qm-focus w-full p-6 border border-dashed border-[var(--color-border)] hover:border-[var(--qm-accent)] rounded-md text-center bg-[var(--color-surface)] cursor-pointer transition-colors"
       >
-        <LuUpload size={32} className="mx-auto text-rose-500/60 mb-2" />
-        <p className="text-xs font-bold text-[var(--color-text)]">
-          {uploading ? 'Parsing & Indexing PDF Chunks...' : 'Click to Upload Quantum Research Paper (PDF)'}
+        <LuUpload size={24} className="mx-auto text-[var(--color-muted)] mb-2" />
+        <p className="text-xs font-medium text-[var(--color-text)]">
+          {uploading ? 'Parsing and indexing the PDF…' : 'Upload a PDF'}
         </p>
         <p className="text-[11px] text-[var(--color-muted)] mt-1">
-          Supports arXiv preprints, IBM/Google quantum whitepapers, and textbooks.
+          arXiv preprints, IBM and Google whitepapers, and textbooks all work.
         </p>
-      </div>
+      </button>
 
       {/* Status Card */}
       {status && (
-        <div className={`p-3 rounded-xl border text-xs leading-relaxed ${
-          status.success ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-500' : 'bg-rose-500/10 border-rose-500/40 text-rose-500'
+        <div className={`p-3 rounded-md border text-xs leading-relaxed bg-[var(--color-surface)] ${
+          status.success ? 'border-[var(--qm-accent)]' : 'border-rose-600/50'
         }`}>
-          <div className="flex items-center gap-2 font-bold font-mono">
-            {status.success ? <LuCircleCheck size={14} className="text-emerald-500" /> : <LuTriangleAlert size={14} className="text-rose-500" />}
-            <span>{status.title || 'Status'}</span>
+          <div className="flex items-center gap-2 font-medium text-[var(--color-text)]">
+            {status.success
+              ? <LuCircleCheck size={13} className="text-[var(--qm-accent)]" />
+              : <LuTriangleAlert size={13} className="text-rose-600" />}
+            <span>{status.title || (status.success ? 'Indexed' : 'Upload failed')}</span>
           </div>
-          <p className="mt-1 text-[11px]">{status.message}</p>
+          <p className="mt-1 text-[11px] text-[var(--color-muted)]">{status.message}</p>
         </div>
       )}
 
       {/* Suggested Inquiries */}
       <div className="space-y-1.5">
-        <p className="text-[10px] font-mono uppercase text-[var(--color-muted)]">Quick Paper Inquiries:</p>
+        <p className="text-[11px] text-[var(--color-muted)]">Ask about the paper</p>
         {[
           "Explain the problem statement and motivation of this paper",
           "Break down the quantum algorithm proposed in the paper",
@@ -1447,9 +1474,9 @@ function PaperRAGPanel({ file, uploading, status, onUploadClick, onAskPaper }) {
           <button
             key={i}
             onClick={() => onAskPaper(prompt)}
-            className="w-full text-left px-3 py-2 rounded-lg bg-[var(--color-surface)] hover:bg-rose-500/10 border border-[var(--color-border)] hover:border-rose-500/40 text-xs text-[var(--color-text)] hover:text-rose-500 transition-all font-mono text-[11px]"
+            className="qm-focus w-full text-left px-3 py-2 rounded-md bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--qm-accent)] text-[11px] text-[var(--color-text)] transition-colors"
           >
-            → {prompt}
+            {prompt}
           </button>
         ))}
       </div>
