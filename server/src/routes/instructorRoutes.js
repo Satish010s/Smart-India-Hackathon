@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getInstructorPortal,
   getInstructorCourses,
+  getCourseById,
   createCourse,
   updateCourse,
   deleteCourse,
@@ -10,11 +11,14 @@ import {
   createModule,
   updateModule,
   createLesson,
+  getLessonById,
   updateLesson,
   getQuizzes,
+  getQuizById,
   createQuiz,
   updateQuiz,
   getChallenges,
+  getChallengeById,
   createChallenge,
   updateChallenge,
   getInstructorStudents,
@@ -40,6 +44,7 @@ router.get('/portal', getInstructorPortal);
 
 // Courses CRUD
 router.get('/courses', getInstructorCourses);
+router.get('/courses/:id', getCourseById);
 router.post('/courses', createCourse);
 router.put('/courses/:id', updateCourse);
 router.delete('/courses/:id', deleteCourse);
@@ -51,16 +56,19 @@ router.post('/courses/:courseId/modules', createModule);
 router.put('/modules/:moduleId', updateModule);
 
 // Lessons
+router.get('/lessons/:lessonId', getLessonById);
 router.post('/modules/:moduleId/lessons', createLesson);
 router.put('/lessons/:lessonId', updateLesson);
 
 // Quizzes
 router.get('/quizzes', getQuizzes);
+router.get('/quizzes/:id', getQuizById);
 router.post('/quizzes', createQuiz);
 router.put('/quizzes/:id', updateQuiz);
 
 // Challenges
 router.get('/challenges', getChallenges);
+router.get('/challenges/:id', getChallengeById);
 router.post('/challenges', createChallenge);
 router.put('/challenges/:id', updateChallenge);
 

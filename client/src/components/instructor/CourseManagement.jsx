@@ -153,12 +153,14 @@ function CreateCourseModal({ onClose, onCreated }) {
           prerequisites: form.prerequisites.filter(Boolean),
         }),
       });
-      if (res?.success) onCreated(res.data.course);
-      else onCreated({ id: `new_${Date.now()}`, ...form, status: 'Draft', enrolledStudents: 0, completionRate: 0 });
+      if (res?.success) {
+        onCreated(res.data.course);
+      } else {
+        alert(res?.error || 'Failed to create course');
+      }
     } catch (e) {
       console.warn('Create course failed:', e);
-      // Still redirect with a temp course object so the flow works offline
-      onCreated({ id: `new_${Date.now()}`, ...form, status: 'Draft', enrolledStudents: 0, completionRate: 0 });
+      alert(e.message || 'Failed to create course');
     } finally {
       setSaving(false);
     }
