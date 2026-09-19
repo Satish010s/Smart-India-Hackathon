@@ -139,30 +139,36 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
 }
 
 export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
-  const [title, setTitle] = useState('Module 1 — Quantum Fundamentals Quiz');
+  const [title, setTitle] = useState('Untitled Quiz');
   const [settings, setSettings] = useState({ timeLimit: 15, passScore: 70, attempts: 1, shuffle: true, difficulty: 'Beginner' });
-  const [questions, setQuestions] = useState([
-    {
-      id: 'qq1', type: 'mcq', text: 'Which property allows a qubit to exist in multiple states simultaneously?',
-      options: ['Entanglement', 'Superposition', 'Interference', 'Measurement'],
-      correct: 1, explanation: 'Superposition allows a qubit to exist in |0⟩ and |1⟩ simultaneously.',
-      marks: 2, difficulty: 'Easy',
-    },
-    {
-      id: 'qq2', type: 'mcq', text: 'What does the Hadamard gate do to a |0⟩ state?',
-      options: ['Flips to |1⟩', 'Creates equal superposition', 'Adds phase π', 'Entangles with another qubit'],
-      correct: 1, explanation: 'H|0⟩ = (|0⟩ + |1⟩)/√2',
-      marks: 2, difficulty: 'Easy',
-    },
-    {
-      id: 'qq3', type: 'mcq', text: 'What is the probability of measuring |1⟩ if a qubit is in state (3|0⟩ + 4|1⟩)/5?',
-      options: ['3/5', '4/5', '9/25', '16/25'],
-      correct: 3, explanation: 'Probability = |amplitude|² = (4/5)² = 16/25.',
-      marks: 3, difficulty: 'Medium',
-    },
-  ]);
+  const [questions, setQuestions] = useState([]);
   const [status, setStatus] = useState('Draft');
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(!!quizId && !quizId.startsWith('qq_'));
+
+  React.useEffect(() => {
+    if (quizId && !quizId.startsWith('qq_')) {
+      setLoading(true);
+      apiFetch(`/instructor/quizzes/${quizId}`)
+        .then(res => {
+          if (res?.success && res.data?.quiz) {
+            const q = res.data.quiz;
+            setTitle(q.title || '');
+            setSettings({
+              timeLimit: q.timeLimit || 15,
+              passScore: q.passScore || 70,
+              attempts: q.attempts || 1,
+              shuffle: q.shuffle ?? true,
+              difficulty: q.difficulty || 'Beginner',
+            });
+            if (q.questions && Array.isArray(q.questions)) setQuestions(q.questions);
+            setStatus(q.status || 'Draft');
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [quizId]);
 
   const addQuestion = () => {
     setQuestions(qs => [...qs, {
@@ -212,7 +218,14 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
           Back to Course Builder
         </button>
       )}
-      {/* Header */}
+      
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
+          {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -302,6 +315,8 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

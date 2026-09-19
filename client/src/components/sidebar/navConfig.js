@@ -101,30 +101,10 @@ export const ROLE_NAV_ITEMS = {
       badge: 'Faculty',
     },
     {
-      label: 'Courses',
+      label: 'My Courses',
       href: '/instructor?tab=courses',
       icon: LuBookOpen,
       badge: '3',
-    },
-    {
-      label: 'Course Builder',
-      href: '/instructor?tab=course-builder',
-      icon: LuFlaskConical,
-    },
-    {
-      label: 'Lesson Builder',
-      href: '/instructor?tab=lesson-builder',
-      icon: LuFileText,
-    },
-    {
-      label: 'Quiz Builder',
-      href: '/instructor?tab=quiz-builder',
-      icon: LuClipboardList,
-    },
-    {
-      label: 'Challenge Builder',
-      href: '/instructor?tab=challenge-builder',
-      icon: LuMicroscope,
     },
     {
       label: 'Students',

@@ -85,6 +85,26 @@ export const getInstructorCourses = async (req, res) => {
   }
 };
 
+export const getCourseById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await prisma.course.findUnique({
+      where: { id, instructorId: req.user.id },
+      include: {
+        modules: {
+          include: { lessons: true }
+        }
+      }
+    });
+    if (!course) {
+      return res.status(404).json({ success: false, error: 'Course not found' });
+    }
+    return res.status(200).json({ success: true, data: { course } });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch course' });
+  }
+};
+
 export const createCourse = async (req, res) => {
   try {
     const { title, description, difficulty, category, duration, objectives, prerequisites } = req.body;
@@ -120,7 +140,16 @@ export const updateCourse = async (req, res) => {
     // Update course metadata
     const course = await prisma.course.update({
       where: { id },
-      data: courseData
+      data: {
+        title: courseData.title,
+        description: courseData.description,
+        difficulty: courseData.difficulty,
+        category: courseData.category,
+        duration: courseData.duration,
+        status: courseData.status,
+        objectives: courseData.objectives,
+        prerequisites: courseData.prerequisites
+      }
     });
 
     // Sync modules and lessons if provided
@@ -202,7 +231,17 @@ export const updateCourse = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ success: true, message: 'Course updated.', data: { course } });
+    // Fetch the updated course with its relations to return
+    const updatedCourse = await prisma.course.findUnique({
+      where: { id },
+      include: {
+        modules: {
+          include: { lessons: true }
+        }
+      }
+    });
+
+    return res.status(200).json({ success: true, message: 'Course updated.', data: { course: updatedCourse } });
   } catch (error) {
     console.error('Error updating course:', error);
     return res.status(500).json({ success: false, error: 'Failed to update course' });
@@ -301,6 +340,17 @@ export const updateModule = async (req, res) => {
 };
 
 // ─── LESSONS ─────────────────────────────────────────────────────────────────
+export const getLessonById = async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    const lesson = await prisma.lesson.findUnique({ where: { id: lessonId } });
+    if (!lesson) return res.status(404).json({ success: false, error: 'Lesson not found' });
+    return res.status(200).json({ success: true, data: { lesson } });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch lesson' });
+  }
+};
+
 export const createLesson = async (req, res) => {
   try {
     const { moduleId } = req.params;
@@ -344,6 +394,17 @@ export const getQuizzes = async (req, res) => {
   }
 };
 
+export const getQuizById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const quiz = await prisma.quiz.findUnique({ where: { id } });
+    if (!quiz) return res.status(404).json({ success: false, error: 'Quiz not found' });
+    return res.status(200).json({ success: true, data: { quiz } });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch quiz' });
+  }
+};
+
 export const createQuiz = async (req, res) => {
   try {
     const newQuiz = await prisma.quiz.create({
@@ -377,6 +438,17 @@ export const getChallenges = async (req, res) => {
     return res.status(200).json({ success: true, data: { challenges } });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'Failed to fetch challenges' });
+  }
+};
+
+export const getChallengeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const challenge = await prisma.challenge.findUnique({ where: { id } });
+    if (!challenge) return res.status(404).json({ success: false, error: 'Challenge not found' });
+    return res.status(200).json({ success: true, data: { challenge } });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch challenge' });
   }
 };
 

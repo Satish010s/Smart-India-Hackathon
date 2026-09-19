@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LuBookOpen, LuPlus, LuGrip, LuTrash2, LuPencil, LuCheck, LuX,
   LuEye, LuUpload, LuDownload, LuChevronRight, LuChevronDown,
@@ -11,9 +11,9 @@ import { apiFetch } from '../../services/api';
 
 const LESSON_TYPES = [
   { type: 'lesson', label: 'Lesson', icon: LuFileText, color: 'text-violet-400 bg-violet-500/10' },
-  { type: 'experiment', label: 'Experiment', icon: LuFlaskConical, color: 'text-cyan-400 bg-cyan-500/10' },
+  { type: 'video lecture', label: 'Video Lecture', icon: LuPlay, color: 'text-cyan-400 bg-cyan-500/10' },
   { type: 'quiz', label: 'Quiz', icon: LuStar, color: 'text-amber-400 bg-amber-500/10' },
-  { type: 'challenge', label: 'Challenge', icon: LuZap, color: 'text-pink-400 bg-pink-500/10' },
+  { type: 'assignment', label: 'Assignment', icon: LuZap, color: 'text-pink-400 bg-pink-500/10' },
 ];
 
 const TYPE_INFO = Object.fromEntries(LESSON_TYPES.map(t => [t.type, t]));
@@ -31,7 +31,7 @@ function LessonItem({ lesson, onDelete, onMoveUp, onMoveDown, isFirst, isLast, c
   const handleEdit = () => {
     if (lesson.type === 'quiz' && onOpenQuiz) {
       onOpenQuiz({ courseId, moduleId, quizId: lesson.id });
-    } else if (lesson.type === 'challenge' && onOpenChallenge) {
+    } else if (lesson.type === 'assignment' && onOpenChallenge) {
       onOpenChallenge({ courseId, moduleId, challengeId: lesson.id });
     } else if (onOpenLesson) {
       onOpenLesson({ courseId, moduleId, lessonId: lesson.id });
@@ -62,11 +62,21 @@ function AddLessonPanel({ onAdd }) {
   const [title, setTitle] = useState('');
   const [type, setType] = useState('lesson');
   const [duration, setDuration] = useState('15 min');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoThumbnail, setVideoThumbnail] = useState('');
 
   const handleAdd = () => {
     if (!title.trim()) return;
-    onAdd({ id: `les_${Date.now()}`, title, type, duration, status: 'Draft', order: 0, blocks: [] });
-    setTitle(''); setType('lesson'); setDuration('15 min'); setOpen(false);
+    const lessonData = {
+      id: `les_${Date.now()}`, title, type, duration, status: 'Draft', order: 0, blocks: []
+    };
+    if (type === 'video lecture') {
+      if (!videoUrl.trim()) return alert('Video Link is required for Video Lecture');
+      lessonData.videoUrl = videoUrl;
+      lessonData.videoThumbnail = videoThumbnail;
+    }
+    onAdd(lessonData);
+    setTitle(''); setType('lesson'); setDuration('15 min'); setVideoUrl(''); setVideoThumbnail(''); setOpen(false);
   };
 
   return (
@@ -93,6 +103,20 @@ function AddLessonPanel({ onAdd }) {
               );
             })}
           </div>
+          {type === 'video lecture' && (
+            <div className="flex gap-2">
+              <input
+                type="text" placeholder="Video Link (URL) *"
+                value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+              />
+              <input
+                type="text" placeholder="Thumbnail URL (optional)"
+                value={videoThumbnail} onChange={e => setVideoThumbnail(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+              />
+            </div>
+          )}
           <div className="flex gap-2">
             <input
               type="text" placeholder="Duration (e.g. 15 min)"
@@ -208,12 +232,12 @@ function AddModulePanel({ onAdd }) {
 
   return !open ? (
     <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-violet-400 hover:border-violet-500/40 transition-all cursor-pointer">
-      <LuPlus size={14} /> Add Module
+      <LuPlus size={14} /> Add Chapter
     </button>
   ) : (
     <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-violet-500/30 space-y-3">
       <input
-        autoFocus type="text" placeholder="Module title..."
+        autoFocus type="text" placeholder="Chapter title..."
         value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
         className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
       />
@@ -234,14 +258,14 @@ function AddModulePanel({ onAdd }) {
       </select>
       <div className="flex gap-2 justify-end">
         <button onClick={() => setOpen(false)} className="px-4 py-2 rounded-xl border border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] cursor-pointer">Cancel</button>
-        <button onClick={handleAdd} disabled={!form.title.trim()} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-xs font-bold disabled:opacity-50 hover:bg-violet-500 cursor-pointer transition-colors">Add Module</button>
+        <button onClick={handleAdd} disabled={!form.title.trim()} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-xs font-bold disabled:opacity-50 hover:bg-violet-500 cursor-pointer transition-colors">Add Chapter</button>
       </div>
     </div>
   );
 }
 
 export default function CourseBuilder({ course: initialCourse, courseId, onBack, onOpenLesson, onOpenQuiz, onOpenChallenge, onOpenPreview }) {
-  const course = initialCourse || {
+  const fallbackCourse = {
     id: courseId || 'ic1', title: 'Quantum Fundamentals: From Bits to Qubits',
     status: 'Published', difficulty: 'Beginner',
     modules: [
@@ -290,28 +314,72 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
     ],
   };
 
-  const [courseData, setCourseData] = useState(course);
-  const [modules, setModules] = useState(course.modules || []);
+  const [courseData, setCourseData] = useState(initialCourse || fallbackCourse);
+  const [modules, setModules] = useState((initialCourse || fallbackCourse).modules || []);
   const [activeModuleId, setActiveModuleId] = useState(modules[0]?.id);
-  const [courseStatus, setCourseStatus] = useState(course.status || 'Draft');
+  const [courseStatus, setCourseStatus] = useState((initialCourse || fallbackCourse).status || 'Draft');
   const [completionReq, setCompletionReq] = useState('Complete all modules');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [loading, setLoading] = useState(!initialCourse && !!courseId);
+
+  useEffect(() => {
+    if (!initialCourse && courseId) {
+      apiFetch(`/instructor/courses/${courseId}`).then(res => {
+        if (res?.success && res.data?.course) {
+          const c = res.data.course;
+          setCourseData(c);
+          setModules(c.modules || []);
+          setActiveModuleId(c.modules?.[0]?.id);
+          setCourseStatus(c.status || 'Draft');
+        }
+      }).catch(e => console.warn('Failed to fetch course', e)).finally(() => setLoading(false));
+    }
+  }, [initialCourse, courseId]);
+
+  useEffect(() => {
+    if (isInitialLoad || loading) {
+      setIsInitialLoad(false);
+      return;
+    }
+    setHasUnsavedChanges(true);
+  }, [courseData, modules, courseStatus, completionReq]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
+        <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm text-[var(--color-muted)] font-mono">Loading course data...</p>
+      </div>
+    );
+  }
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      if (course.id && !course.id.startsWith('ic')) {
-        await apiFetch(`/instructor/courses/${course.id}`, {
+      if (courseData.id && !courseData.id.startsWith('ic')) {
+        const res = await apiFetch(`/instructor/courses/${courseData.id}`, {
           method: 'PUT',
           body: JSON.stringify({ ...courseData, status: courseStatus, modules }),
         });
+        if (res?.success && res.data?.course) {
+          const updated = res.data.course;
+          setCourseData(updated);
+          setModules(updated.modules || []);
+          setCourseStatus(updated.status || 'Draft');
+        } else {
+          alert(res?.error || 'Failed to save course');
+        }
       }
     } catch (e) {
-      console.warn('Save course failed (offline?):', e);
+      console.warn('Save course failed:', e);
+      alert(e.message || 'Failed to save course');
     } finally {
       setSaving(false);
       setSaved(true);
+      setHasUnsavedChanges(false);
       setTimeout(() => setSaved(false), 2000);
     }
   };
@@ -357,7 +425,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
           <button onClick={() => onOpenPreview && onOpenPreview({ ...courseData, modules })} className="px-4 py-2 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)] transition-colors cursor-pointer flex items-center gap-1.5">
             <LuEye size={13} /> Preview
           </button>
-          <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all ${saved ? 'bg-emerald-600 text-white' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
+          <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all duration-300 ${saved ? 'bg-emerald-600 text-white' : hasUnsavedChanges ? 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:bg-violet-500' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
           {saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : saved ? <><LuCheck size={13} /> Saved!</> : <><LuSave size={13} /> Save Draft</>}
           </button>
           <select
@@ -383,7 +451,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
               onSelect={() => setActiveModuleId(mod.id)}
               onUpdate={(updated) => setModules(ms => ms.map(m => m.id === updated.id ? updated : m))}
               onDeleteModule={(id) => setModules(ms => ms.filter(m => m.id !== id))}
-              courseId={course.id}
+              courseId={courseData.id}
               onOpenLesson={onOpenLesson}
               onOpenQuiz={onOpenQuiz}
               onOpenChallenge={onOpenChallenge}
@@ -439,12 +507,12 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
           <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-3">
             <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Structure Summary</h4>
             {[
-              { label: 'Modules', value: modules.length },
+              { label: 'Chapters', value: modules.length },
               { label: 'Total Lessons', value: totalLessons },
               { label: 'Published', value: publishedCount, color: 'text-emerald-400' },
-              { label: 'Experiments', value: modules.reduce((a, m) => a + (m.lessons?.filter(l => l.type === 'experiment').length || 0), 0), color: 'text-cyan-400' },
+              { label: 'Video Lectures', value: modules.reduce((a, m) => a + (m.lessons?.filter(l => l.type === 'video lecture').length || 0), 0), color: 'text-cyan-400' },
               { label: 'Quizzes', value: modules.reduce((a, m) => a + (m.lessons?.filter(l => l.type === 'quiz').length || 0), 0), color: 'text-amber-400' },
-              { label: 'Challenges', value: modules.reduce((a, m) => a + (m.lessons?.filter(l => l.type === 'challenge').length || 0), 0), color: 'text-pink-400' },
+              { label: 'Assignments', value: modules.reduce((a, m) => a + (m.lessons?.filter(l => l.type === 'assignment').length || 0), 0), color: 'text-pink-400' },
             ].map(stat => (
               <div key={stat.label} className="flex justify-between items-center text-xs">
                 <span className="text-[var(--color-muted)]">{stat.label}</span>

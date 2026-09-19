@@ -16,19 +16,16 @@ const DIFFICULTY_STYLES = {
 
 export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBack }) {
   const [form, setForm] = useState({
-    title: 'Bell State Circuit Challenge',
+    title: 'Untitled Assignment',
     difficulty: 'Beginner',
     xp: 150,
-    problemStatement: 'Create a quantum circuit that generates the Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2. Your circuit should start with two qubits in the |00⟩ state and produce a maximally entangled Bell state.',
-    starterCode: 'from qiskit import QuantumCircuit\n\ndef bell_state_circuit():\n    qc = QuantumCircuit(2, 2)\n    # Your implementation here\n    return qc',
-    expectedOutput: '{"00": ~512, "11": ~512}',
-    circuitRequirements: 'Must use exactly 2 qubits. Circuit depth ≤ 3.',
-    hints: ['Start by applying a Hadamard gate to the first qubit', 'Use a CNOT gate with the first qubit as control'],
-    testCases: [
-      { input: 'Initial state: |00⟩', expected: 'Statevector: [0.707, 0, 0, 0.707]', description: 'Bell state amplitudes' },
-      { input: '1024 shots measurement', expected: '~50% |00⟩, ~50% |11⟩', description: 'Measurement distribution' },
-    ],
-    solution: 'from qiskit import QuantumCircuit\n\ndef bell_state_circuit():\n    qc = QuantumCircuit(2, 2)\n    qc.h(0)\n    qc.cx(0, 1)\n    qc.measure([0,1],[0,1])\n    return qc',
+    problemStatement: '',
+    starterCode: '',
+    expectedOutput: '',
+    circuitRequirements: '',
+    hints: [],
+    testCases: [],
+    solution: '',
     autoEval: true,
     evalType: 'statevector',
     fidelityThreshold: 0.99,
@@ -36,6 +33,37 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
   const [status, setStatus] = useState('Draft');
   const [saved, setSaved] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const [loading, setLoading] = useState(!!challengeId && !challengeId.startsWith('cc_'));
+
+  React.useEffect(() => {
+    if (challengeId && !challengeId.startsWith('cc_')) {
+      setLoading(true);
+      apiFetch(`/instructor/challenges/${challengeId}`)
+        .then(res => {
+          if (res?.success && res.data?.challenge) {
+            const c = res.data.challenge;
+            setForm({
+              title: c.title || '',
+              difficulty: c.difficulty || 'Beginner',
+              xp: c.xp || 150,
+              problemStatement: c.problemStatement || '',
+              starterCode: c.starterCode || '',
+              expectedOutput: c.expectedOutput || '',
+              circuitRequirements: c.circuitRequirements || '',
+              hints: Array.isArray(c.hints) ? c.hints : [],
+              testCases: Array.isArray(c.testCases) ? c.testCases : [],
+              solution: c.solution || '',
+              autoEval: c.autoEval ?? true,
+              evalType: c.evalType || 'statevector',
+              fidelityThreshold: c.fidelityThreshold || 0.99,
+            });
+            setStatus(c.status || 'Draft');
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [challengeId]);
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }));
   const updateHint = (i, val) => update('hints', form.hints.map((h, j) => j === i ? val : h));
@@ -137,10 +165,17 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           Back to Course Builder
         </button>
       )}
-      {/* Header */}
+      
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
+          {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2"><LuZap size={15} className="text-pink-400" /><span className="text-xs text-[var(--color-muted)] font-mono">Challenge Builder</span></div>
+          <div className="flex items-center gap-2"><LuZap size={15} className="text-pink-400" /><span className="text-xs text-[var(--color-muted)] font-mono">Assignment Builder</span></div>
           <input type="text" value={form.title} onChange={e => update('title', e.target.value)}
             className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full" />
         </div>
@@ -186,7 +221,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           {/* Problem Statement */}
           <Section label="Problem Statement" required>
             <textarea rows={4} value={form.problemStatement} onChange={e => update('problemStatement', e.target.value)}
-              placeholder="Describe the challenge clearly..."
+              placeholder="Describe the assignment clearly..."
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none" />
           </Section>
 
@@ -273,7 +308,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           </div>
 
           <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-3">
-            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Challenge Info</h4>
+            <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Assignment Info</h4>
             {[
               { label: 'Difficulty', value: form.difficulty, color: DIFFICULTY_STYLES[form.difficulty]?.split(' ')[1] },
               { label: 'XP Reward', value: `+${form.xp} XP`, color: 'text-amber-400' },
@@ -289,6 +324,8 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

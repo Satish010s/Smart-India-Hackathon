@@ -130,19 +130,31 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
 }
 
 export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) {
-  const [lessonTitle, setLessonTitle] = useState('Quantum Interference & Phase');
-  const [blocks, setBlocks] = useState([
-    { id: 'b1', type: 'heading', content: 'Understanding Quantum Interference' },
-    { id: 'b2', type: 'text', content: 'Quantum interference is one of the most fundamental phenomena in quantum mechanics. When quantum amplitudes combine, they can add constructively or cancel destructively, providing the basis for quantum advantage.' },
-    { id: 'b3', type: 'code', content: 'from qiskit import QuantumCircuit\nimport numpy as np\n\n# Create a simple interference circuit\nqc = QuantumCircuit(1)\nqc.h(0)  # Create superposition\nqc.z(0)  # Apply phase\nqc.h(0)  # Interfere\nprint(qc)' },
-    { id: 'b4', type: 'simulation', content: '' },
-    { id: 'b5', type: 'ai', content: 'Ask the AI tutor: What is quantum interference and how does it differ from classical wave interference?' },
-  ]);
+  const [lessonTitle, setLessonTitle] = useState('Untitled Lesson');
+  const [blocks, setBlocks] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [status, setStatus] = useState('Draft');
+  const [loading, setLoading] = useState(!!lessonId && !lessonId.startsWith('les_'));
+
+  React.useEffect(() => {
+    if (lessonId && !lessonId.startsWith('les_')) {
+      setLoading(true);
+      apiFetch(`/instructor/lessons/${lessonId}`)
+        .then(res => {
+          if (res?.success && res.data?.lesson) {
+            const l = res.data.lesson;
+            setLessonTitle(l.title || '');
+            if (l.blocks && Array.isArray(l.blocks)) setBlocks(l.blocks);
+            setStatus(l.status || 'Draft');
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [lessonId]);
 
   const addBlock = (type) => {
     setBlocks(b => [...b, { id: `b_${Date.now()}`, type, content: '' }]);
@@ -188,7 +200,14 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
           Back to Course Builder
         </button>
       )}
-      {/* Header */}
+      
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
+          {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -273,6 +292,8 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
         <div className="text-center text-xs text-[var(--color-muted)] font-mono">
           {blocks.length} block{blocks.length !== 1 ? 's' : ''} · Hover a block to reorder or delete
         </div>
+      )}
+        </>
       )}
     </div>
   );
