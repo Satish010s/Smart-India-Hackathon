@@ -29,6 +29,10 @@ function LessonItem({ lesson, onDelete, onMoveUp, onMoveDown, isFirst, isLast, c
   const Icon = info.icon;
 
   const handleEdit = () => {
+    if (lesson.id.startsWith('les_') || lesson.id.startsWith('mod_') || moduleId.startsWith('mod_')) {
+      alert('Please save the course first before editing newly created content.');
+      return;
+    }
     if (lesson.type === 'quiz' && onOpenQuiz) {
       onOpenQuiz({ courseId, moduleId, quizId: lesson.id });
     } else if (lesson.type === 'assignment' && onOpenChallenge) {
@@ -326,7 +330,8 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
   const [loading, setLoading] = useState(!initialCourse && !!courseId);
 
   useEffect(() => {
-    if (!initialCourse && courseId) {
+    if (courseId) {
+      setLoading(true);
       apiFetch(`/instructor/courses/${courseId}`).then(res => {
         if (res?.success && res.data?.course) {
           const c = res.data.course;
@@ -337,7 +342,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
         }
       }).catch(e => console.warn('Failed to fetch course', e)).finally(() => setLoading(false));
     }
-  }, [initialCourse, courseId]);
+  }, [courseId]);
 
   useEffect(() => {
     if (isInitialLoad || loading) {
