@@ -1,109 +1,140 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   LuX, LuArrowLeft, LuArrowRight, LuPlay, LuBot, LuCode,
-  LuCpu, LuCheck, LuSparkles, LuBookOpen, LuFlame, LuLightbulb,
-  LuBrain, LuCircleCheckBig, LuChevronRight, LuClock,
+  LuCpu, LuCheck, LuSparkles, LuBookOpen, LuLightbulb,
+  LuBrain, LuCircleCheckBig, LuClock, LuVideo, LuFileText,
+  LuImage, LuLoader,
 } from 'react-icons/lu';
+import { apiFetch } from '../../../services/api';
 
-// ─── Mock lesson content ──────────────────────────────────────────────────────
-const LESSON_DATA = {
-  id: 'l8',
-  title: 'The Diffusion Operator',
-  module: "Module 3: Grover's Search",
-  duration: '20 min',
-  theory: `The diffusion operator (also called inversion about the mean) is the second key component of Grover's algorithm. After the oracle marks a target state by flipping its phase, the diffusion operator amplifies that state's amplitude relative to all others.
-
-Mathematically, it is defined as:
-**D = 2|ψ⟩⟨ψ| − I**
-
-where |ψ⟩ is the uniform superposition state. This transformation reflects all amplitudes about their average, which increases the amplitude of the marked state and decreases all others.`,
-  keyPoints: [
-    'Reflects amplitudes about the mean',
-    'Implemented as H⊗n · (2|0⟩⟨0| − I) · H⊗n',
-    'Together with oracle, forms one Grover iteration',
-    'Optimal iterations ≈ π/4 · √N',
-  ],
-  code: `from qiskit import QuantumCircuit
-import numpy as np
-
-def diffusion_operator(n_qubits):
-    """Build the diffusion (inversion about mean) operator."""
-    qc = QuantumCircuit(n_qubits)
-    
-    # Apply Hadamard to all qubits
-    qc.h(range(n_qubits))
-    
-    # Apply X to all qubits
-    qc.x(range(n_qubits))
-    
-    # Apply multi-controlled Z gate
-    qc.h(n_qubits - 1)
-    qc.mcx(list(range(n_qubits - 1)), n_qubits - 1)
-    qc.h(n_qubits - 1)
-    
-    # Reverse X and H
-    qc.x(range(n_qubits))
-    qc.h(range(n_qubits))
-    
-    return qc
-
-# Build 3-qubit Grover circuit
-n = 3
-grover = QuantumCircuit(n)
-grover.h(range(n))          # Initialize superposition
-grover.compose(oracle, inplace=True)  # Apply oracle
-grover.compose(diffusion_operator(n), inplace=True)
-
-print(grover.draw())`,
-  circuit: `H ─┤ Oracle ├─ H ─ X ─ ●── X ─ H
-H ─┤        ├─ H ─ X ─ ●── X ─ H
-H ─┤        ├─ H ─ X ─ Z── X ─ H`,
-  quiz: [
+// ─── Static fallback for demo / when no blocks provided ──────────────────────
+const DEMO_LESSON = {
+  id: 'demo',
+  title: 'Introduction to Quantum Computing',
+  type: 'lesson',
+  contentType: 'lesson',
+  duration: '15 min',
+  module: 'Module 1',
+  blocks: [
+    { id: 'b1', type: 'heading', content: 'What is a Qubit?' },
     {
-      q: 'What does the diffusion operator do to amplitudes?',
-      options: ['Flips all amplitudes', 'Reflects amplitudes about their mean', 'Doubles all amplitudes', 'Sets all amplitudes equal'],
-      answer: 1,
+      id: 'b2', type: 'text',
+      content: 'A qubit (quantum bit) is the basic unit of quantum information. Unlike a classical bit that is either 0 or 1, a qubit can exist in a superposition of both states simultaneously — giving quantum computers their extraordinary power.'
     },
     {
-      q: 'How many Grover iterations give optimal success probability?',
-      options: ['N/2 iterations', 'log(N) iterations', '≈ π/4 · √N iterations', 'N iterations'],
-      answer: 2,
+      id: 'b3', type: 'code',
+      content: `from qiskit import QuantumCircuit\n\n# Create a single qubit circuit\nqc = QuantumCircuit(1, 1)\nqc.h(0)          # Put qubit in superposition\nqc.measure(0, 0) # Measure the qubit\n\nprint(qc.draw())`
     },
   ],
+  keyPoints: ['Qubits can be 0, 1, or both simultaneously', 'Superposition enables exponential parallelism', 'Measurement collapses the quantum state'],
 };
 
-const AI_EXPLANATIONS = {
-  concept: "The diffusion operator is like 'reflecting in a mirror set at the average.' If most values are small but one is large (after oracle), reflecting about the mean makes the large one even bigger and shrinks the small ones. After O(√N) iterations, the marked state has amplitude close to 1.",
-  code: "The code builds D = H⊗n(2|0⟩⟨0|−I)H⊗n. The X gates convert |0⟩⟨0| to |all-ones⟩⟨all-ones|, the multi-controlled-Z flips its phase, and the outer H+X sandwich completes the inversion.",
-  circuit: "Read the circuit left to right: H creates superposition, the Oracle block marks the target, then H→X→MCZ→X→H implements the diffusion. The MCZ acts like a phase kickback on |111...1⟩.",
-  result: "After this iteration, the target state amplitude increases from ~1/√N to ~3/√N. After ≈π/4·√N iterations, amplitude approaches 1.0, giving near-certain measurement outcome.",
-};
+// ─── Block Renderer ────────────────────────────────────────────────────────────
+function BlockRenderer({ block }) {
+  if (!block) return null;
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function AIPanel({ explanation, label }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 overflow-hidden">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-cyan-500/10 transition-colors"
-      >
-        <LuBot size={15} className="text-cyan-400 flex-shrink-0" />
-        <span className="text-xs font-semibold text-cyan-400 flex-1">AI: Explain {label}</span>
-        <LuSparkles size={13} className="text-cyan-400/60" />
-      </button>
-      {open && (
-        <div className="px-4 pb-4 text-xs text-[var(--color-muted)] leading-relaxed border-t border-cyan-500/10">
-          <div className="pt-3">{explanation}</div>
+  switch (block.type) {
+    case 'heading':
+      return <h2 className="text-xl font-bold text-[var(--color-text)] mt-6 mb-2">{block.content}</h2>;
+    case 'text':
+      return (
+        <p className="text-sm text-[var(--color-muted)] leading-relaxed"
+           dangerouslySetInnerHTML={{ __html: (block.content || '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-[var(--color-text)]">$1</strong>') }}
+        />
+      );
+    case 'code':
+      return (
+        <div className="rounded-xl bg-[#0d1117] border border-[var(--color-border)] overflow-hidden">
+          <div className="flex items-center px-4 py-2 border-b border-[var(--color-border)]/50">
+            <LuCode size={12} className="text-emerald-400 mr-2" />
+            <span className="text-[10px] font-mono text-emerald-400">code</span>
+          </div>
+          <pre className="p-4 text-[11px] text-cyan-300 leading-relaxed overflow-x-auto font-mono">{block.content}</pre>
         </div>
-      )}
+      );
+    case 'image':
+      return (
+        <div className="rounded-2xl overflow-hidden border border-[var(--color-border)]">
+          {block.content?.startsWith('http') ? (
+            <img src={block.content} alt="Lesson image" className="w-full object-cover" />
+          ) : (
+            <div className="h-48 flex items-center justify-center bg-[var(--color-surface)] text-[var(--color-muted)] text-xs gap-2">
+              <LuImage size={20} className="opacity-40" />
+              {block.content || 'Image'}
+            </div>
+          )}
+        </div>
+      );
+    case 'video':
+      return (
+        <div className="rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[#0d1117]">
+          {block.content?.startsWith('http') ? (
+            <video controls className="w-full" src={block.content} />
+          ) : (
+            <div className="h-48 flex items-center justify-center text-[var(--color-muted)] text-xs gap-2">
+              <LuVideo size={20} className="opacity-40" />
+              {block.content || 'Video'}
+            </div>
+          )}
+        </div>
+      );
+    default:
+      return block.content ? (
+        <p className="text-sm text-[var(--color-muted)] leading-relaxed">{block.content}</p>
+      ) : null;
+  }
+}
+
+// ─── Video Player ─────────────────────────────────────────────────────────────
+function VideoPlayer({ videoUrl, videoThumbnail, title }) {
+  const videoRef = useRef(null);
+
+  if (!videoUrl) {
+    return (
+      <div className="aspect-video bg-[#0d1117] rounded-2xl flex items-center justify-center border border-[var(--color-border)]">
+        <div className="text-center text-[var(--color-muted)]">
+          <LuVideo size={32} className="mx-auto mb-2 opacity-30" />
+          <p className="text-xs">No video URL configured for this lecture.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Detect YouTube
+  const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (ytMatch) {
+    return (
+      <div className="aspect-video w-full rounded-2xl overflow-hidden border border-[var(--color-border)]">
+        <iframe
+          src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+          title={title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  // Native video
+  return (
+    <div className="rounded-2xl overflow-hidden border border-[var(--color-border)] bg-black">
+      <video
+        ref={videoRef}
+        controls
+        poster={videoThumbnail || undefined}
+        className="w-full max-h-[60vh]"
+        src={videoUrl}
+      >
+        Your browser does not support the video tag.
+      </video>
     </div>
   );
 }
 
+// ─── Quiz Section ─────────────────────────────────────────────────────────────
 function QuizSection({ questions }) {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -164,22 +195,70 @@ function QuizSection({ questions }) {
 }
 
 // ─── Main export ──────────────────────────────────────────────────────────────
-export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPrev, lessonIndex = 2, totalLessons = 6 }) {
-  const [activeTab, setActiveTab] = useState('theory');
-  const [simRunning, setSimRunning] = useState(false);
-  const [simDone, setSimDone] = useState(false);
-  const [completed, setCompleted] = useState(false);
+export default function LessonView({ lesson: lessonProp, onClose, onNext, onPrev, lessonIndex = 1, totalLessons = 1 }) {
+  const [lessonData, setLessonData] = useState(lessonProp || DEMO_LESSON);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('content');
+  const [completed, setCompleted] = useState(lessonProp?.completed || false);
+  const [completing, setCompleting] = useState(false);
+  const [xpEarned, setXpEarned] = useState(null);
 
-  const tabs = [
-    { id: 'theory', label: 'Theory', icon: LuBookOpen },
-    { id: 'code', label: 'Code', icon: LuCode },
-    { id: 'circuit', label: 'Circuit', icon: LuCpu },
-  ];
+  const isVideo = lessonData?.type === 'video lecture' || lessonData?.contentType === 'video';
+  const blocks = Array.isArray(lessonData?.blocks) ? lessonData.blocks : [];
+  const hasBlocks = blocks.length > 0;
 
-  function runSim() {
-    setSimRunning(true);
-    setTimeout(() => { setSimRunning(false); setSimDone(true); }, 2000);
-  }
+  // Fetch full lesson content from API if we only have a lightweight item reference
+  useEffect(() => {
+    if (!lessonProp?.id || lessonProp.id.startsWith('les_')) return;
+    // If we already have full content (blocks or videoUrl), no need to re-fetch
+    if (lessonProp.blocks || lessonProp.videoUrl) {
+      setLessonData(lessonProp);
+      setCompleted(lessonProp.completed || false);
+      return;
+    }
+    let mounted = true;
+    setLoading(true);
+    apiFetch(`/learner/lessons/${lessonProp.id}`)
+      .then(res => {
+        if (mounted && res?.data?.lesson) {
+          setLessonData({ ...lessonProp, ...res.data.lesson });
+          setCompleted(lessonProp.completed || false);
+        }
+      })
+      .catch(err => {
+        console.warn('Could not load lesson content:', err.message);
+        setLessonData(lessonProp);
+      })
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
+  }, [lessonProp?.id]);
+
+  const handleMarkComplete = async () => {
+    if (completed || completing) return;
+    setCompleting(true);
+    try {
+      const res = await apiFetch(`/learner/lessons/${lessonData.id}/complete`, { method: 'PATCH' });
+      if (res?.success) {
+        setCompleted(true);
+        setXpEarned(res.data?.xpEarned || 25);
+      }
+    } catch (err) {
+      console.warn('Complete lesson API error:', err.message);
+      // Optimistic update even on error
+      setCompleted(true);
+      setXpEarned(25);
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const tabs = isVideo
+    ? [{ id: 'content', label: 'Video', icon: LuVideo }]
+    : [
+        { id: 'content', label: 'Content', icon: LuBookOpen },
+        ...(lessonData?.code ? [{ id: 'code', label: 'Code', icon: LuCode }] : []),
+        ...(lessonData?.circuit ? [{ id: 'circuit', label: 'Circuit', icon: LuCpu }] : []),
+      ];
 
   return (
     <div className="space-y-0">
@@ -191,12 +270,15 @@ export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPr
           </button>
         )}
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider">{lesson.module}</div>
-          <h2 className="text-base font-bold text-[var(--color-text)] truncate">{lesson.title}</h2>
+          <div className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider flex items-center gap-1.5">
+            {isVideo ? <LuVideo size={10} /> : <LuFileText size={10} />}
+            {lessonData?.module || 'Lesson'}
+          </div>
+          <h2 className="text-base font-bold text-[var(--color-text)] truncate">{lessonData?.title || 'Loading...'}</h2>
         </div>
         <div className="flex items-center gap-2 text-xs text-[var(--color-muted)] font-mono flex-shrink-0">
           <LuClock size={12} />
-          {lesson.duration}
+          {lessonData?.duration}
           <span className="ml-2">Lesson {lessonIndex}/{totalLessons}</span>
         </div>
       </div>
@@ -208,156 +290,167 @@ export default function LessonView({ lesson = LESSON_DATA, onClose, onNext, onPr
 
       {/* Content */}
       <div className="rounded-b-2xl border-x border-b border-[var(--color-border)] bg-[var(--color-background)] p-6 space-y-6">
-        {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-[var(--color-surface)] rounded-xl w-fit">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[var(--color-primary)] text-white shadow-md'
-                    : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
-                }`}
-              >
-                <Icon size={13} /> {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <LuLoader size={24} className="text-[var(--color-primary)] animate-spin" />
+            <p className="text-sm text-[var(--color-muted)]">Loading lesson content...</p>
+          </div>
+        ) : (
+          <>
+            {/* Tab bar */}
+            {tabs.length > 1 && (
+              <div className="flex gap-1 p-1 bg-[var(--color-surface)] rounded-xl w-fit">
+                {tabs.map(tab => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        activeTab === tab.id
+                          ? 'bg-[var(--color-primary)] text-white shadow-md'
+                          : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
+                      }`}
+                    >
+                      <Icon size={13} /> {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
-        {/* Theory Tab */}
-        {activeTab === 'theory' && (
-          <div className="space-y-5">
-            <div className="prose prose-sm max-w-none">
-              {(lesson.theory || '').split('\n\n').map((para, i) => (
-                <p key={i} className="text-sm text-[var(--color-muted)] leading-relaxed"
-                   dangerouslySetInnerHTML={{ __html: para.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[var(--color-text)]">$1</strong>') }}
+            {/* ── VIDEO LECTURE ── */}
+            {isVideo && (
+              <div className="space-y-4">
+                <VideoPlayer
+                  videoUrl={lessonData?.videoUrl}
+                  videoThumbnail={lessonData?.videoThumbnail}
+                  title={lessonData?.title}
                 />
-              ))}
-            </div>
-
-            <AIPanel explanation={AI_EXPLANATIONS.concept} label="this concept" />
-
-            {/* Key points */}
-            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-2">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
-                <LuLightbulb size={14} className="text-amber-400" /> Key Takeaways
-              </div>
-              <ul className="space-y-1.5">
-                {(lesson.keyPoints || []).map(pt => (
-                  <li key={pt} className="flex items-start gap-2 text-xs text-[var(--color-muted)]">
-                    <LuCheck size={12} className="text-emerald-400 mt-0.5 flex-shrink-0" /> {pt}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Code Tab */}
-        {activeTab === 'code' && (
-          <div className="space-y-4">
-            <div className="rounded-xl bg-[#0d1117] border border-[var(--color-border)] overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)]/50">
-                <span className="text-[10px] font-mono text-emerald-400">diffusion_operator.py</span>
-                <button
-                  onClick={runSim}
-                  disabled={simRunning}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
-                >
-                  {simRunning ? (
-                    <><span className="w-3 h-3 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" /> Running...</>
-                  ) : (
-                    <><LuPlay size={11} /> Run Simulation</>
-                  )}
-                </button>
-              </div>
-              <pre className="p-4 text-[11px] text-cyan-300 leading-relaxed overflow-x-auto font-mono">
-                {lesson.code}
-              </pre>
-            </div>
-
-            {simDone && (
-              <div className="rounded-xl bg-[#0d1117] border border-emerald-500/20 p-4 space-y-2">
-                <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Simulation Output</div>
-                <pre className="text-[11px] text-emerald-300 font-mono leading-relaxed">{`Circuit depth: 12
-Qubits: 3
-Target state |101⟩ amplitude: 0.974
-Measurement probability: 94.8%
-Success after ≈2.2 iterations`}</pre>
+                {lessonData?.description && (
+                  <p className="text-sm text-[var(--color-muted)] leading-relaxed">{lessonData.description}</p>
+                )}
               </div>
             )}
 
-            <AIPanel explanation={AI_EXPLANATIONS.code} label="this implementation" />
-            {simDone && <AIPanel explanation={AI_EXPLANATIONS.result} label="the result" />}
-          </div>
-        )}
+            {/* ── TEXT / BLOCK LESSON ── */}
+            {!isVideo && activeTab === 'content' && (
+              <div className="space-y-4">
+                {hasBlocks ? (
+                  <div className="space-y-4">
+                    {blocks.map(block => (
+                      <BlockRenderer key={block.id} block={block} />
+                    ))}
+                  </div>
+                ) : (
+                  /* Fallback: show theory text if blocks empty */
+                  <div className="space-y-4">
+                    {lessonData?.theory ? (
+                      (lessonData.theory).split('\n\n').map((para, i) => (
+                        <p key={i} className="text-sm text-[var(--color-muted)] leading-relaxed"
+                           dangerouslySetInnerHTML={{ __html: para.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[var(--color-text)]">$1</strong>') }}
+                        />
+                      ))
+                    ) : (
+                      <div className="py-12 text-center text-[var(--color-muted)]">
+                        <LuFileText size={28} className="mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">No content has been added to this lesson yet.</p>
+                        <p className="text-xs mt-1 opacity-60">Check back later when the instructor publishes content.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-        {/* Circuit Tab */}
-        {activeTab === 'circuit' && (
-          <div className="space-y-4">
-            <div className="rounded-xl bg-[#0d1117] border border-[var(--color-border)] overflow-hidden">
-              <div className="flex items-center px-4 py-2 border-b border-[var(--color-border)]/50">
-                <span className="text-[10px] font-mono text-violet-400">Grover Circuit (1 iteration)</span>
-              </div>
-              <div className="p-6">
-                <pre className="text-sm font-mono text-violet-300 leading-loose">{lesson.circuit}</pre>
-              </div>
-            </div>
-            <button
-              onClick={runSim}
-              disabled={simRunning}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-sm font-semibold hover:bg-[var(--color-primary)]/20 transition-colors disabled:opacity-50"
-            >
-              {simRunning ? <span className="w-4 h-4 rounded-full border-2 border-[var(--color-primary)] border-t-transparent animate-spin" /> : <LuPlay size={14} />}
-              Run Circuit Simulation
-            </button>
-            {simDone && (
-              <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-4 text-xs font-mono text-emerald-300">
-                ✓ Circuit valid · Target state probability boosted to 94.8%
+                {/* Key points if present */}
+                {lessonData?.keyPoints?.length > 0 && (
+                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                      <LuLightbulb size={14} className="text-amber-400" /> Key Takeaways
+                    </div>
+                    <ul className="space-y-1.5">
+                      {lessonData.keyPoints.map(pt => (
+                        <li key={pt} className="flex items-start gap-2 text-xs text-[var(--color-muted)]">
+                          <LuCheck size={12} className="text-emerald-400 mt-0.5 flex-shrink-0" /> {pt}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
-            <AIPanel explanation={AI_EXPLANATIONS.circuit} label="this circuit" />
-          </div>
-        )}
 
-        {/* Quiz */}
-        <QuizSection questions={LESSON_DATA.quiz} />
+            {/* Code tab */}
+            {!isVideo && activeTab === 'code' && lessonData?.code && (
+              <div className="rounded-xl bg-[#0d1117] border border-[var(--color-border)] overflow-hidden">
+                <div className="flex items-center px-4 py-2 border-b border-[var(--color-border)]/50">
+                  <LuCode size={12} className="text-emerald-400 mr-2" />
+                  <span className="text-[10px] font-mono text-emerald-400">lesson_code.py</span>
+                </div>
+                <pre className="p-4 text-[11px] text-cyan-300 leading-relaxed overflow-x-auto font-mono">{lessonData.code}</pre>
+              </div>
+            )}
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]/50">
-          <button
-            onClick={onPrev}
-            disabled={!onPrev}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] hover:border-[var(--color-primary)]/40 disabled:opacity-30 transition-all"
-          >
-            <LuArrowLeft size={14} /> Previous
-          </button>
+            {/* Circuit tab */}
+            {!isVideo && activeTab === 'circuit' && lessonData?.circuit && (
+              <div className="rounded-xl bg-[#0d1117] border border-[var(--color-border)] overflow-hidden">
+                <div className="flex items-center px-4 py-2 border-b border-[var(--color-border)]/50">
+                  <LuCpu size={12} className="text-violet-400 mr-2" />
+                  <span className="text-[10px] font-mono text-violet-400">Circuit Diagram</span>
+                </div>
+                <div className="p-6">
+                  <pre className="text-sm font-mono text-violet-300 leading-loose">{lessonData.circuit}</pre>
+                </div>
+              </div>
+            )}
 
-          {!completed ? (
-            <button
-              onClick={() => setCompleted(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-all"
-            >
-              <LuCircleCheckBig size={14} /> Mark Complete
-            </button>
-          ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
-                <LuCheck size={13} /> Completed!
-              </span>
+            {/* XP earned flash */}
+            {xpEarned && (
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold">
+                <LuSparkles size={14} /> +{xpEarned} XP earned! Great work.
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]/50">
               <button
-                onClick={onNext}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold hover:opacity-90 transition-all"
+                onClick={onPrev}
+                disabled={!onPrev}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] hover:border-[var(--color-primary)]/40 disabled:opacity-30 transition-all"
               >
-                Next Lesson <LuArrowRight size={14} />
+                <LuArrowLeft size={14} /> Previous
               </button>
+
+              {!completed ? (
+                <button
+                  onClick={handleMarkComplete}
+                  disabled={completing}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-all disabled:opacity-60"
+                >
+                  {completing ? (
+                    <LuLoader size={14} className="animate-spin" />
+                  ) : (
+                    <LuCircleCheckBig size={14} />
+                  )}
+                  {completing ? 'Saving...' : 'Mark Complete'}
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+                    <LuCheck size={13} /> Completed!
+                  </span>
+                  {onNext && (
+                    <button
+                      onClick={onNext}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold hover:opacity-90 transition-all"
+                    >
+                      Next Lesson <LuArrowRight size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

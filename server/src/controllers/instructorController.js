@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../config/db.js';
 
 // ─── PORTAL OVERVIEW ─────────────────────────────────────────────────────────
 export const getInstructorPortal = async (req, res) => {
@@ -23,7 +21,7 @@ export const getInstructorPortal = async (req, res) => {
       where: { courseId: { in: courseIds }, status: 'PENDING' }
     });
     
-    // Recent activity (dummy for now, or we can use AuditLog or Submission history)
+    // Recent activity — from submission history
     const recentActivity = await prisma.submission.findMany({
       where: { courseId: { in: courseIds } },
       orderBy: { submittedAt: 'desc' },
@@ -231,12 +229,22 @@ export const updateCourse = async (req, res) => {
       }
     }
 
+    // After syncing all modules/lessons, recalculate and update totalLessons
+    const lessonCount = await prisma.lesson.count({
+      where: { module: { courseId: id } }
+    });
+    await prisma.course.update({
+      where: { id },
+      data: { totalLessons: lessonCount }
+    });
+
     // Fetch the updated course with its relations to return
     const updatedCourse = await prisma.course.findUnique({
       where: { id },
       include: {
         modules: {
-          include: { lessons: true }
+          include: { lessons: true },
+          orderBy: { order: 'asc' }
         }
       }
     });
@@ -354,16 +362,25 @@ export const getLessonById = async (req, res) => {
 export const createLesson = async (req, res) => {
   try {
     const { moduleId } = req.params;
-    const { title, type, duration } = req.body;
+    const { title, type, duration, videoUrl, videoThumbnail, blocks } = req.body;
+    const contentType = (type === 'video lecture') ? 'video' : 'lesson';
     const count = await prisma.lesson.count({ where: { moduleId } });
     const lesson = await prisma.lesson.create({
       data: {
-        title, type: type || 'lesson', duration: duration || '10 min',
-        order: count + 1, moduleId
+        title: title || 'Untitled Lesson',
+        type: type || 'lesson',
+        contentType,
+        duration: duration || '10 min',
+        order: count + 1,
+        moduleId,
+        videoUrl: videoUrl || null,
+        videoThumbnail: videoThumbnail || null,
+        blocks: blocks || null,
       }
     });
     return res.status(201).json({ success: true, message: 'Lesson created.', data: { lesson } });
   } catch (error) {
+    console.error('Error creating lesson:', error);
     return res.status(500).json({ success: false, error: 'Failed to create lesson' });
   }
 };
@@ -371,12 +388,25 @@ export const createLesson = async (req, res) => {
 export const updateLesson = async (req, res) => {
   try {
     const { lessonId } = req.params;
+    const { title, type, duration, status, videoUrl, videoThumbnail, blocks, order } = req.body;
+    const contentType = type ? ((type === 'video lecture') ? 'video' : 'lesson') : undefined;
     const lesson = await prisma.lesson.update({
       where: { id: lessonId },
-      data: req.body
+      data: {
+        ...(title !== undefined && { title }),
+        ...(type !== undefined && { type }),
+        ...(contentType !== undefined && { contentType }),
+        ...(duration !== undefined && { duration }),
+        ...(status !== undefined && { status }),
+        ...(order !== undefined && { order }),
+        ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
+        ...(videoThumbnail !== undefined && { videoThumbnail: videoThumbnail || null }),
+        ...(blocks !== undefined && { blocks: blocks || null }),
+      }
     });
     return res.status(200).json({ success: true, message: 'Lesson updated.', data: { lesson } });
   } catch (error) {
+    console.error('Error updating lesson:', error);
     return res.status(500).json({ success: false, error: 'Failed to update lesson' });
   }
 };
@@ -539,7 +569,7 @@ export const getGradingQueue = async (req, res) => {
       }
     });
     const formatted = submissions.map(s => ({
-      id: s.id, student: s.user.name, course: s.course?.title,
+      id: s.id, student: s.user.name, course: s.course?.title || 'Unknown Course',
       submittedAt: s.submittedAt, status: s.status, type: s.type, score: s.score
     }));
     return res.status(200).json({
@@ -547,6 +577,7 @@ export const getGradingQueue = async (req, res) => {
       data: { submissions: formatted, pendingCount: formatted.filter(s => s.status === 'PENDING').length },
     });
   } catch (error) {
+    console.error('Error fetching grading queue:', error);
     return res.status(500).json({ success: false, error: 'Failed to fetch grading queue' });
   }
 };

@@ -225,6 +225,7 @@ model Course {
   quizzes          Quiz[]
   challenges       Challenge[]
   enrollments      Enrollment[]
+  submissions      Submission[]
   pathCourses      PathCourse[]
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
@@ -251,17 +252,20 @@ model Module {
 }
 
 model Lesson {
-  id          String   @id @default(cuid())
-  title       String
-  type        String   @default("lesson") // lesson, experiment
-  duration    String   @default("10 min")
-  status      String   @default("Draft")
-  order       Int      @default(1)
-  blocks      Json?    // Optional content blocks
-  moduleId    String
-  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  title          String
+  type           String   @default("lesson") // lesson, video lecture, quiz, assignment
+  contentType    String   @default("lesson")  // lesson | video
+  duration       String   @default("10 min")
+  status         String   @default("Draft")
+  order          Int      @default(1)
+  blocks         Json?    // Optional content blocks for text lessons
+  videoUrl       String?  // URL for video lecture
+  videoThumbnail String?  // Thumbnail for video lecture
+  moduleId       String
+  module         Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([moduleId])
 }
@@ -340,14 +344,16 @@ model Submission {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignmentId String    // ID of Challenge, Quiz, or Lesson
   courseId     String?   // Optional relation for analytics
+  course       Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
   type         String    // "Challenge", "Quiz", "Lab"
   status       String    @default("PENDING") // PENDING, GRADED
   score        Float?
   feedback     String?
   submittedAt  DateTime  @default(now())
   gradedAt     DateTime?
-  
+
   @@index([userId])
+  @@index([courseId])
   @@index([assignmentId])
   @@index([status])
 }

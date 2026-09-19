@@ -159,35 +159,51 @@ export const getLearnerDashboard = async (req, res) => {
 
 export const getLearnerCourses = async (req, res) => {
   try {
+    // Only show Published courses to learners
     const courses = await prisma.course.findMany({
+      where: { status: 'Published' },
       include: {
-        instructor: { select: { name: true } }
-      }
+        instructor: { select: { name: true } },
+        modules: {
+          include: { lessons: { select: { id: true } } }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
     });
 
     const enrollments = await prisma.enrollment.findMany({
       where: { userId: req.user.id }
     });
 
-    const enrolledCourseIds = new Set(enrollments.map(e => e.courseId));
-    
-    const formattedCourses = courses.map(c => ({
-      id: c.id,
-      title: c.title,
-      description: c.description,
-      difficulty: c.difficulty,
-      duration: c.duration,
-      modules: c.totalLessons > 0 ? 5 : 0,
-      lessons: c.totalLessons,
-      instructor: c.instructor?.name || 'Unknown',
-      progress: enrolledCourseIds.has(c.id) ? 0 : 0,
-      enrolled: enrolledCourseIds.has(c.id),
-      studentsEnrolled: c.enrolledStudents || 0,
-      category: c.category,
-      rating: c.rating || 0
-    }));
+    const enrollmentMap = new Map(enrollments.map(e => [e.courseId, e]));
 
-    const paths = await prisma.learningPath.findMany();
+    const formattedCourses = courses.map(c => {
+      const enrollment = enrollmentMap.get(c.id);
+      const totalLessons = c.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+      return {
+        id: c.id,
+        title: c.title,
+        description: c.description,
+        difficulty: c.difficulty,
+        duration: c.duration,
+        modules: c.modules.length,
+        lessons: totalLessons || c.totalLessons,
+        instructor: c.instructor?.name || 'Unknown',
+        progress: enrollment ? Math.round(enrollment.progress) : 0,
+        enrolled: !!enrollment,
+        enrollmentStatus: enrollment?.status || null,
+        studentsEnrolled: c.enrolledStudents || 0,
+        category: c.category,
+        rating: c.rating || 0,
+        objectives: c.objectives,
+        prerequisites: c.prerequisites,
+        thumbnail: c.thumbnail,
+      };
+    });
+
+    const paths = await prisma.learningPath.findMany({
+      include: { pathCourses: { include: { course: { select: { id: true } } } } }
+    });
 
     return res.status(200).json({
       success: true,
@@ -199,8 +215,8 @@ export const getLearnerCourses = async (req, res) => {
           id: p.id,
           title: p.title,
           description: p.description,
-          courses: 0,
-          totalHours: p.totalHours || 0,
+          courses: p.pathCourses.length,
+          totalHours: p.totalHours || '0 hrs',
           difficulty: p.difficulty || 'Beginner',
           progress: 0,
           enrolled: false
@@ -222,8 +238,9 @@ export const getCourseById = async (req, res) => {
         instructor: { select: { name: true } },
         modules: {
           include: {
-            lessons: true
-          }
+            lessons: { orderBy: { order: 'asc' } }
+          },
+          orderBy: { order: 'asc' }
         }
       }
     });
@@ -232,11 +249,21 @@ export const getCourseById = async (req, res) => {
       return res.status(404).json({ success: false, error: 'Course not found' });
     }
 
+    // Get enrollment if any
+    const enrollment = await prisma.enrollment.findFirst({
+      where: { userId: req.user.id, courseId }
+    });
+
+    const moduleProgress = enrollment?.moduleProgress || {};
+    const completedLessonIds = new Set(
+      Object.values(moduleProgress).flatMap(m => m.completedLessons || [])
+    );
+
     const formattedCourse = {
       ...course,
       instructor: course.instructor?.name || 'Unknown',
-      enrolled: true,
-      progress: 0
+      enrolled: !!enrollment,
+      progress: enrollment ? Math.round(enrollment.progress) : 0
     };
 
     const curriculum = course.modules.map(m => ({
@@ -248,9 +275,12 @@ export const getCourseById = async (req, res) => {
       items: m.lessons.map(l => ({
         id: l.id,
         type: l.type,
+        contentType: l.contentType,
         title: l.title,
         duration: l.duration,
-        completed: false
+        completed: completedLessonIds.has(l.id),
+        videoUrl: l.videoUrl || null,
+        videoThumbnail: l.videoThumbnail || null,
       }))
     }));
 
@@ -267,19 +297,32 @@ export const getCourseById = async (req, res) => {
 export const enrollCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const enrollment = await prisma.enrollment.create({
-      data: {
-        userId: req.user.id,
-        courseId,
-        progress: 0,
-        status: 'Active'
-      }
+    const userId = req.user.id;
+
+    // Verify course exists and is published
+    const course = await prisma.course.findUnique({ where: { id: courseId } });
+    if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+    if (course.status !== 'Published') {
+      return res.status(400).json({ success: false, error: 'Course is not available for enrollment' });
+    }
+
+    // Upsert enrollment — prevents duplicate crash
+    const enrollment = await prisma.enrollment.upsert({
+      where: { userId_courseId: { userId, courseId } },
+      update: { status: 'Active' },
+      create: { userId, courseId, progress: 0, status: 'Active' }
     });
+
+    // Increment enrolledStudents counter on course (atomic)
+    await prisma.course.update({
+      where: { id: courseId },
+      data: { enrolledStudents: { increment: 1 } }
+    }).catch(() => {}); // Non-critical, ignore failure
 
     return res.status(200).json({
       success: true,
-      message: `Successfully enrolled in course ${courseId}.`,
-      data: { courseId, enrolled: true, progress: 0 },
+      message: `Successfully enrolled in course.`,
+      data: { courseId, enrolled: true, progress: Math.round(enrollment.progress) },
     });
   } catch (error) {
     console.error('Error enrolling course:', error);
@@ -287,33 +330,183 @@ export const enrollCourse = async (req, res) => {
   }
 };
 
+// ─── Lesson Content Fetch ─────────────────────────────────────────────────────
+export const getLessonContent = async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        module: {
+          include: { course: { select: { id: true, title: true, status: true } } }
+        }
+      }
+    });
+
+    if (!lesson) {
+      return res.status(404).json({ success: false, error: 'Lesson not found' });
+    }
+
+    // Verify learner has access (course is published)
+    if (lesson.module?.course?.status !== 'Published') {
+      return res.status(403).json({ success: false, error: 'This lesson is not available' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        lesson: {
+          id: lesson.id,
+          title: lesson.title,
+          type: lesson.type,
+          contentType: lesson.contentType,
+          duration: lesson.duration,
+          status: lesson.status,
+          blocks: lesson.blocks || [],
+          videoUrl: lesson.videoUrl || null,
+          videoThumbnail: lesson.videoThumbnail || null,
+          module: lesson.module?.course?.title,
+          courseId: lesson.module?.course?.id,
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching lesson content:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch lesson' });
+  }
+};
+
 export const completeLesson = async (req, res) => {
   try {
     const { lessonId } = req.params;
+    const userId = req.user.id;
+
+    // Get lesson and its module/course
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        module: {
+          include: {
+            course: {
+              include: {
+                modules: { include: { lessons: { select: { id: true } } } }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!lesson) return res.status(404).json({ success: false, error: 'Lesson not found' });
+
+    const courseId = lesson.module?.courseId;
+    if (!courseId) return res.status(400).json({ success: false, error: 'Invalid lesson structure' });
+
+    // Get or create enrollment
+    let enrollment = await prisma.enrollment.findFirst({ where: { userId, courseId } });
+    if (!enrollment) {
+      return res.status(403).json({ success: false, error: 'You are not enrolled in this course' });
+    }
+
+    // Update moduleProgress
+    const moduleProgress = enrollment.moduleProgress ? { ...enrollment.moduleProgress } : {};
+    const moduleId = lesson.moduleId;
+    if (!moduleProgress[moduleId]) {
+      moduleProgress[moduleId] = { completedLessons: [] };
+    }
+    const completedLessons = moduleProgress[moduleId].completedLessons || [];
+    if (!completedLessons.includes(lessonId)) {
+      completedLessons.push(lessonId);
+    }
+    moduleProgress[moduleId].completedLessons = completedLessons;
+
+    // Compute new overall progress
+    const allLessons = lesson.module.course.modules.flatMap(m => m.lessons);
+    const totalLessons = allLessons.length;
+    const completedAll = Object.values(moduleProgress).reduce((sum, m) => sum + (m.completedLessons?.length || 0), 0);
+    const newProgress = totalLessons > 0 ? Math.min(100, (completedAll / totalLessons) * 100) : 0;
+    const newStatus = newProgress >= 100 ? 'Completed' : 'Active';
+
+    // Update enrollment
+    await prisma.enrollment.update({
+      where: { id: enrollment.id },
+      data: {
+        moduleProgress,
+        progress: newProgress,
+        status: newStatus,
+        lastActive: new Date()
+      }
+    });
+
+    // Award XP to learner profile (25 XP per lesson)
+    const XP_PER_LESSON = 25;
+    await prisma.learnerProfile.upsert({
+      where: { userId },
+      update: { xp: { increment: XP_PER_LESSON } },
+      create: { userId, xp: XP_PER_LESSON, level: 1, streak: 0 }
+    });
+
     return res.status(200).json({
       success: true,
-      message: `Lesson ${lessonId} marked as completed.`,
-      data: { lessonId, completed: true, xpEarned: 25 },
+      message: `Lesson marked as completed.`,
+      data: {
+        lessonId,
+        completed: true,
+        xpEarned: XP_PER_LESSON,
+        newProgress: Math.round(newProgress),
+        courseCompleted: newStatus === 'Completed'
+      },
     });
   } catch (error) {
+    console.error('Error completing lesson:', error);
     res.status(500).json({ success: false, error: 'Failed to complete lesson' });
   }
 };
 
 export const getLearnerProgress = async (req, res) => {
   try {
-    const profile = await prisma.learnerProfile.findUnique({
-      where: { userId: req.user.id }
+    const userId = req.user.id;
+    const profile = await prisma.learnerProfile.findUnique({ where: { userId } });
+
+    const enrollments = await prisma.enrollment.findMany({
+      where: { userId },
+      include: {
+        course: {
+          include: { modules: { include: { lessons: { select: { id: true } } } } }
+        }
+      }
     });
-    
+
+    const totalCourses = enrollments.length;
+    const coursesCompleted = enrollments.filter(e => e.status === 'Completed' || e.progress >= 100).length;
+    const overallProgress = totalCourses > 0
+      ? Math.round(enrollments.reduce((s, e) => s + e.progress, 0) / totalCourses)
+      : 0;
+
+    // Count completed lessons
+    let lessonsCompleted = 0;
+    let totalLessons = 0;
+    for (const enroll of enrollments) {
+      const moduleProgress = enroll.moduleProgress ? { ...enroll.moduleProgress } : {};
+      const allCourseLessons = enroll.course.modules.flatMap(m => m.lessons);
+      totalLessons += allCourseLessons.length;
+      lessonsCompleted += Object.values(moduleProgress).reduce(
+        (sum, m) => sum + (m.completedLessons?.length || 0), 0
+      );
+    }
+
+    // Simulations count
+    const simulationsRun = await prisma.simulationRun.count({ where: { userId } });
+    const circuitsBuilt = await prisma.savedCircuit.count({ where: { userId } });
+
     return res.status(200).json({
       success: true,
       data: {
-        overallProgress: 0,
-        coursesCompleted: 0,
-        totalCourses: 0,
-        lessonsCompleted: 0,
-        totalLessons: 0,
+        overallProgress,
+        coursesCompleted,
+        totalCourses,
+        lessonsCompleted,
+        totalLessons,
         challengesSolved: 0,
         challengesAttempted: 0,
         quizAvgScore: 0,
@@ -322,12 +515,13 @@ export const getLearnerProgress = async (req, res) => {
         longestStreak: profile?.longestStreak || 0,
         weeklyActivity: [0, 0, 0, 0, 0, 0, 0],
         milestones: [],
-        circuitsBuilt: 0,
-        simulationsRun: 0,
+        circuitsBuilt,
+        simulationsRun,
         aiInteractions: 0,
       },
     });
   } catch (error) {
+    console.error('Error fetching progress:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch progress' });
   }
 };
