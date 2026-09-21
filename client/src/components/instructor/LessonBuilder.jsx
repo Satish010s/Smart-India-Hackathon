@@ -8,9 +8,10 @@ import {
   LuHeading, LuActivity, LuPlay, LuMonitor, LuArrowLeft,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { BuilderSkeleton } from './InstructorSkeletons';
 
 const BLOCK_TYPES = [
-  { type: 'heading', label: 'Heading', icon: LuHeading, color: 'text-violet-400 bg-violet-500/10' },
+  { type: 'heading', label: 'Heading', icon: LuHeading, color: 'text-[var(--color-primary)] bg-[var(--color-primary)]/10' },
   { type: 'text', label: 'Text', icon: LuType, color: 'text-slate-400 bg-slate-500/10' },
   { type: 'image', label: 'Image', icon: LuImage, color: 'text-emerald-400 bg-emerald-500/10' },
   { type: 'video', label: 'Video', icon: LuVideo, color: 'text-red-400 bg-red-500/10' },
@@ -54,18 +55,18 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
       {/* Side controls */}
       <div className="flex flex-col items-center gap-1 pt-3 opacity-0 group-hover:opacity-100 transition-opacity">
         <LuGrip size={13} className="text-[var(--color-muted)] cursor-grab" />
-        {!isFirst && <button onClick={onMoveUp} className="p-0.5 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer"><LuArrowUp size={11} /></button>}
-        {!isLast && <button onClick={onMoveDown} className="p-0.5 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer"><LuArrowDown size={11} /></button>}
+        {!isFirst && <button onClick={onMoveUp} className="p-0.5 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer"><LuArrowUp size={11} /></button>}
+        {!isLast && <button onClick={onMoveDown} className="p-0.5 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer"><LuArrowDown size={11} /></button>}
         <button onClick={onDelete} className="p-0.5 hover:text-rose-400 text-[var(--color-muted)] cursor-pointer"><LuTrash2 size={11} /></button>
       </div>
 
-      <div className="flex-1 p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] group-hover:border-violet-500/30 transition-all space-y-3">
+      <div className="flex-1 p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] group-hover:border-[var(--color-primary)]/30 transition-all space-y-3">
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-2 text-xs font-semibold ${info.color.split(' ')[0]}`}>
             <div className={`p-1.5 rounded-lg ${info.color}`}><Icon size={12} /></div>
             {info.label}
           </div>
-          <button onClick={() => setEditing(!editing)} className="text-[10px] text-[var(--color-muted)] hover:text-violet-400 cursor-pointer transition-colors px-2 py-1 rounded-lg hover:bg-violet-500/10">
+          <button onClick={() => setEditing(!editing)} className="text-[10px] text-[var(--color-muted)] hover:text-[var(--color-primary)] cursor-pointer transition-colors px-2 py-1 rounded-lg hover:bg-[var(--color-primary)]/10">
             {editing ? 'Done' : 'Edit'}
           </button>
         </div>
@@ -79,7 +80,7 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
                 value={block.content || ''}
                 onChange={e => onUpdate({ ...block, content: e.target.value })}
                 placeholder={`Enter ${info.label.toLowerCase()} content...`}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] resize-none font-mono"
               />
             )}
             {block.type === 'code' && (
@@ -88,7 +89,7 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
                 value={block.content || ''}
                 onChange={e => onUpdate({ ...block, content: e.target.value })}
                 placeholder="# Enter code here..."
-                className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none font-mono"
               />
             )}
             {(block.type === 'image' || block.type === 'video') && (
@@ -97,7 +98,7 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
                 value={block.content || ''}
                 onChange={e => onUpdate({ ...block, content: e.target.value })}
                 placeholder={`${info.label} URL or caption...`}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
               />
             )}
             {(block.type === 'circuit' || block.type === 'simulation' || block.type === 'visualization') && (
@@ -111,7 +112,7 @@ function ContentBlock({ block, onUpdate, onDelete, onMoveUp, onMoveDown, isFirst
                 value={block.content || ''}
                 onChange={e => onUpdate({ ...block, content: e.target.value })}
                 placeholder={`${info.label} ID to embed...`}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
               />
             )}
           </div>
@@ -200,7 +201,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
       {onBack && (
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-violet-400 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer group"
         >
           <LuArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Course Builder
@@ -208,35 +209,33 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
       )}
       
       {loading ? (
-        <div className="flex justify-center p-12">
-          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-        </div>
+        <BuilderSkeleton />
       ) : (
         <>
           {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <LuFileText size={15} className="text-violet-400" />
+            <LuFileText size={15} className="text-[var(--color-primary)]" />
             <span className="text-xs text-[var(--color-muted)] font-mono">Lesson Builder</span>
           </div>
           <input
             type="text" value={lessonTitle}
             onChange={e => setLessonTitle(e.target.value)}
-            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full"
+            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-[var(--color-primary)] transition-colors w-full"
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap shrink-0">
           <button
             onClick={() => setPreviewMode(!previewMode)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all ${previewMode ? 'bg-violet-600 text-white' : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all ${previewMode ? 'bg-[var(--color-primary)] text-white' : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}
           >
             <LuEye size={13} /> {previewMode ? 'Exit Preview' : 'Preview'}
           </button>
           <button onClick={handleSave} disabled={saving} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all disabled:opacity-60 ${saved ? 'bg-emerald-600 text-white' : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
             {saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : saved ? <><LuCheck size={13} /> Saved</> : <><LuSave size={13} /> Save Draft</>}
           </button>
-          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 cursor-pointer">
+          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 cursor-pointer">
             <option>Draft</option>
             <option>Review</option>
             <option>Published</option>
@@ -247,7 +246,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
       <div className={`max-w-3xl mx-auto space-y-4 ${previewMode ? 'p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)]' : ''}`}>
         {previewMode && (
           <div className="flex items-center gap-2 pb-4 border-b border-[var(--color-border)] mb-6">
-            <LuPlay size={14} className="text-violet-400" />
+            <LuPlay size={14} className="text-[var(--color-primary)]" />
             <span className="text-xs font-mono text-[var(--color-muted)]">Learner Preview — {lessonTitle}</span>
           </div>
         )}
@@ -296,7 +295,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
                   <input
                     type="text" value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
                     placeholder="e.g. https://youtube.com/watch?v=..."
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -304,7 +303,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
                   <input
                     type="text" value={videoThumbnail} onChange={e => setVideoThumbnail(e.target.value)}
                     placeholder="https://..."
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                   />
                 </div>
               </div>
@@ -328,7 +327,7 @@ export default function LessonBuilder({ courseId, moduleId, lessonId, onBack }) 
           <div className="relative">
             <button
               onClick={() => setShowBlockPicker(!showBlockPicker)}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-violet-400 hover:border-violet-500/40 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-all cursor-pointer"
             >
               <LuPlus size={14} /> Add Content Block
             </button>

@@ -9,6 +9,7 @@
   --color-background: var(--bg);
   --color-surface: var(--surface);
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-text: var(--text);
   --color-muted: var(--muted);
@@ -16,25 +17,27 @@
 }
 
 :root {
-  /* Light Mode (default) */
-  --bg: #f8fafc; /* warm white / very light cool gray */
+  /* Light Mode — neutral graphite + teal accent */
+  --bg: #fafaf9;
   --surface: #ffffff;
-  --primary: #3730a3; /* deep indigo */
-  --secondary: #06b6d4; /* cyan */
-  --text: #0f172a; /* deep navy */
-  --muted: #64748b; /* slate */
-  --border: #cbd5e1; /* light slate */
+  --primary: #0f766e;   /* teal-700 — single accent */
+  --primary-foreground: #ffffff; /* crisp white on dark teal */
+  --secondary: #134e4a; /* teal-900 — deeper accent variant */
+  --text: #111418;      /* near-black */
+  --muted: #5b6572;     /* warm graphite */
+  --border: #e4e4e7;    /* neutral zinc */
 }
 
 .dark {
-  /* Dark Mode */
-  --bg: #020617; /* near-black / deep navy */
-  --surface: #0f172a; /* slightly lighter navy */
-  --primary: #6366f1; /* electric indigo / violet */
-  --secondary: #22d3ee; /* cyan */
-  --text: #f8fafc; /* off-white */
-  --muted: #94a3b8; /* cool gray */
-  --border: #334155; /* subtle slate/indigo */
+  /* Dark Mode — deep graphite + teal accent */
+  --bg: #0a0c0f;
+  --surface: #0f1318;
+  --primary: #2dd4bf;   /* teal-400 — balanced modern accent */
+  --primary-foreground: #041f1e; /* deep dark spruce/black for maximum readability */
+  --secondary: #14b8a6; /* teal-500 — secondary accent */
+  --text: #e8ecf1;      /* off-white */
+  --muted: #8a95a3;     /* cool graphite */
+  --border: #1f2730;    /* dark graphite */
 }
 
 @layer base {
@@ -63,7 +66,7 @@
   
   .bento-glow {
     @apply absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none;
-    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.08), transparent 40%);
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(15, 118, 110, 0.07), transparent 40%);
   }
   
   .bento-card:hover .bento-glow {
@@ -72,5 +75,25 @@
   
   .glass-panel {
     @apply bg-[var(--color-surface)]/70 backdrop-blur-xl border border-[var(--color-border)]/50 shadow-2xl;
+  }
+
+  /* Ensure razor-sharp text and icon readability on primary buttons in dark mode */
+  .dark [style*="background: var(--color-primary)"],
+  .dark [style*="background:var(--color-primary)"],
+  .dark .bg-\[var\(--color-primary\)\] {
+    color: var(--primary-foreground) !important;
+  }
+
+  .dark [style*="background: var(--color-primary)"] svg,
+  .dark [style*="background:var(--color-primary)"] svg,
+  .dark .bg-\[var\(--color-primary\)\] svg {
+    color: var(--primary-foreground) !important;
+    stroke: var(--primary-foreground) !important;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 }

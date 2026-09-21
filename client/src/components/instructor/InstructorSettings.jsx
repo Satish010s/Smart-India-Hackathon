@@ -27,7 +27,7 @@ function Toggle({ checked, onChange, label, description }) {
       </div>
       <button onClick={() => onChange(!checked)} className="cursor-pointer shrink-0 mt-0.5">
         {checked
-          ? <LuToggleRight size={28} className="text-violet-400" />
+          ? <LuToggleRight size={28} className="text-[var(--color-primary)]" />
           : <LuToggleLeft size={28} className="text-[var(--color-muted)]" />}
       </button>
     </div>
@@ -46,14 +46,14 @@ function FormField({ label, children }) {
 function InputField({ value, onChange, placeholder, type = 'text', disabled }) {
   return (
     <input type={type} value={value} onChange={onChange} placeholder={placeholder} disabled={disabled}
-      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] disabled:opacity-50" />
+      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] disabled:opacity-50" />
   );
 }
 
 function SaveButton({ saving, saved, onSave, label = 'Save Changes' }) {
   return (
     <button onClick={onSave} disabled={saving}
-      className={`px-6 py-2.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-2 transition-all ${saved ? 'bg-emerald-600 text-white' : 'bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-lg shadow-violet-500/20 hover:opacity-90'} disabled:opacity-50`}>
+      className={`px-6 py-2.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-2 transition-all ${saved ? 'bg-emerald-600 text-white' : 'bg-[var(--color-primary)] text-white shadow-lg shadow-sm hover:opacity-90'} disabled:opacity-50`}>
       {saved ? <><LuCheck size={14} /> Saved!</> : saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : <><LuSave size={14} /> {label}</>}
     </button>
   );
@@ -121,7 +121,7 @@ export default function InstructorSettings({ user }) {
     <div className="space-y-6 animate-fadeIn">
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuUser size={20} className="text-violet-400" /> Profile & Settings
+          <LuUser size={20} className="text-[var(--color-primary)]" /> Profile & Settings
         </h2>
         <p className="text-xs text-[var(--color-muted)] mt-1">Manage your profile, account preferences, teaching settings, and security.</p>
       </div>
@@ -133,7 +133,7 @@ export default function InstructorSettings({ user }) {
             const Icon = tab.icon;
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]'}`}>
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${activeTab === tab.id ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-sm' : 'text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]'}`}>
                 <Icon size={15} />{tab.label}
                 {activeTab !== tab.id && <LuChevronRight size={13} className="ml-auto opacity-40" />}
               </button>
@@ -151,10 +151,10 @@ export default function InstructorSettings({ user }) {
               {/* Avatar */}
               <div className="flex items-center gap-5">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-20 h-20 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center text-white text-2xl font-bold">
                     {profile.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </div>
-                  <button className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-violet-400 cursor-pointer transition-colors">
+                  <button className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-primary)] cursor-pointer transition-colors">
                     <LuCamera size={12} />
                   </button>
                 </div>
@@ -186,7 +186,7 @@ export default function InstructorSettings({ user }) {
               </div>
               <FormField label="Bio">
                 <textarea rows={3} value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Tell students about yourself..."
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none placeholder:text-[var(--color-muted)]" />
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none placeholder:text-[var(--color-muted)]" />
               </FormField>
               <SaveButton saving={saving} saved={saved} onSave={handleSave} />
             </div>
@@ -206,7 +206,7 @@ export default function InstructorSettings({ user }) {
                     <div className="relative">
                       <InputField type={showPwd ? 'text' : 'password'} value={account[field]}
                         onChange={e => setAccount(a => ({ ...a, [field]: e.target.value }))} placeholder="••••••••" />
-                      <button onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)] hover:text-violet-400 cursor-pointer">
+                      <button onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)] hover:text-[var(--color-primary)] cursor-pointer">
                         {showPwd ? <LuEyeOff size={15} /> : <LuEye size={15} />}
                       </button>
                     </div>
@@ -224,13 +224,13 @@ export default function InstructorSettings({ user }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField label="Default Course Difficulty">
                   <select value={teaching.defaultDifficulty} onChange={e => setTeaching(t => ({ ...t, defaultDifficulty: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                     <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
                   </select>
                 </FormField>
                 <FormField label="Simulation Strictness">
                   <select value={teaching.simulationStrictness} onChange={e => setTeaching(t => ({ ...t, simulationStrictness: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                     <option>Strict (≥99.5% fidelity)</option>
                     <option>Standard (≥95.0% fidelity)</option>
                     <option>Relaxed (≥90.0% fidelity)</option>
@@ -238,7 +238,7 @@ export default function InstructorSettings({ user }) {
                 </FormField>
                 <FormField label="Max Simulation Shots">
                   <select value={teaching.maxSimShots} onChange={e => setTeaching(t => ({ ...t, maxSimShots: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                     <option value="1024">1,024 shots (Default)</option>
                     <option value="2048">2,048 shots</option>
                     <option value="4096">4,096 shots (High Precision)</option>
@@ -246,7 +246,7 @@ export default function InstructorSettings({ user }) {
                 </FormField>
                 <FormField label="Late Submission Policy">
                   <select value={teaching.lateSubmissionPolicy} onChange={e => setTeaching(t => ({ ...t, lateSubmissionPolicy: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                    className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                     <option>Not accepted</option>
                     <option>Accepted with 10% penalty</option>
                     <option>Accepted with 25% penalty</option>
@@ -292,7 +292,7 @@ export default function InstructorSettings({ user }) {
                 <div className="grid grid-cols-3 gap-3">
                   {['dark', 'light', 'system'].map(t => (
                     <button key={t} onClick={() => setAppearance(a => ({ ...a, theme: t }))}
-                      className={`p-4 rounded-xl border capitalize text-xs font-bold cursor-pointer transition-all ${appearance.theme === t ? 'border-violet-500 bg-violet-500/15 text-violet-300' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-violet-500/30'}`}>
+                      className={`p-4 rounded-xl border capitalize text-xs font-bold cursor-pointer transition-all ${appearance.theme === t ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary)]' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]/30'}`}>
                       {t === 'dark' ? '🌙' : t === 'light' ? '☀️' : '💻'} {t}
                     </button>
                   ))}
@@ -302,7 +302,7 @@ export default function InstructorSettings({ user }) {
                 <div className="grid grid-cols-3 gap-3">
                   {['small', 'medium', 'large'].map(s => (
                     <button key={s} onClick={() => setAppearance(a => ({ ...a, fontSize: s }))}
-                      className={`p-4 rounded-xl border capitalize text-xs font-bold cursor-pointer transition-all ${appearance.fontSize === s ? 'border-violet-500 bg-violet-500/15 text-violet-300' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-violet-500/30'}`}>
+                      className={`p-4 rounded-xl border capitalize text-xs font-bold cursor-pointer transition-all ${appearance.fontSize === s ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary)]' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]/30'}`}>
                       {s}
                     </button>
                   ))}
@@ -332,7 +332,7 @@ export default function InstructorSettings({ user }) {
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-[var(--color-text)]">Two-Factor Authentication</h4>
                 <p className="text-xs text-[var(--color-muted)]">Add an extra layer of security to your account with 2FA. Use an authenticator app like Google Authenticator.</p>
-                <button className="px-5 py-2.5 rounded-xl border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs font-bold hover:bg-violet-500/20 cursor-pointer transition-colors flex items-center gap-2">
+                <button className="px-5 py-2.5 rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-xs font-bold hover:bg-[var(--color-primary)]/20 cursor-pointer transition-colors flex items-center gap-2">
                   <LuKey size={14} /> Enable 2FA (Coming Soon)
                 </button>
               </div>

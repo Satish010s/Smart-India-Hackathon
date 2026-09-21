@@ -9,3 +9,11 @@ export { default as InstructorAnalytics } from './InstructorAnalytics';
 export { default as ContentManagement } from './ContentManagement';
 export { default as InstructorSettings } from './InstructorSettings';
 export { default as CoursePreview } from './CoursePreview';
+export { 
+  default as InstructorTabSkeleton,
+  OverviewSkeleton,
+  ListSkeleton,
+  TableSkeleton,
+  ContentSkeleton,
+  BuilderSkeleton
+} from './InstructorSkeletons';

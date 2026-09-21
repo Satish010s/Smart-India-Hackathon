@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   LuBrain, LuSave, LuRefreshCcw, LuCheck, LuSlidersHorizontal,
-  LuSparkles, LuActivity, LuLock, LuTerminal, LuCpu,
+  LuSparkles, LuActivity, LuWand2, LuHistory, LuDatabase, LuLock, LuTerminal, LuCpu,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { GridSkeleton } from './AdminSkeletons';
 
 export default function AdminAiManagement() {
   const [config, setConfig] = useState({
@@ -81,13 +82,17 @@ export default function AdminAiManagement() {
     });
   };
 
+  if (loading) {
+    return <GridSkeleton />;
+  }
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuBrain className="text-cyan-400" />
+            <LuBrain className="text-cyan-700 dark:text-cyan-400" />
             AI Engine &amp; Quantum Tutor Management
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -112,7 +117,7 @@ export default function AdminAiManagement() {
             <div className="text-xs text-[var(--color-muted)]">Requests Today</div>
             <div className="text-2xl font-extrabold text-[var(--color-text)] mt-1">{config.metrics?.todayRequests || 142}</div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 flex items-center justify-center">
             <LuActivity size={20} />
           </div>
         </div>
@@ -120,9 +125,9 @@ export default function AdminAiManagement() {
         <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-between">
           <div>
             <div className="text-xs text-[var(--color-muted)]">Inference Latency</div>
-            <div className="text-2xl font-extrabold text-emerald-400 mt-1">{config.metrics?.avgLatencyMs || 320} ms</div>
+            <div className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-1">{config.metrics?.avgLatencyMs || 320} ms</div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
             <LuCpu size={20} />
           </div>
         </div>
@@ -132,7 +137,7 @@ export default function AdminAiManagement() {
             <div className="text-xs text-[var(--color-muted)]">Error Rate</div>
             <div className="text-2xl font-extrabold text-[var(--color-text)] mt-1">{config.metrics?.errorRate || 0.5}%</div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
             <LuSparkles size={20} />
           </div>
         </div>
@@ -143,7 +148,7 @@ export default function AdminAiManagement() {
         {/* Left 2 cols: Provider & Model Parameters */}
         <div className="lg:col-span-2 p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-5">
           <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuSlidersHorizontal size={18} className="text-cyan-400" />
+            <LuSlidersHorizontal size={18} className="text-cyan-700 dark:text-cyan-400" />
             Model &amp; Provider Configuration
           </h3>
 
@@ -177,7 +182,7 @@ export default function AdminAiManagement() {
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-[var(--color-text)]">Sampling Temperature</label>
-                <span className="font-mono text-cyan-400">{config.temperature}</span>
+                <span className="font-mono text-cyan-700 dark:text-cyan-400">{config.temperature}</span>
               </div>
               <input
                 type="range"
@@ -228,7 +233,7 @@ export default function AdminAiManagement() {
           {/* System Prompt */}
           <div className="space-y-1.5 pt-2">
             <label className="text-xs font-semibold text-[var(--color-text)] flex items-center gap-1.5">
-              <LuTerminal size={14} className="text-cyan-400" />
+              <LuTerminal size={14} className="text-cyan-700 dark:text-cyan-400" />
               Global System Prompt for Quantum Tutor
             </label>
             <textarea
@@ -246,7 +251,7 @@ export default function AdminAiManagement() {
         {/* Right col: Feature Toggles */}
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-5">
           <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuSparkles size={18} className="text-amber-400" />
+            <LuSparkles size={18} className="text-amber-700 dark:text-amber-400" />
             AI Capability Toggles
           </h3>
           <p className="text-xs text-[var(--color-muted)]">

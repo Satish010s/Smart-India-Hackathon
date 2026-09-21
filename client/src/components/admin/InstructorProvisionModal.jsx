@@ -65,14 +65,14 @@ export default function InstructorProvisionModal({ onInstructorCreated }) {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-500 text-xs flex items-center gap-2">
           <LuCircleAlert size={16} className="flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {successData && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs space-y-1">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-500 text-xs space-y-1">
           <div className="font-semibold flex items-center gap-2">
             <LuCircleCheckBig size={16} />
             {successData.message}

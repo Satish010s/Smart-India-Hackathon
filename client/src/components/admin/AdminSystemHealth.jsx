@@ -6,6 +6,7 @@ import {
   LuDatabase, LuCpu, LuBrain, LuServer, LuClock, LuZap,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { GridSkeleton } from './AdminSkeletons';
 
 export default function AdminSystemHealth() {
   const [health, setHealth] = useState(null);
@@ -59,13 +60,17 @@ export default function AdminSystemHealth() {
     return `${hours}h ${minutes}m`;
   };
 
+  if (loading) {
+    return <GridSkeleton />;
+  }
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuActivity className="text-rose-500" />
+            <LuActivity className="text-rose-700 dark:text-rose-500" />
             Infrastructure &amp; Subsystem Health
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -86,7 +91,7 @@ export default function AdminSystemHealth() {
       {/* Overall Health Banner */}
       <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-emerald-500/20 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
             <LuCircleCheckBig size={26} />
           </div>
           <div>
@@ -132,8 +137,8 @@ export default function AdminSystemHealth() {
                 <span
                   className={`px-2 py-0.5 rounded-full font-mono font-bold text-[10px] border ${
                     isOnline
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                      : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                      : 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30'
                   }`}
                 >
                   {srv.status}
@@ -160,7 +165,7 @@ export default function AdminSystemHealth() {
       {/* Infrastructure Node Runtime Metrics */}
       <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-4">
         <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuServer className="text-indigo-400" />
+          <LuServer className="text-blue-400" />
           Runtime Infrastructure Metrics
         </h3>
 
@@ -172,7 +177,7 @@ export default function AdminSystemHealth() {
 
           <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
             <span className="text-[10px] text-[var(--color-muted)] uppercase block mb-1">Heap Used</span>
-            <span className="font-bold text-sm text-indigo-400">{health?.infrastructure?.heapUsedMb || 68} MB</span>
+            <span className="font-bold text-sm text-blue-400">{health?.infrastructure?.heapUsedMb || 68} MB</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">

@@ -8,7 +8,7 @@ import {
 } from 'react-icons/lu';
 
 const KPI_CARDS = [
-  { key: 'totalStudents', label: 'Total Students', icon: LuUsers, color: 'from-violet-500/20 to-violet-600/10', iconColor: 'text-violet-500', border: 'border-violet-500/20', suffix: '', fallback: 142 },
+  { key: 'totalStudents', label: 'Total Students', icon: LuUsers, color: 'from-[var(--color-primary)]/20 to-[var(--color-primary)]/10', iconColor: 'text-[var(--color-primary)]', border: 'border-[var(--color-primary)]/20', suffix: '', fallback: 142 },
   { key: 'activeStudents', label: 'Active Students', icon: LuActivity, color: 'from-emerald-500/20 to-emerald-600/10', iconColor: 'text-emerald-500', border: 'border-emerald-500/20', suffix: '', fallback: 118 },
   { key: 'totalCourses', label: 'Total Courses', icon: LuBookOpen, color: 'from-cyan-500/20 to-cyan-600/10', iconColor: 'text-cyan-500', border: 'border-cyan-500/20', suffix: '', fallback: 3 },
   { key: 'publishedLessons', label: 'Published Lessons', icon: LuFileText, color: 'from-amber-500/20 to-amber-600/10', iconColor: 'text-amber-500', border: 'border-amber-500/20', suffix: '', fallback: 62 },
@@ -25,7 +25,7 @@ const ACTIVITY_ICONS = {
 };
 
 const ACTIVITY_COLORS = {
-  submission: 'text-violet-400 bg-violet-500/10',
+  submission: 'text-[var(--color-primary)] bg-[var(--color-primary)]/10',
   completion: 'text-emerald-400 bg-emerald-500/10',
   enrollment: 'text-cyan-400 bg-cyan-500/10',
   atrisk: 'text-rose-400 bg-rose-500/10',
@@ -39,10 +39,10 @@ const ALERT_STYLES = {
 };
 
 const QUICK_ACTIONS = [
-  { label: 'New Course', icon: LuBookOpen, tab: 'courses', color: 'from-violet-600 to-violet-700', shadow: 'shadow-violet-500/20' },
-  { label: 'New Lesson', icon: LuFileText, tab: 'lesson-builder', color: 'from-cyan-600 to-cyan-700', shadow: 'shadow-cyan-500/20' },
-  { label: 'New Quiz', icon: LuStar, tab: 'quiz-builder', color: 'from-amber-500 to-amber-600', shadow: 'shadow-amber-500/20' },
-  { label: 'New Challenge', icon: LuZap, tab: 'challenge-builder', color: 'from-pink-600 to-pink-700', shadow: 'shadow-pink-500/20' },
+  { label: 'New Course', icon: LuBookOpen, tab: 'courses', color: 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-primary)]/50', text: 'text-[var(--color-primary)]' },
+  { label: 'New Lesson', icon: LuFileText, tab: 'lesson-builder', color: 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-cyan-500/50', text: 'text-cyan-500' },
+  { label: 'New Quiz', icon: LuStar, tab: 'quiz-builder', color: 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-amber-500/50', text: 'text-amber-500' },
+  { label: 'New Challenge', icon: LuZap, tab: 'challenge-builder', color: 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-pink-500/50', text: 'text-pink-500' },
 ];
 
 // Map alert action labels to handler keys
@@ -72,41 +72,6 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden p-8 rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)] to-violet-500/5">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-violet-500/5 blur-3xl" />
-          <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-emerald-500/5 blur-3xl" />
-        </div>
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-lg shadow-violet-500/20">
-              <LuGraduationCap size={13} />
-              <span>Instructor Dashboard</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-heading font-bold text-[var(--color-text)]">
-              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">{user?.name?.split(' ')[0] || 'Dr. Eleanor'}</span>
-            </h1>
-            <p className="text-sm text-[var(--color-muted)] max-w-lg leading-relaxed">
-              Manage your quantum curriculum, monitor student performance, and publish engaging content — all from one place.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-center p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] min-w-[90px]">
-              <div className="text-2xl font-bold font-heading text-violet-400">{totalStudents}</div>
-              <div className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider mt-0.5">Students</div>
-            </div>
-            <div className="text-center p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] min-w-[90px]">
-              <div className="text-2xl font-bold font-heading text-emerald-400">{courseCount}</div>
-              <div className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider mt-0.5">Courses</div>
-            </div>
-            <div className="text-center p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] min-w-[90px]">
-              <div className="text-2xl font-bold font-heading text-cyan-400">{avgScore}%</div>
-              <div className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider mt-0.5">Avg Score</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
@@ -146,7 +111,7 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
         {/* Quick Actions */}
         <div className="space-y-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuZap size={16} className="text-violet-400" />
+            <LuZap size={16} className="text-[var(--color-primary)]" />
             Quick Actions
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -169,10 +134,10 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
                 <button
                   key={action.label}
                   onClick={handleQuickAction}
-                  className={`p-4 rounded-2xl bg-gradient-to-br ${action.color} text-white shadow-lg ${action.shadow} hover:opacity-90 hover:scale-[1.03] transition-all duration-200 text-left space-y-2 cursor-pointer`}
+                  className={`p-4 rounded-2xl border ${action.color} shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 text-left space-y-2 cursor-pointer`}
                 >
-                  <Icon size={18} />
-                  <div className="text-xs font-bold">{action.label}</div>
+                  <Icon size={18} className={action.text} />
+                  <div className={`text-xs font-bold text-[var(--color-text)]`}>{action.label}</div>
                 </button>
               );
             })}
@@ -183,7 +148,7 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
             <div className="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider">This Month</div>
             {[
               { label: 'New enrollments', value: '+28', color: 'text-emerald-400' },
-              { label: 'Lessons published', value: '8', color: 'text-violet-400' },
+              { label: 'Lessons published', value: '8', color: 'text-[var(--color-primary)]' },
               { label: 'Submissions graded', value: '34', color: 'text-cyan-400' },
             ].map(stat => (
               <div key={stat.label} className="flex items-center justify-between">
@@ -257,7 +222,7 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
               { id: 'ra5', type: 'quiz', student: 'Sneha Patel', action: 'scored 88% on Module 3 Quiz', time: '1d ago' },
             ]).map((event) => {
               const Icon = ACTIVITY_ICONS[event.type] || LuActivity;
-              const colorClass = ACTIVITY_COLORS[event.type] || 'text-violet-400 bg-violet-500/10';
+              const colorClass = ACTIVITY_COLORS[event.type] || 'text-[var(--color-primary)] bg-[var(--color-primary)]/10';
               return (
                 <div key={event.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--color-surface)] transition-colors">
                   <div className={`p-1.5 rounded-lg ${colorClass} shrink-0 mt-0.5`}>
@@ -281,19 +246,19 @@ export default function InstructorOverview({ user, portalData, onTabChange, onOp
       <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)]">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuChartBar size={16} className="text-violet-400" />
+            <LuChartBar size={16} className="text-[var(--color-primary)]" />
             Course Performance Overview
           </h3>
           <button
             onClick={() => onTabChange && onTabChange('analytics')}
-            className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1 cursor-pointer"
+            className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1 cursor-pointer"
           >
             Full Analytics <LuArrowRight size={12} />
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { label: 'Quantum Fundamentals', completion: 68, students: 98, color: 'bg-violet-500' },
+            { label: 'Quantum Fundamentals', completion: 68, students: 98, color: 'bg-[var(--color-primary)]' },
             { label: 'Advanced Algorithms', completion: 42, students: 44, color: 'bg-cyan-500' },
             { label: 'Quantum ML', completion: 0, students: 0, color: 'bg-amber-500' },
           ].map(course => (

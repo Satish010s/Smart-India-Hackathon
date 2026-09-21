@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   LuChartBar, LuUsers, LuCpu, LuBrain, LuActivity, LuRefreshCcw,
-  LuSparkles, LuClock, LuCircleAlert, LuDollarSign, LuLayers,
+  LuSparkles, LuClock, LuCircleAlert, LuDollarSign, LuLayers, LuZap,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { GridSkeleton } from './AdminSkeletons';
 
 export default function AdminPlatformAnalytics() {
   const [data, setData] = useState(null);
@@ -60,13 +61,17 @@ export default function AdminPlatformAnalytics() {
     fetchAnalytics();
   }, []);
 
+  if (loading) {
+    return <GridSkeleton />;
+  }
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuChartBar className="text-rose-500" />
+            <LuChartBar className="text-rose-700 dark:text-rose-500" />
             Platform Telemetry &amp; System Analytics
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -88,7 +93,7 @@ export default function AdminPlatformAnalytics() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-2">
           <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider font-semibold">User Retention</div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-700 dark:text-emerald-400">
             {data?.growth?.retentionRate || 84.6}%
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">30-day active return rate</p>
@@ -96,7 +101,7 @@ export default function AdminPlatformAnalytics() {
 
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-2">
           <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider font-semibold">Course Completion</div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-indigo-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-blue-400">
             {data?.learning?.completionRate || 76.4}%
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">Avg pass rate: {data?.learning?.passRate || 91.2}%</p>
@@ -104,7 +109,7 @@ export default function AdminPlatformAnalytics() {
 
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-2">
           <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider font-semibold">Sim Executions</div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-violet-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-teal-400">
             {data?.simulations?.totalExecutions || 384}
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">Avg latency: {data?.simulations?.avgExecutionTimeMs || 46.8}ms</p>
@@ -112,7 +117,7 @@ export default function AdminPlatformAnalytics() {
 
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-2">
           <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider font-semibold">AI Tokens Consumed</div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-cyan-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-cyan-700 dark:text-cyan-400">
             {Math.round((data?.aiTelemetry?.totalTokensUsed || 684200) / 1000)}k
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">Est. cost: ${data?.aiTelemetry?.estimatedCostUsd || '1.36'}</p>
@@ -126,12 +131,12 @@ export default function AdminPlatformAnalytics() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-                <LuCpu className="text-violet-400" />
+                <LuCpu className="text-teal-400" />
                 Quantum Backend Usage Distribution
               </h3>
               <p className="text-xs text-[var(--color-muted)]">Circuits executed across supported framework simulators</p>
             </div>
-            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
               97.9% Success
             </span>
           </div>
@@ -163,7 +168,7 @@ export default function AdminPlatformAnalytics() {
                 </div>
                 <div className="text-right">
                   <div className="font-mono font-bold text-[var(--color-text)]">{b.share}%</div>
-                  <div className="text-[10px] text-emerald-400">Operational</div>
+                  <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Operational</div>
                 </div>
               </div>
             ))}
@@ -175,12 +180,12 @@ export default function AdminPlatformAnalytics() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-                <LuBrain className="text-cyan-400" />
+                <LuBrain className="text-cyan-700 dark:text-cyan-400" />
                 AI Tutor &amp; Engine Telemetry
               </h3>
               <p className="text-xs text-[var(--color-muted)]">FastAPI integration with Google Gemini &amp; local models</p>
             </div>
-            <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-mono font-bold text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">
               {data?.aiTelemetry?.totalRequests || 1420} Requests
             </span>
           </div>
@@ -191,12 +196,12 @@ export default function AdminPlatformAnalytics() {
               <div className="text-xl font-extrabold text-[var(--color-text)] mt-1">
                 {data?.aiTelemetry?.avgLatencyMs || 340} ms
               </div>
-              <div className="text-[10px] text-emerald-400 mt-1">✓ Within 500ms target</div>
+              <div className="text-[10px] text-emerald-700 dark:text-emerald-400 mt-1">✓ Within 500ms target</div>
             </div>
 
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
               <div className="text-xs text-[var(--color-muted)]">API Error Rate</div>
-              <div className="text-xl font-extrabold text-emerald-400 mt-1">
+              <div className="text-xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-1">
                 {data?.aiTelemetry?.errorRate || 0.8}%
               </div>
               <div className="text-[10px] text-[var(--color-muted)] mt-1">Sub-1% standard</div>
@@ -212,7 +217,7 @@ export default function AdminPlatformAnalytics() {
 
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
               <div className="text-xs text-[var(--color-muted)]">Estimated API Cost</div>
-              <div className="text-xl font-extrabold text-emerald-400 mt-1">
+              <div className="text-xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-1">
                 ${data?.aiTelemetry?.estimatedCostUsd || '1.36'}
               </div>
               <div className="text-[10px] text-[var(--color-muted)] mt-1">Gemini 1.5 Flash tier</div>
@@ -226,7 +231,7 @@ export default function AdminPlatformAnalytics() {
             </div>
             <div className="h-2 w-full rounded-full bg-[var(--color-surface)] overflow-hidden flex">
               <div className="h-full bg-cyan-400" style={{ width: '85%' }} />
-              <div className="h-full bg-violet-400" style={{ width: '15%' }} />
+              <div className="h-full bg-teal-400" style={{ width: '15%' }} />
             </div>
           </div>
         </div>

@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
 import { LearnerSidebar } from '../../components/sidebar';
 import DashboardNavbar from '../../components/navbar/DashboardNavbar';
+import { useAuthStore } from '../../store/useAuthStore';
 import { apiFetch } from '../../services/api';
+import { ProgressSkeleton } from './ProgressSkeleton';
 import {
   LuChartBar,
   LuSparkles,
@@ -99,7 +101,11 @@ export default function ProgressPage() {
           />
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
-            {/* Hero Card */}
+            {loading ? (
+              <ProgressSkeleton />
+            ) : (
+              <>
+                {/* Hero Card */}
             <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)] to-cyan-500/10 p-6 sm:p-8">
               <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-[var(--color-primary)]/10 blur-3xl pointer-events-none" />
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -320,6 +326,8 @@ export default function ProgressPage() {
                 ))}
               </div>
             </div>
+              </>
+            )}
           </main>
         </div>
       </div>

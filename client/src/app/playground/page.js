@@ -6,12 +6,14 @@ import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
 import { LearnerSidebar } from '../../components/sidebar';
 import DashboardNavbar from '../../components/navbar/DashboardNavbar';
+import { PlaygroundSkeleton } from './PlaygroundSkeleton';
 import {
   LuCpu, LuPlay, LuLayers, LuActivity, LuTriangleAlert, LuInfo,
   LuCircleAlert, LuTrash2, LuCode, LuCopy, LuCheck, LuPlus, LuMinus,
   LuRotateCcw, LuZap, LuAtom, LuSparkles, LuBookmark, LuShare2,
   LuClock, LuSlidersHorizontal, LuHelpCircle, LuMaximize2, LuEye,
-  LuGlobe, LuCircuitBoard, LuDownload, LuUpload, LuRefreshCw, LuTerminal
+  LuGlobe, LuCircuitBoard, LuDownload, LuUpload, LuRefreshCw, LuTerminal,
+  LuLayers2
 } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import { apiFetch } from '../../services/api';
@@ -670,7 +672,7 @@ function CircuitPlaygroundContent() {
             <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <LuLayers size={16} className="text-cyan-400" />
+                  <LuLayers2 size={16} className="text-cyan-400" />
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted)] font-mono">
                     Graphical Quantum Gate Palette (Drag onto grid or click to select)
                   </span>
@@ -1142,7 +1144,15 @@ function CircuitPlaygroundContent() {
 
 export default function CircuitPlaygroundPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-[var(--color-background)] flex items-center justify-center font-mono text-cyan-400 text-sm">Loading Quantum Playground...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[var(--color-background)] flex">
+        <LearnerSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <DashboardNavbar />
+          <PlaygroundSkeleton />
+        </div>
+      </div>
+    }>
       <CircuitPlaygroundContent />
     </Suspense>
   );

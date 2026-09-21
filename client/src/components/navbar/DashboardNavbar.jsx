@@ -102,7 +102,7 @@ export default function DashboardNavbar({
             title="Toggle Theme"
             aria-label="Toggle Dark/Light Mode"
           >
-            {theme === 'dark' ? <LuSun size={18} className="text-yellow-400" /> : <LuMoon size={18} className="text-indigo-600" />}
+            {theme === 'dark' ? <LuSun size={18} className="text-yellow-400" /> : <LuMoon size={18} className="text-[var(--color-muted)]" />}
           </button>
         )}
 
@@ -116,7 +116,7 @@ export default function DashboardNavbar({
           >
             {/* Name & Email on Left (Right-aligned text) */}
             <div className="hidden sm:flex flex-col text-right leading-tight min-w-0 pl-1">
-              <span className="text-xs font-extrabold text-[var(--color-text)] max-w-[130px] truncate tracking-tight group-hover:text-cyan-400 transition-colors">
+              <span className="text-xs font-semibold text-[var(--color-text)] max-w-[130px] truncate tracking-tight group-hover:text-[var(--color-primary)] transition-colors">
                 {user?.name || 'Account'}
               </span>
               <span className="text-[10px] text-[var(--color-muted)] font-mono max-w-[140px] truncate">
@@ -126,7 +126,7 @@ export default function DashboardNavbar({
 
             {/* Profile Avatar Icon on Right */}
             <div className="relative flex-shrink-0">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 text-white flex items-center justify-center text-xs font-black uppercase shadow-md shadow-cyan-500/20 ring-2 ring-cyan-500/30 group-hover:ring-cyan-400 group-hover:shadow-cyan-500/40 transition-all">
+              <div className="w-9 h-9 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] flex items-center justify-center text-xs font-semibold uppercase transition-all">
                 {user?.name?.charAt(0) || 'U'}
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[var(--color-surface)]" />
@@ -135,36 +135,36 @@ export default function DashboardNavbar({
             <LuChevronDown
               size={14}
               className={`text-[var(--color-muted)] hidden sm:block transition-transform duration-200 ${
-                isProfileOpen ? 'rotate-180 text-cyan-400' : 'group-hover:text-[var(--color-text)]'
+                isProfileOpen ? 'rotate-180 text-[var(--color-primary)]' : 'group-hover:text-[var(--color-text)]'
               }`}
             />
           </button>
 
           {/* Glassmorphic Profile Dropdown Card */}
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2.5 w-64 rounded-3xl bg-[var(--color-surface)]/95 backdrop-blur-xl border border-[var(--color-border)] shadow-2xl p-2.5 space-y-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-2.5 w-64 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl p-2 space-y-1 z-50">
               
               {/* Header User Card Banner */}
-              <div className="p-3 rounded-2xl bg-gradient-to-r from-cyan-500/10 via-indigo-500/10 to-purple-500/10 border border-[var(--color-border)]/60 space-y-2">
+              <div className="p-3 rounded-lg bg-[var(--color-background,var(--bg))] border border-[var(--color-border)] space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 text-white flex items-center justify-center text-sm font-black uppercase shadow-md shadow-cyan-500/20 ring-2 ring-white/20">
+                    <div className="w-9 h-9 rounded-lg bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] flex items-center justify-center text-sm font-semibold uppercase">
                       {user?.name?.charAt(0) || 'U'}
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[var(--color-surface)]" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[var(--color-surface)]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-[var(--color-text)] truncate">{user?.name || 'Quantum Learner'}</div>
+                    <div className="text-xs font-semibold text-[var(--color-text)] truncate">{user?.name || 'Quantum Learner'}</div>
                     <div className="text-[10px] text-[var(--color-muted)] font-mono truncate">{user?.email || 'authenticated'}</div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 border-t border-[var(--color-border)]/40 text-[10px]">
-                  <span className={`font-mono font-bold uppercase px-2 py-0.5 rounded-md border ${roleTheme.badgeBg} ${roleTheme.badgeText} ${roleTheme.badgeBorder}`}>
+                <div className="flex items-center justify-between pt-1.5 border-t border-[var(--color-border)] text-[10px]">
+                  <span className={`font-mono font-semibold uppercase px-2 py-0.5 rounded border ${roleTheme.badgeBg} ${roleTheme.badgeText} ${roleTheme.badgeBorder}`}>
                     {roleTheme.name}
                   </span>
-                  <span className="text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-md flex items-center gap-1">
-                    <LuSparkles size={11} /> Verified
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/8 px-2 py-0.5 rounded flex items-center gap-1">
+                    <LuSparkles size={11} /> Active
                   </span>
                 </div>
               </div>
@@ -174,18 +174,18 @@ export default function DashboardNavbar({
                 <Link
                   href={getDashboardHref()}
                   onClick={() => setIsProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[var(--color-text)] hover:bg-cyan-500/15 hover:text-cyan-400 transition-all"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-primary)]/8 hover:text-[var(--color-primary)] transition-colors"
                 >
-                  <LuLayoutDashboard size={15} className="text-cyan-400" />
+                  <LuLayoutDashboard size={15} className="text-[var(--color-primary)]" />
                   <span>My Portal Dashboard</span>
                 </Link>
 
                 <Link
                   href="/profile"
                   onClick={() => setIsProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[var(--color-text)] hover:bg-cyan-500/15 hover:text-cyan-400 transition-all"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-primary)]/8 hover:text-[var(--color-primary)] transition-colors"
                 >
-                  <LuUser size={15} className="text-indigo-400" />
+                  <LuUser size={15} className="text-[var(--color-muted)]" />
                   <span>User Profile &amp; Stats</span>
                 </Link>
 
@@ -193,9 +193,9 @@ export default function DashboardNavbar({
                   <Link
                     href="/achievement"
                     onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[var(--color-text)] hover:bg-amber-500/15 hover:text-amber-400 transition-all"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-border)]/60 transition-colors"
                   >
-                    <LuMedal size={15} className="text-amber-400" />
+                    <LuMedal size={15} className="text-[var(--color-muted)]" />
                     <span>Achievements &amp; Badges</span>
                   </Link>
                 )}
@@ -204,7 +204,7 @@ export default function DashboardNavbar({
                   <Link
                     href="/admin"
                     onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/15 transition-all"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/8 transition-colors"
                   >
                     <LuShieldAlert size={15} />
                     <span>Admin Control Center</span>
@@ -215,7 +215,7 @@ export default function DashboardNavbar({
                   <Link
                     href="/instructor"
                     onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-500 hover:bg-emerald-500/15 transition-all"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/8 transition-colors"
                   >
                     <LuGraduationCap size={15} />
                     <span>Faculty Center</span>
@@ -224,19 +224,16 @@ export default function DashboardNavbar({
               </div>
 
               {/* Divider & Sign Out */}
-              <div className="pt-1 border-t border-[var(--color-border)]/60">
+              <div className="pt-1 border-t border-[var(--color-border)]">
                 <button
                   onClick={() => {
                     setIsProfileOpen(false);
                     logout();
                   }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/15 border border-transparent hover:border-rose-500/30 transition-all cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/8 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <LuLogOut size={15} />
-                    <span>Sign Out</span>
-                  </div>
-                  <span className="text-[9px] font-mono uppercase text-rose-400/80">Exit</span>
+                  <LuLogOut size={15} />
+                  <span>Sign Out</span>
                 </button>
               </div>
 

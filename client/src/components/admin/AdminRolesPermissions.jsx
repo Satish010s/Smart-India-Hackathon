@@ -60,7 +60,7 @@ export default function AdminRolesPermissions() {
       {/* Title */}
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuKeyRound className="text-rose-500" />
+          <LuKeyRound className="text-rose-700 dark:text-rose-500" />
           Roles &amp; Fine-Grained Permissions
         </h2>
         <p className="text-xs text-[var(--color-muted)]">
@@ -71,12 +71,12 @@ export default function AdminRolesPermissions() {
       {/* 3 Active Roles Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Learner */}
-        <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-indigo-500/20 shadow-sm space-y-3">
+        <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-blue-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
               ROLE: LEARNER
             </span>
-            <LuBookOpen className="text-indigo-400" size={18} />
+            <LuBookOpen className="text-blue-400" size={18} />
           </div>
           <h3 className="text-base font-bold text-[var(--color-text)]">Self-Paced Quantum Learner</h3>
           <p className="text-xs text-[var(--color-muted)] leading-relaxed">
@@ -91,10 +91,10 @@ export default function AdminRolesPermissions() {
         {/* Instructor */}
         <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-emerald-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
               ROLE: INSTRUCTOR
             </span>
-            <LuGraduationCap className="text-emerald-400" size={18} />
+            <LuGraduationCap className="text-emerald-700 dark:text-emerald-400" size={18} />
           </div>
           <h3 className="text-base font-bold text-[var(--color-text)]">Academic Faculty Member</h3>
           <p className="text-xs text-[var(--color-muted)] leading-relaxed">
@@ -109,10 +109,10 @@ export default function AdminRolesPermissions() {
         {/* Admin */}
         <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-rose-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
               ROLE: ADMIN
             </span>
-            <LuShield className="text-rose-400" size={18} />
+            <LuShield className="text-rose-700 dark:text-rose-400" size={18} />
           </div>
           <h3 className="text-base font-bold text-[var(--color-text)]">Platform Super Administrator</h3>
           <p className="text-xs text-[var(--color-muted)] leading-relaxed">
@@ -127,7 +127,7 @@ export default function AdminRolesPermissions() {
 
       {/* Security Governance Policies Callout */}
       <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-xs space-y-2">
-        <div className="font-bold text-amber-400 flex items-center gap-2">
+        <div className="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
           <LuLock size={15} />
           <span>Security Governance Guardrails</span>
         </div>
@@ -150,9 +150,9 @@ export default function AdminRolesPermissions() {
             <thead>
               <tr className="border-b border-[var(--color-border)] bg-[var(--color-background)]/50 text-[var(--color-muted)] uppercase tracking-wider">
                 <th className="py-3 px-4 w-1/2">Capability</th>
-                <th className="py-3 px-4 text-center font-bold text-indigo-400">LEARNER</th>
-                <th className="py-3 px-4 text-center font-bold text-emerald-400">INSTRUCTOR</th>
-                <th className="py-3 px-4 text-center font-bold text-rose-400">ADMIN</th>
+                <th className="py-3 px-4 text-center font-bold text-blue-400">LEARNER</th>
+                <th className="py-3 px-4 text-center font-bold text-emerald-700 dark:text-emerald-400">INSTRUCTOR</th>
+                <th className="py-3 px-4 text-center font-bold text-rose-700 dark:text-rose-400">ADMIN</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]/40">
@@ -168,21 +168,21 @@ export default function AdminRolesPermissions() {
                       <td className="py-3 px-4 text-[var(--color-text)] font-medium">{p.name}</td>
                       <td className="py-3 px-4 text-center">
                         {p.learner ? (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400"><LuCheck size={12} /></span>
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><LuCheck size={12} /></span>
                         ) : (
                           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-500/10 text-slate-500"><LuX size={12} /></span>
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
                         {p.instructor ? (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400"><LuCheck size={12} /></span>
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><LuCheck size={12} /></span>
                         ) : (
                           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-500/10 text-slate-500"><LuX size={12} /></span>
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
                         {p.admin ? (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400"><LuCheck size={12} /></span>
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><LuCheck size={12} /></span>
                         ) : (
                           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-500/10 text-slate-500"><LuX size={12} /></span>
                         )}

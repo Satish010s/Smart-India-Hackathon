@@ -8,6 +8,7 @@ import {
   LuChartBar,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { TableSkeleton } from './InstructorSkeletons';
 
 const STATUS_STYLES = {
   Active: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -16,12 +17,12 @@ const STATUS_STYLES = {
 };
 
 const AVATAR_COLORS = [
-  'from-violet-500 to-violet-600', 'from-cyan-500 to-cyan-600',
+  'from-[var(--color-primary)] to-[var(--color-primary)]', 'from-cyan-500 to-cyan-600',
   'from-emerald-500 to-emerald-600', 'from-pink-500 to-pink-600',
   'from-amber-500 to-amber-600', 'from-teal-500 to-teal-600',
 ];
 
-function MiniBar({ value, max = 100, color = 'bg-violet-500' }) {
+function MiniBar({ value, max = 100, color = 'bg-[var(--color-primary)]' }) {
   return (
     <div className="h-1.5 rounded-full bg-[var(--color-background)] w-24">
       <div className={`h-1.5 rounded-full ${color} transition-all duration-500`} style={{ width: `${Math.min(100, (value / max) * 100)}%` }} />
@@ -58,7 +59,7 @@ function StudentDetailPanel({ student, onClose }) {
         {/* KPI row */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Progress', value: `${student.progress}%`, color: 'text-violet-400' },
+            { label: 'Progress', value: `${student.progress}%`, color: 'text-[var(--color-primary)]' },
             { label: 'Quiz Avg', value: `${student.quizAvg}%`, color: 'text-amber-400' },
             { label: 'Time Spent', value: student.timeSpent, color: 'text-cyan-400' },
           ].map(s => (
@@ -72,7 +73,7 @@ function StudentDetailPanel({ student, onClose }) {
         {/* Module Progress */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider flex items-center gap-2">
-            <LuChartBar size={13} className="text-violet-400" /> Module Progress
+            <LuChartBar size={13} className="text-[var(--color-primary)]" /> Module Progress
           </h4>
           {(student.moduleProgress || []).map((m, i) => (
             <div key={i} className="space-y-1.5">
@@ -84,7 +85,7 @@ function StudentDetailPanel({ student, onClose }) {
                 </div>
               </div>
               <div className="h-2 rounded-full bg-[var(--color-background)]">
-                <div className="h-2 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all" style={{ width: `${m.progress}%` }} />
+                <div className="h-2 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-cyan-500 transition-all" style={{ width: `${m.progress}%` }} />
               </div>
             </div>
           ))}
@@ -153,7 +154,7 @@ function StudentDetailPanel({ student, onClose }) {
           </h4>
           {(student.recentActivity || []).map((act, i) => (
             <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--color-border)] last:border-0">
-              <div className="w-1.5 h-1.5 rounded-full bg-violet-400 mt-1.5 shrink-0" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] mt-1.5 shrink-0" />
               <div className="flex-1 text-xs text-[var(--color-text)]">{act.label}</div>
               <span className="text-[10px] text-[var(--color-muted)] font-mono shrink-0">{act.time}</span>
             </div>
@@ -235,7 +236,7 @@ export default function StudentManagement({ focusGrading = false }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2"><LuUsers size={20} className="text-violet-400" /> Student Management</h2>
+          <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2"><LuUsers size={20} className="text-[var(--color-primary)]" /> Student Management</h2>
           <p className="text-xs text-[var(--color-muted)] mt-1">{students.length} students enrolled · {students.filter(s => s.status === 'At Risk').length} at risk</p>
         </div>
       </div>
@@ -245,18 +246,18 @@ export default function StudentManagement({ focusGrading = false }) {
         <div className="relative flex-1">
           <LuSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" />
           <input type="text" placeholder="Search students..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
         </div>
-        <select value={filterCourse} onChange={e => setFilterCourse(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+        <select value={filterCourse} onChange={e => setFilterCourse(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
           <option value="All">All Courses</option>
           <option value="Fundamentals">Quantum Fundamentals</option>
           <option value="Algorithms">Quantum Algorithms</option>
         </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
           <option value="All">All Status</option>
           <option>Active</option><option>At Risk</option><option>Completed</option>
         </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
           <option value="name">Sort: Name</option>
           <option value="progress">Sort: Progress</option>
           <option value="quiz">Sort: Quiz Score</option>
@@ -267,7 +268,7 @@ export default function StudentManagement({ focusGrading = false }) {
       {/* Summary stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total', value: students.length, color: 'text-violet-400' },
+          { label: 'Total', value: students.length, color: 'text-[var(--color-primary)]' },
           { label: 'Active', value: students.filter(s => s.status === 'Active').length, color: 'text-emerald-400' },
           { label: 'At Risk', value: students.filter(s => s.status === 'At Risk').length, color: 'text-rose-400' },
           { label: 'Completed', value: students.filter(s => s.status === 'Completed').length, color: 'text-cyan-400' },
@@ -281,10 +282,7 @@ export default function StudentManagement({ focusGrading = false }) {
 
       {/* Student Table */}
       {loading ? (
-        <div className="py-16 text-center space-y-3">
-          <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-[var(--color-muted)]">Loading students...</p>
-        </div>
+        <TableSkeleton />
       ) : (
       <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
         <table className="w-full text-left text-xs">
@@ -318,9 +316,9 @@ export default function StudentManagement({ focusGrading = false }) {
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-[10px]">
                       <span className="text-[var(--color-muted)]">{s.lessonsCompleted}/{s.totalLessons} lessons</span>
-                      <span className="text-violet-400 font-mono font-bold">{s.progress}%</span>
+                      <span className="text-[var(--color-primary)] font-mono font-bold">{s.progress}%</span>
                     </div>
-                    <MiniBar value={s.progress} color="bg-gradient-to-r from-violet-500 to-cyan-500" />
+                    <MiniBar value={s.progress} color="bg-gradient-to-r from-[var(--color-primary)] to-cyan-500" />
                   </div>
                 </td>
                 <td className="px-5 py-4">

@@ -5,18 +5,19 @@ import {
   LuFolderOpen, LuBookOpen, LuFileText, LuStar, LuZap, LuFlaskConical,
   LuLayers, LuSearch, LuFilter, LuArrowRight, LuCheck, LuX,
   LuEye, LuPencil, LuTrash2, LuArchive, LuUpload, LuDownload,
-  LuClock, LuEllipsisVertical, LuExternalLink,
+  LuClock, LuEllipsisVertical, LuExternalLink, LuChevronRight,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { ContentSkeleton } from './InstructorSkeletons';
 
 const CONTENT_TYPES = ['All', 'Course', 'Module', 'Lesson', 'Experiment', 'Quiz', 'Challenge'];
 const STATUSES = ['All', 'Draft', 'Review', 'Published', 'Archived'];
 
 const STATUS_STYLES = {
-  Draft: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
-  Review: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  Published: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  Archived: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  Draft: 'bg-slate-500/15 text-slate-700 dark:text-slate-400 border-slate-500/30',
+  Review: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30',
+  Published: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
+  Archived: 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)]/30',
 };
 
 const STATUS_FLOW = { Draft: ['Review', 'Published'], Review: ['Draft', 'Published'], Published: ['Draft', 'Archived'], Archived: ['Draft'] };
@@ -26,9 +27,12 @@ const TYPE_ICONS = {
   Experiment: LuFlaskConical, Quiz: LuStar, Challenge: LuZap,
 };
 const TYPE_COLORS = {
-  Course: 'text-violet-400 bg-violet-500/10', Module: 'text-cyan-400 bg-cyan-500/10',
-  Lesson: 'text-blue-400 bg-blue-500/10', Experiment: 'text-teal-400 bg-teal-500/10',
-  Quiz: 'text-amber-400 bg-amber-500/10', Challenge: 'text-pink-400 bg-pink-500/10',
+  Course: 'text-[var(--color-primary)] bg-[var(--color-primary)]/10', 
+  Module: 'text-cyan-700 dark:text-cyan-400 bg-cyan-500/10',
+  Lesson: 'text-blue-700 dark:text-blue-400 bg-blue-500/10', 
+  Experiment: 'text-teal-700 dark:text-teal-400 bg-teal-500/10',
+  Quiz: 'text-amber-700 dark:text-amber-400 bg-amber-500/10', 
+  Challenge: 'text-pink-700 dark:text-pink-400 bg-pink-500/10',
 };
 
 const INITIAL_CONTENT = [
@@ -169,7 +173,7 @@ export default function ContentManagement({ initialFilterType = 'All', onOpenLes
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuFolderOpen size={20} className="text-violet-400" /> Content Management
+          <LuFolderOpen size={20} className="text-[var(--color-primary)]" /> Content Management
         </h2>
         <p className="text-xs text-[var(--color-muted)] mt-1">Manage all your courses, modules, lessons, experiments, quizzes, and challenges through the content lifecycle.</p>
       </div>
@@ -184,7 +188,7 @@ export default function ContentManagement({ initialFilterType = 'All', onOpenLes
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Items', value: stats.total, color: 'text-violet-400' },
+          { label: 'Total Items', value: stats.total, color: 'text-[var(--color-primary)]' },
           { label: 'Published', value: stats.published, color: 'text-emerald-400' },
           { label: 'Draft', value: stats.draft, color: 'text-slate-400' },
           { label: 'Under Review', value: stats.review, color: 'text-amber-400' },
@@ -202,7 +206,7 @@ export default function ContentManagement({ initialFilterType = 'All', onOpenLes
           const Icon = TYPE_ICONS[t];
           return (
             <button key={t} onClick={() => setFilterType(t)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${filterType === t ? 'bg-violet-600 text-white' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${filterType === t ? 'bg-[var(--color-primary)] text-white' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
               {Icon && <Icon size={12} />}{t}
             </button>
           );
@@ -214,9 +218,9 @@ export default function ContentManagement({ initialFilterType = 'All', onOpenLes
         <div className="relative flex-1">
           <LuSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" />
           <input type="text" placeholder="Search content..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
         </div>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
           {STATUSES.map(s => <option key={s}>{s}</option>)}
         </select>
       </div>
@@ -224,10 +228,7 @@ export default function ContentManagement({ initialFilterType = 'All', onOpenLes
       {/* Content list */}
       <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center space-y-3">
-            <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-[var(--color-muted)]">Loading content...</p>
-          </div>
+          <ContentSkeleton />
         ) : filtered.length === 0 ? (
           <div className="py-12 text-center space-y-2">
             <LuFolderOpen size={28} className="mx-auto text-[var(--color-muted)]" />

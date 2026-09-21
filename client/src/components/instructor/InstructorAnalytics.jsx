@@ -7,7 +7,7 @@ import {
   LuActivity, LuTarget,
 } from 'react-icons/lu';
 
-function BarChart({ data, labelKey, valueKey, color = 'bg-violet-500', unit = '' }) {
+function BarChart({ data, labelKey, valueKey, color = 'bg-[var(--color-primary)]', unit = '' }) {
   const max = Math.max(...data.map(d => d[valueKey]));
   return (
     <div className="space-y-2">
@@ -26,7 +26,7 @@ function BarChart({ data, labelKey, valueKey, color = 'bg-violet-500', unit = ''
   );
 }
 
-function MiniLineChart({ data, color = 'stroke-violet-500' }) {
+function MiniLineChart({ data, color = 'stroke-[var(--color-primary)]' }) {
   const max = Math.max(...data.map(d => d.students));
   const min = Math.min(...data.map(d => d.students));
   const range = max - min || 1;
@@ -127,7 +127,7 @@ export default function InstructorAnalytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -136,7 +136,7 @@ export default function InstructorAnalytics() {
     <div className="space-y-8 animate-fadeIn">
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuChartBar size={20} className="text-violet-400" /> Instructor Analytics
+          <LuChartBar size={20} className="text-[var(--color-primary)]" /> Instructor Analytics
         </h2>
         <p className="text-xs text-[var(--color-muted)] mt-1">Comprehensive insights into student performance, content effectiveness, and engagement.</p>
       </div>
@@ -144,7 +144,7 @@ export default function InstructorAnalytics() {
       {/* KPI Row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
-          { label: 'Total Students', value: data.summary.totalStudents, color: 'text-violet-400', icon: LuUsers },
+          { label: 'Total Students', value: data.summary.totalStudents, color: 'text-[var(--color-primary)]', icon: LuUsers },
           { label: 'Active Students', value: data.summary.activeStudents, color: 'text-emerald-400', icon: LuActivity },
           { label: 'Courses', value: data.summary.totalCourses, color: 'text-cyan-400', icon: LuBookOpen },
           { label: 'Lessons', value: data.summary.publishedLessons, color: 'text-amber-400', icon: LuStar },
@@ -173,7 +173,7 @@ export default function InstructorAnalytics() {
           <div className="flex items-end justify-between gap-1 mt-2">
             {data.weeklyEngagement.map((d, i) => (
               <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                <div className="w-full rounded-t-sm bg-violet-500/60 hover:bg-violet-500 transition-colors" style={{ height: `${(d.students / 100) * 48}px` }} />
+                <div className="w-full rounded-t-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary)] transition-colors" style={{ height: `${(d.students / 100) * 48}px` }} />
                 <span className="text-[9px] font-mono text-[var(--color-muted)]">{d.day}</span>
               </div>
             ))}
@@ -187,7 +187,7 @@ export default function InstructorAnalytics() {
             <DonutChart value={data.summary.completionRate} color="#7c3aed" />
             <div className="space-y-2">
               {[
-                { label: 'Completed', value: `${Math.round(data.summary.totalStudents * data.summary.completionRate / 100)}`, color: 'text-violet-400' },
+                { label: 'Completed', value: `${Math.round(data.summary.totalStudents * data.summary.completionRate / 100)}`, color: 'text-[var(--color-primary)]' },
                 { label: 'In Progress', value: `${data.summary.activeStudents - Math.round(data.summary.totalStudents * data.summary.completionRate / 100)}`, color: 'text-amber-400' },
                 { label: 'Not Started', value: `${data.summary.totalStudents - data.summary.activeStudents}`, color: 'text-rose-400' },
               ].map(s => (
@@ -265,7 +265,7 @@ export default function InstructorAnalytics() {
       {/* Concept Heatmap */}
       <div className="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-4">
         <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-          <LuBrain size={14} className="text-violet-400" /> Concept-Level Performance
+          <LuBrain size={14} className="text-[var(--color-primary)]" /> Concept-Level Performance
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {data.conceptPerformance.map((c, i) => {

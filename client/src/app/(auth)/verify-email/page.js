@@ -127,84 +127,78 @@ function VerifyEmailForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--color-background)]">
-      <div className="w-full max-w-md space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white shadow-lg shadow-[var(--color-primary)]/20 transition-transform group-hover:scale-105">
-              <LuCpu size={24} />
+    <div className="min-h-screen flex w-full bg-[var(--color-background)]">
+      {/* Left Panel - Minimalist Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 xl:px-32 relative py-12">
+        <div className="w-full max-w-sm mx-auto space-y-8">
+          {/* Header */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
+              Verify your email
+            </h1>
+            <p className="text-[15px] text-[var(--color-muted)]">
+              We sent a 6-digit code to your email
+            </p>
+          </div>
+
+          {/* Notices */}
+          {isUnverifiedAttempt && (
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 text-sm flex items-center gap-2">
+              <LuCircleAlert size={16} />
+              <span>You must verify your email before logging in.</span>
             </div>
-            <span className="font-heading font-bold text-2xl tracking-tight text-[var(--color-text)]">
-              QubitMind
-            </span>
-          </Link>
-          <h2 className="text-3xl font-heading font-bold text-[var(--color-text)]">
-            Verify your email
-          </h2>
-          <p className="text-sm text-[var(--color-muted)]">
-            We sent a 6-digit verification code to activate your account
-          </p>
-        </div>
+          )}
 
-        {/* Notices */}
-        {isUnverifiedAttempt && (
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-sm flex items-center gap-3">
-            <LuCircleAlert size={18} className="flex-shrink-0" />
-            <span>Your email is not verified yet. Please enter the code sent to your inbox to activate your session.</span>
-          </div>
-        )}
+          {resendSuccess && (
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm flex items-center gap-2">
+              <LuCircleCheck size={16} />
+              <span>{resendSuccess}</span>
+            </div>
+          )}
 
-        {resendSuccess && (
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm flex items-center gap-3">
-            <LuCircleCheck size={18} className="flex-shrink-0" />
-            <span>{resendSuccess}</span>
-          </div>
-        )}
+          {(error || localError) && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 text-sm flex items-center gap-2 animate-shake">
+              <LuCircleAlert size={16} />
+              <span>{error || localError}</span>
+            </div>
+          )}
 
-        {(error || localError) && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm flex items-center gap-3 animate-shake">
-            <LuCircleAlert size={18} className="flex-shrink-0" />
-            <span>{error || localError}</span>
-          </div>
-        )}
-
-        {/* OTP Input Card */}
-        <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl space-y-6">
           <form onSubmit={handleVerify} className="space-y-6">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
-                Target Email Address
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
+                Email Address
               </label>
-              <div className="relative">
-                <LuMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
-                />
-              </div>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => {
+                  if (error) clearError();
+                  if (localError) setLocalError('');
+                  setEmail(e.target.value);
+                }}
+                placeholder="name@institution.edu"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-3 text-center">
-                6-Digit Security Code
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
+                Verification Code
               </label>
-              <div className="flex justify-between gap-2 sm:gap-3" onPaste={handlePaste}>
+              <div className="flex gap-2 justify-between">
                 {otp.map((digit, idx) => (
                   <input
                     key={idx}
-                    ref={(el) => (inputRefs.current[idx] = el)}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
+                    ref={(el) => (inputRefs.current[idx] = el)}
                     onChange={(e) => handleDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(idx, e)}
-                    className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-mono font-bold rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all shadow-inner"
+                    onPaste={idx === 0 ? handlePaste : undefined}
+                    className="w-12 h-14 text-center text-xl font-bold rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
                   />
                 ))}
               </div>
@@ -212,8 +206,8 @@ function VerifyEmailForm() {
 
             <button
               type="submit"
-              disabled={isLoading || otp.join('').length !== 6}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white shadow-lg shadow-[var(--color-primary)]/25 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              disabled={isLoading}
+              className="w-full mt-4 py-2.5 rounded-lg font-medium text-[15px] bg-[var(--color-text)] text-[var(--color-background)] hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -221,32 +215,50 @@ function VerifyEmailForm() {
                   <span>Verifying Code...</span>
                 </>
               ) : (
-                <>
-                  <span>Verify Email & Access Hub</span>
-                  <LuArrowRight size={18} />
-                </>
+                <span>Verify Email</span>
               )}
             </button>
           </form>
 
-          {/* Resend Action */}
-          <div className="pt-4 border-t border-[var(--color-border)]/50 flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--color-muted)] gap-2">
-            <span>Didn&apos;t receive the code?</span>
+          {/* Resend Code Section */}
+          <div className="pt-6 mt-6 border-t border-[var(--color-border)] text-center">
+            <p className="text-[14px] text-[var(--color-muted)] mb-3">
+              Didn't receive the code?
+            </p>
             <button
               type="button"
-              disabled={cooldownRemaining > 0 || isLoading}
               onClick={handleResend}
-              className="inline-flex items-center gap-1.5 font-semibold text-[var(--color-primary)] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer disabled:cursor-not-allowed"
+              disabled={cooldownRemaining > 0 || isLoading}
+              className="inline-flex items-center gap-2 text-[14px] font-medium text-[var(--color-text)] hover:underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <LuRefreshCw size={14} className={cooldownRemaining > 0 ? '' : 'group-hover:rotate-180 transition-transform'} />
-              {cooldownRemaining > 0 ? `Resend in ${cooldownRemaining}s` : 'Resend Code'}
+              {cooldownRemaining > 0 ? (
+                <span>Resend available in {cooldownRemaining}s</span>
+              ) : (
+                <>
+                  <LuRefreshCw size={16} />
+                  <span>Resend Code</span>
+                </>
+              )}
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Console / Development Notice */}
-        <div className="text-center text-xs text-[var(--color-muted)]">
-          Testing in development? Check your server console for simulated OTP previews if Resend key is unconfigured.
+      {/* Right Panel - Quantum Image Background */}
+      <div className="hidden lg:block w-1/2 relative bg-zinc-950">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
+          style={{ backgroundImage: "url('/images/quantum-bg.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+        
+        <div className="absolute bottom-12 left-12 right-12 text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+            Verification Required
+          </div>
+          <h2 className="text-3xl font-medium tracking-tight mb-2">Secure Workspace</h2>
+          <p className="text-zinc-400 text-sm">Verify your identity to unlock the full potential of your quantum workspace.</p>
         </div>
       </div>
     </div>

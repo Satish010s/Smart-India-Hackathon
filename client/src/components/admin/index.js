@@ -1,6 +1,7 @@
 export { default as AdminOverview } from './AdminOverview.jsx';
 export { default as InstructorProvisionModal } from './InstructorProvisionModal.jsx';
 export { default as UserDirectoryTable } from './UserDirectoryTable.jsx';
+export { AdminTabSkeleton, OverviewSkeleton, TableSkeleton, GridSkeleton } from './AdminSkeletons.jsx';
 export { default as AdminDashboardOverview } from './AdminDashboardOverview.jsx';
 export { default as AdminUserManager } from './AdminUserManager.jsx';
 export { default as AdminRolesPermissions } from './AdminRolesPermissions.jsx';

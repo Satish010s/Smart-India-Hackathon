@@ -81,62 +81,53 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--color-background)]">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white shadow-lg shadow-[var(--color-primary)]/20 transition-transform group-hover:scale-105">
-              <LuCpu size={24} />
-            </div>
-            <span className="font-heading font-bold text-2xl tracking-tight text-[var(--color-text)]">
-              QubitMind
-            </span>
-          </Link>
-          <h2 className="text-3xl font-heading font-bold text-[var(--color-text)]">
-            Create new password
-          </h2>
-          <p className="text-sm text-[var(--color-muted)]">
-            Enter the 6-digit code received via email and choose a strong password
-          </p>
-        </div>
-
-        {/* Security Alert regarding Session Invalidation */}
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs flex items-start gap-3">
-          <LuShieldCheck size={18} className="flex-shrink-0 mt-0.5" />
-          <span>
-            <strong>Security Invalidation:</strong> For your protection, resetting your password will automatically terminate and invalidate all other active sessions and refresh tokens across all devices.
-          </span>
-        </div>
-
-        {(error || localError) && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm flex items-center gap-3 animate-shake">
-            <LuCircleAlert size={18} className="flex-shrink-0" />
-            <span>{error || localError}</span>
+    <div className="min-h-screen flex w-full bg-[var(--color-background)]">
+      {/* Left Panel - Minimalist Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 xl:px-32 relative py-12">
+        <div className="w-full max-w-sm mx-auto space-y-8">
+          {/* Header */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
+              Create new password
+            </h1>
+            <p className="text-[15px] text-[var(--color-muted)]">
+              Enter the 6-digit code and choose a new password
+            </p>
           </div>
-        )}
 
-        <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl space-y-6">
+          {/* Security Alert regarding Session Invalidation */}
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 text-sm flex items-start gap-2">
+            <LuShieldCheck size={16} className="mt-0.5 flex-shrink-0" />
+            <span>
+              <strong>Security Note:</strong> Resetting your password will automatically log you out of all other active devices.
+            </span>
+          </div>
+
+          {(error || localError) && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 text-sm flex items-center gap-2 animate-shake">
+              <LuCircleAlert size={16} />
+              <span>{error || localError}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
-                Account Email
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
+                Email Address
               </label>
-              <div className="relative">
-                <LuMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="name@institution.edu"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
-                />
-              </div>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="name@institution.edu"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 6-Digit Reset Code
               </label>
               <input
@@ -147,104 +138,103 @@ function ResetPasswordForm() {
                 value={formData.otp}
                 onChange={handleChange}
                 placeholder="123456"
-                className="w-full px-4 py-3 font-mono tracking-widest text-center text-lg rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
+                className="w-full px-4 py-2.5 font-mono tracking-widest text-center text-lg rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 New Password
               </label>
-              <div className="relative">
-                <LuLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="password"
-                  name="newPassword"
-                  required
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  placeholder="Min. 8 characters"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
-                />
-              </div>
+              <input
+                type="password"
+                name="newPassword"
+                required
+                value={formData.newPassword}
+                onChange={handleChange}
+                placeholder="Min. 8 characters"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
 
+              {/* Password Strength Meter */}
               {formData.newPassword && (
-                <div className="mt-2 space-y-1">
-                  <div className="grid grid-cols-4 gap-1.5 h-1.5">
-                    {[1, 2, 3, 4].map((step) => (
-                      <div
-                        key={step}
-                        className={`rounded-full transition-all ${
-                          passScore >= step
-                            ? passScore <= 2
-                              ? 'bg-rose-500'
-                              : passScore === 3
-                              ? 'bg-amber-500'
-                              : 'bg-emerald-500'
-                            : 'bg-[var(--color-border)]'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between text-[11px] text-[var(--color-muted)]">
-                    <span>Password Strength</span>
-                    <span className="font-medium">
-                      {passScore <= 1 && 'Weak'}
-                      {passScore === 2 && 'Fair'}
-                      {passScore === 3 && 'Good'}
-                      {passScore === 4 && 'Strong (Argon2id)'}
-                    </span>
-                  </div>
+                <div className="mt-2 grid grid-cols-4 gap-1 h-1">
+                  {[1, 2, 3, 4].map((step) => (
+                    <div
+                      key={step}
+                      className={`rounded-full transition-all ${
+                        passScore >= step
+                          ? passScore <= 2
+                            ? 'bg-rose-500'
+                            : passScore === 3
+                            ? 'bg-amber-500'
+                            : 'bg-emerald-500'
+                          : 'bg-[var(--color-border)]'
+                      }`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 Confirm New Password
               </label>
-              <div className="relative">
-                <LuLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Repeat new password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50"
-                />
-              </div>
+              <input
+                type="password"
+                name="confirmPassword"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Repeat new password"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white shadow-lg shadow-[var(--color-primary)]/25 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-4 py-2.5 rounded-lg font-medium text-[15px] bg-[var(--color-text)] text-[var(--color-background)] hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
                   <LuLoaderCircle className="animate-spin" size={18} />
-                  <span>Resetting & Terminating Sessions...</span>
+                  <span>Resetting Password...</span>
                 </>
               ) : (
-                <>
-                  <span>Update Password</span>
-                  <LuArrowRight size={18} />
-                </>
+                <span>Reset Password</span>
               )}
             </button>
           </form>
 
-          <div className="pt-4 border-t border-[var(--color-border)]/50 text-center">
+          <div className="text-center pt-2">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[14px] font-medium text-[var(--color-text)] hover:underline"
             >
               <LuArrowLeft size={16} />
-              Cancel and Return to Login
+              Back to Login
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Quantum Image Background */}
+      <div className="hidden lg:block w-1/2 relative bg-zinc-950">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
+          style={{ backgroundImage: "url('/images/quantum-bg.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+        
+        <div className="absolute bottom-12 left-12 right-12 text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            Security Protocol
+          </div>
+          <h2 className="text-3xl font-medium tracking-tight mb-2">Secure Reset</h2>
+          <p className="text-zinc-400 text-sm">Your new password is encrypted before it leaves your browser.</p>
         </div>
       </div>
     </div>

@@ -8,8 +8,10 @@ import CourseCard from '../../components/learner/learn/CourseCard';
 import CourseDetail from '../../components/learner/learn/CourseDetail';
 import ModuleOverview from '../../components/learner/learn/ModuleOverview';
 import LessonView from '../../components/learner/learn/LessonView';
+import { CourseCardSkeleton } from '../../components/learner/learn/CourseCardSkeleton';
 import InteractiveExperiment from '../../components/learner/learn/InteractiveExperiment';
 import { apiFetch } from '../../services/api';
+import { Skeleton } from '@/components/ui/Skeleton';
 import {
   LuBookOpen, LuCompass, LuStar, LuGraduationCap, LuSparkles,
   LuArrowLeft, LuSearch, LuFilter, LuFlaskConical,
@@ -120,7 +122,6 @@ const LEARNING_PATHS = [
     difficulty: 'Beginner → Intermediate',
     progress: 72,
     enrolled: true,
-    color: 'from-[var(--color-primary)] to-violet-500',
     icon: LuBookOpen,
   },
   {
@@ -132,7 +133,6 @@ const LEARNING_PATHS = [
     difficulty: 'Intermediate → Advanced',
     progress: 40,
     enrolled: true,
-    color: 'from-cyan-500 to-[var(--color-secondary)]',
     icon: LuBrain,
   },
   {
@@ -144,7 +144,6 @@ const LEARNING_PATHS = [
     difficulty: 'Advanced',
     progress: 0,
     enrolled: false,
-    color: 'from-violet-500 to-rose-500',
     icon: LuSparkles,
   },
   {
@@ -156,7 +155,6 @@ const LEARNING_PATHS = [
     difficulty: 'Intermediate',
     progress: 0,
     enrolled: false,
-    color: 'from-emerald-500 to-cyan-500',
     icon: LuTrendingUp,
   },
 ];
@@ -174,43 +172,61 @@ const CATEGORIES = ['All', 'Foundations', 'Algorithms', 'Error Correction', 'QML
 function LearningPathCard({ path }) {
   const Icon = path.icon;
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-xl hover:-translate-y-0.5 transition-all group cursor-pointer`}>
-      {/* Gradient header strip */}
-      <div className={`h-1.5 bg-gradient-to-r ${path.color}`} />
-
+    <div className="relative overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer">
       <div className="p-6 space-y-4">
         <div className="flex items-start gap-4">
-          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${path.color} flex items-center justify-center flex-shrink-0 opacity-90`}>
-            <Icon size={22} className="text-white" />
+          <div
+            className="w-10 h-10 rounded-lg border flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'color-mix(in srgb, var(--color-primary) 12%, transparent)',
+              borderColor: 'color-mix(in srgb, var(--color-primary) 30%, transparent)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <Icon size={18} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">{path.title}</h3>
-            <p className="text-xs text-[var(--color-muted)] mt-1 line-clamp-2 leading-relaxed">{path.description}</p>
+            <h3 className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
+              {path.title}
+            </h3>
+            <p className="text-xs text-[var(--color-muted)] mt-1 line-clamp-2 leading-relaxed">
+              {path.description}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-[11px] text-[var(--color-muted)] font-mono flex-wrap">
-          <span className="flex items-center gap-1"><LuBookOpen size={10} />{path.courses} courses</span>
-          <span className="flex items-center gap-1"><LuClock size={10} />{path.totalHours}</span>
-          <span className="flex items-center gap-1"><LuZap size={10} />{path.difficulty}</span>
+          <span className="flex items-center gap-1"><LuBookOpen size={11} />{path.courses} courses</span>
+          <span className="flex items-center gap-1"><LuClock size={11} />{path.totalHours}</span>
+          <span className="flex items-center gap-1"><LuZap size={11} />{path.difficulty}</span>
         </div>
 
         {path.enrolled && (
           <div className="space-y-1">
             <div className="flex justify-between text-[10px] font-mono text-[var(--color-muted)]">
-              <span>Progress</span><span>{path.progress}%</span>
+              <span>Progress</span>
+              <span>{path.progress}%</span>
             </div>
-            <div className="h-1.5 bg-[var(--color-border)]/40 rounded-full overflow-hidden">
-              <div className={`h-full bg-gradient-to-r ${path.color} rounded-full transition-all duration-700`} style={{ width: `${path.progress}%` }} />
+            <div className="h-1 bg-[var(--color-border)] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${path.progress}%`,
+                  background: path.progress >= 100 ? '#10b981' : 'var(--color-primary)',
+                }}
+              />
             </div>
           </div>
         )}
 
-        <button className={`w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
-          path.enrolled
-            ? `bg-gradient-to-r ${path.color} text-white hover:opacity-90 shadow-md`
-            : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-        }`}>
+        <button
+          className={`w-full py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+            path.enrolled
+              ? 'text-white dark:text-zinc-950 font-bold hover:opacity-90'
+              : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]'
+          }`}
+          style={path.enrolled ? { background: 'var(--color-primary)' } : {}}
+        >
           {path.enrolled ? '▶ Continue Path' : '+ Enroll in Path'}
         </button>
       </div>
@@ -218,12 +234,13 @@ function LearningPathCard({ path }) {
   );
 }
 
-function CoursesGrid({ courses, onSelect, filter, loading }) {
+function CoursesGrid({ courses, onSelect, onEnroll, filter, loading, onBrowseMore }) {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
   const filtered = courses.filter(c => {
-    const matchesFilter = filter === 'all' || (filter === 'my' ? c.enrolled : !c.enrolled);
+    const isEnrolled = !!(c.enrolled || c.progress > 0);
+    const matchesFilter = filter === 'all' || (filter === 'my' ? isEnrolled : !isEnrolled);
     const matchesCategory = category === 'All' || c.category === category;
     const matchesSearch = !search || c.title.toLowerCase().includes(search.toLowerCase()) || c.description.toLowerCase().includes(search.toLowerCase());
     return matchesFilter && matchesCategory && matchesSearch;
@@ -240,7 +257,7 @@ function CoursesGrid({ courses, onSelect, filter, loading }) {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search courses..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-primary)]/50 transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-primary)]/50 transition-colors"
           />
         </div>
         <div className="flex gap-1.5 overflow-x-auto">
@@ -248,9 +265,9 @@ function CoursesGrid({ courses, onSelect, filter, loading }) {
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                 category === cat
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-white dark:text-zinc-950 font-bold'
                   : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'
               }`}
             >
@@ -261,19 +278,46 @@ function CoursesGrid({ courses, onSelect, filter, loading }) {
       </div>
 
       {loading ? (
-        <div className="py-16 text-center space-y-3">
-          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-[var(--color-muted)]">Loading courses...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <CourseCardSkeleton key={i} />
+          ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-[var(--color-muted)]">
-          <LuSearch size={32} className="mx-auto mb-3 opacity-40" />
-          <p>No courses found matching your criteria.</p>
-        </div>
+        filter === 'my' ? (
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full border border-[var(--color-border)] bg-[var(--color-background,var(--bg))] flex items-center justify-center mx-auto text-[var(--color-muted)]">
+              <LuGraduationCap size={22} />
+            </div>
+            <h3 className="font-semibold text-sm text-[var(--color-text)]">No enrolled courses yet</h3>
+            <p className="text-xs text-[var(--color-muted)] max-w-sm mx-auto leading-relaxed">
+              Explore our quantum catalog and enroll in courses to start tracking your modules and lessons here.
+            </p>
+            {onBrowseMore && (
+              <button
+                onClick={onBrowseMore}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white mt-2 hover:opacity-90 transition-opacity"
+                style={{ background: 'var(--color-primary)' }}
+              >
+                Browse All Courses
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-16 text-[var(--color-muted)]">
+            <LuSearch size={32} className="mx-auto mb-3 opacity-40" />
+            <p>No courses found matching your criteria.</p>
+          </div>
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(course => (
-            <CourseCard key={course.id} course={course} onSelect={onSelect} />
+            <CourseCard
+              key={course.id}
+              course={course}
+              onSelect={onSelect}
+              onEnroll={onEnroll}
+            />
           ))}
         </div>
       )}
@@ -293,7 +337,7 @@ export default function LearnPage() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('paths');
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState(COURSES);
   const [paths, setPaths] = useState(LEARNING_PATHS);
   const [loading, setLoading] = useState(true);
   const [apiLoaded, setApiLoaded] = useState(false);
@@ -314,22 +358,19 @@ export default function LearnPage() {
         setLoading(true);
         const res = await apiFetch('/learner/courses');
         if (mounted) {
-          // Always use API data — even an empty array is valid (no published courses)
-          setCourses(res?.data?.courses || []);
+          if (res?.data?.courses?.length) {
+            setCourses(res.data.courses);
+          }
           if (res?.data?.paths?.length) {
             setPaths(res.data.paths.map(p => ({
               ...p,
               icon: p.id === 'p1' ? LuBookOpen : p.id === 'p2' ? LuBrain : p.id === 'p3' ? LuSparkles : LuTrendingUp,
-              color: p.id === 'p1' ? 'from-[var(--color-primary)] to-violet-500' :
-                     p.id === 'p2' ? 'from-cyan-500 to-[var(--color-secondary)]' :
-                     p.id === 'p3' ? 'from-violet-500 to-rose-500' : 'from-emerald-500 to-cyan-500',
             })));
           }
           setApiLoaded(true);
         }
       } catch (err) {
         console.warn('LearnPage: API unavailable, using demo data:', err.message);
-        // Keep existing COURSES state as fallback
         if (mounted) setApiLoaded(true);
       } finally {
         if (mounted) setLoading(false);
@@ -342,14 +383,22 @@ export default function LearnPage() {
   async function handleEnroll(courseId) {
     try {
       await apiFetch(`/learner/courses/${courseId}/enroll`, { method: 'POST' });
-      setCourses(prev => prev.map(c => c.id === courseId ? { ...c, enrolled: true, progress: 0 } : c));
     } catch (err) {
-      console.warn('Enroll failed:', err.message);
+      console.warn('Enroll API unavailable, updating local state:', err.message);
     }
+    // Update courses list
+    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, enrolled: true, progress: c.progress || 0 } : c));
+    // Update currently viewed course if open
+    setSelectedCourse(prev => prev && prev.id === courseId ? { ...prev, enrolled: true, progress: prev.progress || 0 } : prev);
   }
 
   function handleSelectLesson(item, curriculum) {
-    // Build flat lesson list from the full curriculum for prev/next navigation
+    const isEnrolled = !!(selectedCourse?.enrolled || (selectedCourse?.progress || 0) > 0);
+    if (!isEnrolled) {
+      console.warn('Please enroll in the course to access the player');
+      return;
+    }
+
     const allLessons = (curriculum || []).flatMap(mod => mod.items || []);
     const idx = allLessons.findIndex(l => l.id === item.id);
     setCourseLessons(allLessons);
@@ -385,14 +434,15 @@ export default function LearnPage() {
       setCurrentLessonIdx(idx);
       setSelectedLesson(courseLessons[idx]);
     } else {
-      // End of course
       setSelectedLesson(null);
     }
   }
 
+  const enrolledCount = courses.filter(c => c.enrolled || c.progress > 0).length;
+
   const pageTitle = view === 'experiment' ? 'Interactive Lab' :
                     view === 'lesson' ? selectedLesson?.title || 'Lesson' :
-                    view === 'course' ? 'Course Overview' :
+                    view === 'course' ? selectedCourse?.title || 'Course Details' :
                     'Learn';
 
   return (
@@ -423,8 +473,8 @@ export default function LearnPage() {
               >
                 <LuArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 {view === 'course' ? 'Back to Courses' :
-                 view === 'lesson' ? 'Back to Course' :
-                 'Back to Course'}
+                 view === 'lesson' ? 'Back to Course Details' :
+                 'Back to Course Details'}
               </button>
             )}
 
@@ -449,49 +499,39 @@ export default function LearnPage() {
                 course={selectedCourse}
                 onClose={goBack}
                 onSelectLesson={(item, curriculum) => handleSelectLesson(item, curriculum)}
+                onEnroll={handleEnroll}
               />
             )}
 
             {/* ── LIST VIEW ── */}
             {view === 'list' && (
               <>
-                {/* Hero */}
-                <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)] to-cyan-500/10 p-6 sm:p-8">
-                  <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-[var(--color-primary)]/10 blur-3xl pointer-events-none" />
-                  <div className="relative z-10 space-y-2">
-                    <span className="text-[11px] font-mono uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                      Interactive Quantum Academy
-                    </span>
-                    <h1 className="text-2xl sm:text-3xl font-bold font-heading text-[var(--color-text)]">
-                      Your Learning Journey
-                    </h1>
-                    <p className="text-sm text-[var(--color-muted)] max-w-xl">
-                      Structured paths, expert-taught courses, interactive experiments, and AI-powered personalization.
-                    </p>
-                    <div className="flex items-center gap-4 pt-2 text-xs font-mono text-[var(--color-muted)] flex-wrap">
-                      <span className="flex items-center gap-1.5 text-emerald-400"><LuCheck size={12} />3 enrolled</span>
-                      <span className="flex items-center gap-1.5"><LuBookOpen size={12} />6 courses available</span>
-                      <span className="flex items-center gap-1.5"><LuFlaskConical size={12} />12 labs</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Tab bar */}
-                <div className="flex gap-1 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl w-fit">
+                <div className="flex gap-1 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl w-fit">
                   {TABS.map(tab => {
                     const Icon = tab.icon;
                     return (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                        className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
                           activeTab === tab.id
-                            ? 'bg-[var(--color-primary)] text-white shadow-md'
+                            ? 'text-white dark:text-zinc-950 font-bold shadow-sm'
                             : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
                         }`}
+                        style={activeTab === tab.id ? { background: 'var(--color-primary)' } : {}}
                       >
-                        <Icon size={14} />
+                        <Icon size={14} className={activeTab === tab.id ? 'text-white dark:text-zinc-950' : ''} />
                         <span className="hidden sm:inline">{tab.label}</span>
+                        {tab.id === 'my' && enrolledCount > 0 && (
+                          <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
+                            activeTab === 'my'
+                              ? 'bg-black/15 text-white dark:text-zinc-950 font-bold'
+                              : 'bg-[var(--color-border)] text-[var(--color-muted)]'
+                          }`}>
+                            {enrolledCount}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -506,25 +546,39 @@ export default function LearnPage() {
                   </div>
                 )}
 
+                {/* All Courses tab */}
                 {activeTab === 'courses' && (
-                  <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="all" loading={loading} />
+                  <CoursesGrid
+                    courses={courses}
+                    onSelect={setSelectedCourse}
+                    onEnroll={handleEnroll}
+                    filter="all"
+                    loading={loading}
+                  />
                 )}
 
                 {/* My Courses tab */}
                 {activeTab === 'my' && (
                   <div className="space-y-5">
                     <div className="text-sm text-[var(--color-muted)]">
-                      You are enrolled in <span className="text-[var(--color-text)] font-semibold">{courses.filter(c => c.enrolled).length} courses</span>.
+                      You are enrolled in <span className="text-[var(--color-text)] font-semibold">{enrolledCount} courses</span>.
                     </div>
-                    <CoursesGrid courses={courses} onSelect={setSelectedCourse} filter="my" loading={loading} />
+                    <CoursesGrid
+                      courses={courses}
+                      onSelect={setSelectedCourse}
+                      onEnroll={handleEnroll}
+                      filter="my"
+                      loading={loading}
+                      onBrowseMore={() => setActiveTab('courses')}
+                    />
                   </div>
                 )}
 
                 {/* Recommended tab */}
                 {activeTab === 'recommended' && (
                   <div className="space-y-5">
-                    <div className="rounded-2xl border border-[var(--color-secondary)]/20 bg-gradient-to-r from-cyan-500/5 to-violet-500/5 p-4 flex items-start gap-3">
-                      <LuSparkles size={18} className="text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 flex items-start gap-3">
+                      <LuSparkles size={18} className="text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--color-text)]">AI-Powered Recommendations</div>
                         <div className="text-xs text-[var(--color-muted)] mt-1">Based on your progress, quiz scores, and learning history, here's what we suggest next.</div>
@@ -533,10 +587,14 @@ export default function LearnPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                       {RECOMMENDED.map(course => (
                         <div key={course.id} className="space-y-2">
-                          <div className="text-xs font-semibold text-cyan-400 flex items-center gap-1.5">
+                          <div className="text-xs font-semibold text-[var(--color-primary)] flex items-center gap-1.5">
                             <LuSparkles size={11} /> {course.recommendedReason}
                           </div>
-                          <CourseCard course={course} onSelect={setSelectedCourse} />
+                          <CourseCard
+                            course={course}
+                            onSelect={setSelectedCourse}
+                            onEnroll={handleEnroll}
+                          />
                         </div>
                       ))}
                     </div>

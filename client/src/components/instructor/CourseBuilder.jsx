@@ -4,13 +4,15 @@ import React, { useState, useEffect } from 'react';
 import {
   LuBookOpen, LuPlus, LuGrip, LuTrash2, LuPencil, LuCheck, LuX,
   LuEye, LuUpload, LuDownload, LuChevronRight, LuChevronDown,
-  LuFileText, LuFlaskConical, LuStar, LuZap, LuSettings, LuArrowUp, LuArrowDown,
-  LuGlobe, LuArchive, LuSave, LuPlay, LuCircleCheck, LuArrowLeft, LuExternalLink,
+  LuFileText, LuFlaskConical, LuChevronUp, LuGripVertical, 
+  LuStar, LuZap, LuAlertCircle, LuPlay, LuSettings, LuArrowUp, LuArrowDown,
+  LuGlobe, LuArchive, LuSave, LuCircleCheck, LuArrowLeft, LuExternalLink
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { BuilderSkeleton } from './InstructorSkeletons';
 
 const LESSON_TYPES = [
-  { type: 'lesson', label: 'Lesson', icon: LuFileText, color: 'text-violet-400 bg-violet-500/10' },
+  { type: 'lesson', label: 'Lesson', icon: LuFileText, color: 'text-[var(--color-primary)] bg-[var(--color-primary)]/10' },
   { type: 'video lecture', label: 'Video Lecture', icon: LuPlay, color: 'text-cyan-400 bg-cyan-500/10' },
   { type: 'quiz', label: 'Quiz', icon: LuStar, color: 'text-amber-400 bg-amber-500/10' },
   { type: 'assignment', label: 'Assignment', icon: LuZap, color: 'text-pink-400 bg-pink-500/10' },
@@ -43,7 +45,7 @@ function LessonItem({ lesson, onDelete, onMoveUp, onMoveDown, isFirst, isLast, c
   };
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] group hover:border-violet-500/30 transition-all`}>
+    <div className={`flex items-center gap-3 p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] group hover:border-[var(--color-primary)]/30 transition-all`}>
       <LuGrip size={14} className="text-[var(--color-muted)] cursor-grab shrink-0" />
       <div className={`p-1.5 rounded-lg ${info.color} shrink-0`}><Icon size={13} /></div>
       <div className="flex-1 min-w-0">
@@ -52,8 +54,8 @@ function LessonItem({ lesson, onDelete, onMoveUp, onMoveDown, isFirst, isLast, c
       </div>
       <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${STATUS_CHIP[lesson.status] || STATUS_CHIP.Draft}`}>{lesson.status}</span>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {!isFirst && <button onClick={onMoveUp} className="p-1 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuArrowUp size={12} /></button>}
-        {!isLast && <button onClick={onMoveDown} className="p-1 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuArrowDown size={12} /></button>}
+        {!isFirst && <button onClick={onMoveUp} className="p-1 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer transition-colors"><LuArrowUp size={12} /></button>}
+        {!isLast && <button onClick={onMoveDown} className="p-1 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer transition-colors"><LuArrowDown size={12} /></button>}
         <button onClick={handleEdit} title="Edit in builder" className="p-1 hover:text-cyan-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuExternalLink size={12} /></button>
         <button onClick={onDelete} className="p-1 hover:text-rose-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuTrash2 size={12} /></button>
       </div>
@@ -86,22 +88,22 @@ function AddLessonPanel({ onAdd }) {
   return (
     <div className="space-y-2">
       {!open ? (
-        <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-violet-400 hover:border-violet-500/40 transition-all cursor-pointer">
+        <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-all cursor-pointer">
           <LuPlus size={14} /> Add Content
         </button>
       ) : (
-        <div className="p-3 rounded-xl bg-[var(--color-background)] border border-violet-500/30 space-y-3">
+        <div className="p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-primary)]/30 space-y-3">
           <input
             autoFocus type="text" placeholder="Content title..."
             value={title} onChange={e => setTitle(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+            className="w-full px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
           />
           <div className="grid grid-cols-2 gap-2">
             {LESSON_TYPES.map(lt => {
               const Icon = lt.icon;
               return (
                 <button key={lt.type} onClick={() => setType(lt.type)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-all cursor-pointer ${type === lt.type ? 'border-violet-500 bg-violet-500/10 text-violet-300' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-violet-500/30'}`}>
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-all cursor-pointer ${type === lt.type ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]/30'}`}>
                   <Icon size={12} />{lt.label}
                 </button>
               );
@@ -112,12 +114,12 @@ function AddLessonPanel({ onAdd }) {
               <input
                 type="text" placeholder="Video Link (URL) *"
                 value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
               />
               <input
                 type="text" placeholder="Thumbnail URL (optional)"
                 value={videoThumbnail} onChange={e => setVideoThumbnail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
               />
             </div>
           )}
@@ -125,10 +127,10 @@ function AddLessonPanel({ onAdd }) {
             <input
               type="text" placeholder="Duration (e.g. 15 min)"
               value={duration} onChange={e => setDuration(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+              className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
             />
             <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] cursor-pointer">Cancel</button>
-            <button onClick={handleAdd} disabled={!title.trim()} className="px-3 py-2 rounded-lg bg-violet-600 text-white text-xs font-bold disabled:opacity-50 hover:bg-violet-500 cursor-pointer transition-colors">Add</button>
+            <button onClick={handleAdd} disabled={!title.trim()} className="px-3 py-2 rounded-lg bg-[var(--color-primary)] text-white text-xs font-bold disabled:opacity-50 hover:bg-[var(--color-primary)] cursor-pointer transition-colors">Add</button>
           </div>
         </div>
       )}
@@ -163,16 +165,16 @@ function ModuleBlock({ module, isActive, onSelect, onUpdate, onDeleteModule, cou
   };
 
   return (
-    <div className={`rounded-2xl border transition-all duration-200 ${isActive ? 'border-violet-500/50 bg-violet-500/5' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}>
+    <div className={`rounded-2xl border transition-all duration-200 ${isActive ? 'border-[var(--color-primary)] bg-[var(--color-surface)]' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}>
       <button onClick={() => { setExpanded(!expanded); onSelect(); }} className="w-full flex items-center gap-3 p-4 text-left cursor-pointer">
         <LuGrip size={14} className="text-[var(--color-muted)] shrink-0" />
-        {expanded ? <LuChevronDown size={14} className="text-violet-400 shrink-0" /> : <LuChevronRight size={14} className="text-[var(--color-muted)] shrink-0" />}
+        {expanded ? <LuChevronDown size={14} className="text-[var(--color-primary)] shrink-0" /> : <LuChevronRight size={14} className="text-[var(--color-muted)] shrink-0" />}
         {editing ? (
           <input
             autoFocus value={title}
             onChange={e => setTitle(e.target.value)}
             onBlur={() => { setEditing(false); onUpdate({ ...module, title, completionRule }); }}
-            className="flex-1 bg-transparent text-xs font-bold text-[var(--color-text)] focus:outline-none border-b border-violet-500"
+            className="flex-1 bg-transparent text-xs font-bold text-[var(--color-text)] focus:outline-none border-b border-[var(--color-primary)]"
             onClick={e => e.stopPropagation()}
           />
         ) : (
@@ -196,7 +198,7 @@ function ModuleBlock({ module, isActive, onSelect, onUpdate, onDeleteModule, cou
         ) : (
           <span className="text-[10px] font-mono text-[var(--color-muted)]">{lessons.length} items</span>
         )}
-        <button onClick={e => { e.stopPropagation(); setEditing(true); }} className="p-1 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuPencil size={12} /></button>
+        <button onClick={e => { e.stopPropagation(); setEditing(true); }} className="p-1 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer transition-colors"><LuPencil size={12} /></button>
         <button onClick={e => { e.stopPropagation(); onDeleteModule(module.id); }} className="p-1 hover:text-rose-400 text-[var(--color-muted)] cursor-pointer transition-colors"><LuTrash2 size={12} /></button>
       </button>
 
@@ -239,24 +241,24 @@ function AddModulePanel({ onAdd }) {
   };
 
   return !open ? (
-    <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-violet-400 hover:border-violet-500/40 transition-all cursor-pointer">
+    <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-all cursor-pointer">
       <LuPlus size={14} /> Add Chapter
     </button>
   ) : (
-    <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-violet-500/30 space-y-3">
+    <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-primary)]/30 space-y-3">
       <input
         autoFocus type="text" placeholder="Chapter title..."
         value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
       />
       <input
         type="text" placeholder="Description (optional)"
         value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
       />
       <select
         value={form.completionRule} onChange={e => setForm(f => ({ ...f, completionRule: e.target.value }))}
-        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+        className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
       >
         <option>All lessons</option>
         <option>All lessons + quiz</option>
@@ -266,7 +268,7 @@ function AddModulePanel({ onAdd }) {
       </select>
       <div className="flex gap-2 justify-end">
         <button onClick={() => setOpen(false)} className="px-4 py-2 rounded-xl border border-[var(--color-border)] text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] cursor-pointer">Cancel</button>
-        <button onClick={handleAdd} disabled={!form.title.trim()} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-xs font-bold disabled:opacity-50 hover:bg-violet-500 cursor-pointer transition-colors">Add Chapter</button>
+        <button onClick={handleAdd} disabled={!form.title.trim()} className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-bold disabled:opacity-50 hover:bg-[var(--color-primary)] cursor-pointer transition-colors">Add Chapter</button>
       </div>
     </div>
   );
@@ -357,12 +359,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
   }, [courseData, modules, courseStatus, completionReq]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
-        <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm text-[var(--color-muted)] font-mono">Loading course data...</p>
-      </div>
-    );
+    return <BuilderSkeleton />;
   }
 
   const handleSave = async () => {
@@ -402,7 +399,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
       {onBack && (
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-violet-400 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer group"
         >
           <LuArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Courses
@@ -412,7 +409,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1 w-full max-w-xl">
           <div className="flex items-center gap-2 mb-1">
-            <LuBookOpen size={16} className="text-violet-400" />
+            <LuBookOpen size={16} className="text-[var(--color-primary)]" />
             <span className="text-xs text-[var(--color-muted)] font-mono">Course Builder</span>
           </div>
           <input 
@@ -420,27 +417,27 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
             value={courseData.title} 
             onChange={e => setCourseData({ ...courseData, title: e.target.value })}
             placeholder="Course Title"
-            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full" 
+            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-[var(--color-primary)] transition-colors w-full" 
           />
           <input 
             type="text" 
             value={courseData.description || ''} 
             onChange={e => setCourseData({ ...courseData, description: e.target.value })}
             placeholder="Short description..."
-            className="text-xs mt-1 bg-transparent text-[var(--color-muted)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full" 
+            className="text-xs mt-1 bg-transparent text-[var(--color-muted)] focus:outline-none border-b border-transparent focus:border-[var(--color-primary)] transition-colors w-full" 
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap shrink-0">
           <button onClick={() => onOpenPreview && onOpenPreview({ ...courseData, modules })} className="px-4 py-2 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)] transition-colors cursor-pointer flex items-center gap-1.5">
             <LuEye size={13} /> Preview
           </button>
-          <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all duration-300 ${saved ? 'bg-emerald-600 text-white' : hasUnsavedChanges ? 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:bg-violet-500' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
+          <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all duration-300 ${saved ? 'bg-emerald-600 text-white' : hasUnsavedChanges ? 'bg-[var(--color-primary)] text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:bg-[var(--color-primary)]' : 'bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
           {saving ? <><div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : saved ? <><LuCheck size={13} /> Saved!</> : <><LuSave size={13} /> Save Draft</>}
           </button>
           <select
             value={courseStatus}
             onChange={e => setCourseStatus(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
+            className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 cursor-pointer"
           >
             <option value="Draft">Draft</option>
             <option value="Review">Send for Review</option>
@@ -473,14 +470,14 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
         <div className="space-y-4">
           <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-4">
             <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider flex items-center gap-2">
-              <LuSettings size={13} className="text-violet-400" /> Course Settings
+              <LuSettings size={13} className="text-[var(--color-primary)]" /> Course Settings
             </h4>
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider">Category</label>
                 <select
                   value={courseData.category || 'Foundations'} onChange={e => setCourseData({ ...courseData, category: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                 >
                   <option>Foundations</option><option>Algorithms</option><option>QML</option><option>Cryptography</option>
                 </select>
@@ -489,7 +486,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider">Difficulty</label>
                 <select
                   value={courseData.difficulty || 'Beginner'} onChange={e => setCourseData({ ...courseData, difficulty: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                 >
                   <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
                 </select>
@@ -502,7 +499,7 @@ export default function CourseBuilder({ course: initialCourse, courseId, onBack,
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase tracking-wider">Completion Requirement</label>
                 <select
                   value={completionReq} onChange={e => setCompletionReq(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                 >
                   <option>Complete all modules</option>
                   <option>Complete 80% of modules</option>

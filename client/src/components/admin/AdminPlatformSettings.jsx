@@ -6,6 +6,7 @@ import {
   LuBell, LuLock, LuGlobe,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { GridSkeleton } from './AdminSkeletons';
 
 export default function AdminPlatformSettings() {
   const [settings, setSettings] = useState({
@@ -76,13 +77,17 @@ export default function AdminPlatformSettings() {
     }
   };
 
+  if (loading) {
+    return <GridSkeleton />;
+  }
+
   return (
     <form onSubmit={handleSave} className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuSettings className="text-rose-500" />
+            <LuSettings className="text-rose-700 dark:text-rose-500" />
             Global Platform Configuration &amp; Policies
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -104,7 +109,7 @@ export default function AdminPlatformSettings() {
         {/* 1. General & Branding */}
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuGlobe size={16} className="text-indigo-400" />
+            <LuGlobe size={16} className="text-blue-400" />
             General Branding &amp; Contact
           </h3>
 
@@ -157,7 +162,7 @@ export default function AdminPlatformSettings() {
         {/* 2. Learning & Gamification Defaults */}
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuBookOpen size={16} className="text-emerald-400" />
+            <LuBookOpen size={16} className="text-emerald-700 dark:text-emerald-400" />
             Learning Defaults &amp; Gamification
           </h3>
 
@@ -187,7 +192,7 @@ export default function AdminPlatformSettings() {
             <div className="space-y-1">
               <div className="flex justify-between">
                 <label className="font-semibold text-[var(--color-text)]">Quiz Passing Threshold</label>
-                <span className="font-mono text-emerald-400">{settings.learning?.quizPassingThresholdPct || 75}%</span>
+                <span className="font-mono text-emerald-700 dark:text-emerald-400">{settings.learning?.quizPassingThresholdPct || 75}%</span>
               </div>
               <input
                 type="range"
@@ -218,7 +223,7 @@ export default function AdminPlatformSettings() {
         {/* 3. Authentication & Security Policy */}
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuLock size={16} className="text-rose-400" />
+            <LuLock size={16} className="text-rose-700 dark:text-rose-400" />
             Authentication &amp; Password Policies
           </h3>
 
@@ -265,7 +270,7 @@ export default function AdminPlatformSettings() {
         {/* 4. Global Announcements & Notifications */}
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-4">
           <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuBell size={16} className="text-cyan-400" />
+            <LuBell size={16} className="text-cyan-700 dark:text-cyan-400" />
             Global Announcements &amp; Notifications
           </h3>
 

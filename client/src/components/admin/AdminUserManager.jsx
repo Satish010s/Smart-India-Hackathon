@@ -7,6 +7,7 @@ import {
   LuRefreshCcw, LuX, LuTriangleAlert,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { TableBodySkeleton } from './AdminSkeletons';
 
 export default function AdminUserManager({ currentUserId, onOpenProvisionModal }) {
   const [users, setUsers] = useState([]);
@@ -118,7 +119,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuUsers className="text-rose-500" />
+            <LuUsers className="text-rose-700 dark:text-rose-500" />
             User Management Directory
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -208,10 +209,9 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]/50">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-[var(--color-muted)]">
-                    <LuRefreshCcw className="animate-spin inline-block mr-2" size={16} />
-                    Loading platform user directory...
+                <tr className="w-full">
+                  <td colSpan={7} className="p-0 w-full">
+                    <TableBodySkeleton rows={6} />
                   </td>
                 </tr>
               ) : users.length === 0 ? (
@@ -235,10 +235,10 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] border ${
                             u.role === 'ADMIN'
-                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                              ? 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30'
                               : u.role === 'INSTRUCTOR'
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                              : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
+                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                              : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                           }`}
                         >
                           {u.role}
@@ -247,11 +247,11 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
 
                       <td className="py-3.5 px-4">
                         {u.isEmailVerified ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-400 font-semibold">
+                          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
                             <LuCircleCheckBig size={13} /> Verified
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-amber-400 font-semibold">
+                          <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 font-semibold">
                             <LuCircleAlert size={13} /> Pending
                           </span>
                         )}
@@ -259,11 +259,11 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
 
                       <td className="py-3.5 px-4">
                         {u.isSuspended ? (
-                          <span className="inline-flex items-center gap-1 text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
+                          <span className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
                             <LuCircleX size={13} /> Suspended
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
+                          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Active
                           </span>
                         )}
@@ -318,8 +318,8 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
                               }}
                               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                                 u.isSuspended
-                                  ? 'text-emerald-400 hover:bg-emerald-500/10'
-                                  : 'text-amber-400 hover:bg-amber-500/10'
+                                  ? 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10'
+                                  : 'text-amber-700 dark:text-amber-400 hover:bg-amber-500/10'
                               }`}
                               title={u.isSuspended ? 'Activate Account' : 'Suspend Account'}
                             >
@@ -331,7 +331,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
                           {!isCurrent && (
                             <button
                               onClick={() => setUserToDelete(u)}
-                              className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-rose-700 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
                               title="Delete User"
                             >
                               <LuTrash2 size={14} />
@@ -354,7 +354,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
           <div className="w-full max-w-lg rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-6 space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-base">
+                <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-700 dark:text-rose-400 flex items-center justify-center font-bold text-base">
                   {selectedUser.name?.charAt(0) || 'U'}
                 </div>
                 <div>
@@ -377,7 +377,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
               </div>
               <div className="p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]">
                 <span className="text-[var(--color-muted)] block mb-1">Account Status</span>
-                <span className={selectedUser.isSuspended ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+                <span className={selectedUser.isSuspended ? 'text-rose-700 dark:text-rose-400 font-bold' : 'text-emerald-700 dark:text-emerald-400 font-bold'}>
                   {selectedUser.isSuspended ? 'Suspended' : 'Active'}
                 </span>
               </div>
@@ -387,7 +387,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
               </div>
               <div className="p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]">
                 <span className="text-[var(--color-muted)] block mb-1">Email Verified</span>
-                <span className={selectedUser.isEmailVerified ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                <span className={selectedUser.isEmailVerified ? 'text-emerald-700 dark:text-emerald-400 font-bold' : 'text-amber-700 dark:text-amber-400 font-bold'}>
                   {selectedUser.isEmailVerified ? 'Verified' : 'Pending OTP'}
                 </span>
               </div>
@@ -431,7 +431,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
       {userToSuspend && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3 text-amber-400">
+            <div className="flex items-center gap-3 text-amber-700 dark:text-amber-400">
               <LuTriangleAlert size={24} />
               <h3 className="text-base font-bold text-[var(--color-text)]">
                 {userToSuspend.isSuspended ? 'Activate User Account' : 'Suspend User Account'}
@@ -481,7 +481,7 @@ export default function AdminUserManager({ currentUserId, onOpenProvisionModal }
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-3xl bg-[var(--color-surface)] border border-rose-500/30 shadow-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3 text-rose-500">
+            <div className="flex items-center gap-3 text-rose-700 dark:text-rose-500">
               <LuTrash2 size={24} />
               <h3 className="text-base font-bold text-[var(--color-text)]">Permanently Delete User</h3>
             </div>

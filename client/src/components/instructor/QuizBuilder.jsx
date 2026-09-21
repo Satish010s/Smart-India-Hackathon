@@ -7,6 +7,7 @@ import {
   LuChevronDown, LuChevronRight, LuCircleCheck, LuArrowLeft,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { BuilderSkeleton } from './InstructorSkeletons';
 
 const QUESTION_TYPES = [
   { type: 'mcq', label: 'Multiple Choice', icon: LuCircleCheck },
@@ -29,16 +30,16 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
   };
 
   return (
-    <div className="rounded-2xl bg-[var(--color-surface)]/60 backdrop-blur-md border border-[var(--color-border)] hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/10 transition-all duration-300 overflow-hidden">
-      <button onClick={() => setExpanded(!expanded)} className="w-full flex items-center gap-3 p-4 text-left cursor-pointer hover:bg-violet-500/5 transition-colors">
+    <div className="rounded-2xl bg-[var(--color-surface)]/60 backdrop-blur-md border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:shadow-lg hover:shadow-sm transition-all duration-300 overflow-hidden">
+      <button onClick={() => setExpanded(!expanded)} className="w-full flex items-center gap-3 p-4 text-left cursor-pointer hover:bg-[var(--color-surface)] transition-colors">
         <LuGrip size={13} className="text-[var(--color-muted)] shrink-0" />
-        {expanded ? <LuChevronDown size={13} className="text-violet-400 shrink-0" /> : <LuChevronRight size={13} className="text-[var(--color-muted)] shrink-0" />}
-        <span className="text-[10px] font-mono font-bold text-violet-400 px-2 py-0.5 rounded-lg bg-violet-500/10 shrink-0">Q{idx + 1}</span>
+        {expanded ? <LuChevronDown size={13} className="text-[var(--color-primary)] shrink-0" /> : <LuChevronRight size={13} className="text-[var(--color-muted)] shrink-0" />}
+        <span className="text-[10px] font-mono font-bold text-[var(--color-primary)] px-2 py-0.5 rounded-lg bg-[var(--color-primary)]/10 shrink-0">Q{idx + 1}</span>
         <span className="flex-1 text-sm font-semibold text-[var(--color-text)] truncate">{q.text || 'Untitled question'}</span>
         <span className="text-[10px] font-mono font-medium px-2 py-1 rounded bg-[var(--color-background)] text-[var(--color-muted)] shrink-0">{q.marks} pts · {q.difficulty}</span>
         <div className="flex items-center gap-1 shrink-0">
-          {!isFirst && <button onClick={e => { e.stopPropagation(); onMoveUp(); }} className="p-1 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer"><LuArrowUp size={11} /></button>}
-          {!isLast && <button onClick={e => { e.stopPropagation(); onMoveDown(); }} className="p-1 hover:text-violet-400 text-[var(--color-muted)] cursor-pointer"><LuArrowDown size={11} /></button>}
+          {!isFirst && <button onClick={e => { e.stopPropagation(); onMoveUp(); }} className="p-1 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer"><LuArrowUp size={11} /></button>}
+          {!isLast && <button onClick={e => { e.stopPropagation(); onMoveDown(); }} className="p-1 hover:text-[var(--color-primary)] text-[var(--color-muted)] cursor-pointer"><LuArrowDown size={11} /></button>}
           <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1 hover:text-rose-400 text-[var(--color-muted)] cursor-pointer"><LuTrash2 size={11} /></button>
         </div>
       </button>
@@ -50,7 +51,7 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
             <div className="space-y-1">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Type</label>
               <select value={q.type} onChange={e => onUpdate({ ...q, type: e.target.value })}
-                className="px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                className="px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                 {QUESTION_TYPES.map(t => <option key={t.type} value={t.type}>{t.label}</option>)}
               </select>
             </div>
@@ -58,12 +59,12 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Marks</label>
               <input type="number" min={1} max={20} value={q.marks}
                 onChange={e => onUpdate({ ...q, marks: Number(e.target.value) })}
-                className="w-16 px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                className="w-16 px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Difficulty</label>
               <select value={q.difficulty} onChange={e => onUpdate({ ...q, difficulty: e.target.value })}
-                className="px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                className="px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                 {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
               </select>
             </div>
@@ -74,7 +75,7 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
             <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Question Text *</label>
             <textarea rows={2} value={q.text} onChange={e => onUpdate({ ...q, text: e.target.value })}
               placeholder="Enter the question..."
-              className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] resize-none"
             />
           </div>
 
@@ -83,7 +84,7 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
             <div className="space-y-2">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Answer Options</label>
               {q.options.map((opt, i) => (
-                <div key={i} className={`flex items-center gap-3 p-2 rounded-xl border transition-all ${q.correct === i ? 'bg-emerald-500/5 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-violet-500/30'}`}>
+                <div key={i} className={`flex items-center gap-3 p-2 rounded-xl border transition-all ${q.correct === i ? 'bg-emerald-500/5 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-primary)]/30'}`}>
                   <button onClick={() => onUpdate({ ...q, correct: i })}
                     className={`w-5 h-5 rounded-full border-2 shrink-0 transition-all flex items-center justify-center cursor-pointer ${q.correct === i ? 'border-emerald-500 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'border-[var(--color-muted)] hover:border-emerald-500/50'}`}>
                     {q.correct === i && <LuCheck size={12} className="text-white" />}
@@ -98,7 +99,7 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
                 </div>
               ))}
               {q.options.length < 6 && (
-                <button onClick={addOption} className="text-xs font-semibold text-violet-400 hover:text-violet-300 flex items-center gap-1.5 cursor-pointer mt-2"><LuPlus size={14} /> Add another option</button>
+                <button onClick={addOption} className="text-xs font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary)] flex items-center gap-1.5 cursor-pointer mt-2"><LuPlus size={14} /> Add another option</button>
               )}
               <p className="text-[10px] text-[var(--color-muted)]">Click the circle to mark the correct answer.</p>
             </div>
@@ -111,14 +112,14 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Starter Code</label>
                 <textarea rows={4} value={q.starterCode || ''} onChange={e => onUpdate({ ...q, starterCode: e.target.value })}
                   placeholder="from qiskit import QuantumCircuit\n..."
-                  className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none font-mono"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Expected Output / Solution</label>
                 <textarea rows={4} value={q.solution || ''} onChange={e => onUpdate({ ...q, solution: e.target.value })}
                   placeholder="Model solution or expected output..."
-                  className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none font-mono"
                 />
               </div>
             </div>
@@ -129,7 +130,7 @@ function QuestionCard({ q, idx, onUpdate, onDelete, onMoveUp, onMoveDown, isFirs
             <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Explanation (shown after answer)</label>
             <textarea rows={2} value={q.explanation || ''} onChange={e => onUpdate({ ...q, explanation: e.target.value })}
               placeholder="Explain why this answer is correct..."
-              className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] resize-none"
             />
           </div>
         </div>
@@ -212,7 +213,7 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
       {onBack && (
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-violet-400 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer group"
         >
           <LuArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Course Builder
@@ -220,9 +221,7 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
       )}
       
       {loading ? (
-        <div className="flex justify-center p-12">
-          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-        </div>
+        <BuilderSkeleton />
       ) : (
         <>
           {/* Header */}
@@ -233,13 +232,13 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
             <span className="text-xs text-[var(--color-muted)] font-mono">Quiz Builder</span>
           </div>
           <input type="text" value={title} onChange={e => setTitle(e.target.value)}
-            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full" />
+            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-[var(--color-primary)] transition-colors w-full" />
         </div>
         <div className="flex items-center gap-2 flex-wrap shrink-0">
           <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all ${saved ? 'bg-emerald-600 text-white' : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
             {saved ? <><LuCheck size={13} /> Saved</> : <><LuSave size={13} /> Save</>}
           </button>
-          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 cursor-pointer">
+          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 cursor-pointer">
             <option>Draft</option><option>Review</option><option>Published</option>
           </select>
         </div>
@@ -282,19 +281,19 @@ export default function QuizBuilder({ courseId, moduleId, quizId, onBack }) {
               <div key={key} className="space-y-1">
                 <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">{label}</label>
                 <input type={type} value={settings[key]} onChange={e => setSettings(s => ({ ...s, [key]: Number(e.target.value) }))}
-                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
               </div>
             ))}
             <div className="space-y-1">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Difficulty</label>
               <select value={settings.difficulty} onChange={e => setSettings(s => ({ ...s, difficulty: e.target.value }))}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                 <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
               </select>
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={settings.shuffle} onChange={e => setSettings(s => ({ ...s, shuffle: e.target.checked }))}
-                className="rounded accent-violet-500" />
+                className="rounded accent-[var(--color-primary)]" />
               <span className="text-xs text-[var(--color-text)]">Shuffle questions</span>
             </label>
           </div>

@@ -8,6 +8,7 @@ import {
   LuRefreshCcw, LuUserCheck, LuUserPlus, LuSparkles, LuClock,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { OverviewSkeleton } from './AdminSkeletons';
 
 export default function AdminDashboardOverview({ user, onNavigateTab }) {
   const [data, setData] = useState(null);
@@ -71,15 +72,18 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
   const instructorPct = Math.round(((metrics.roleDistribution?.INSTRUCTOR || 0) / totalUsers) * 100);
   const adminPct = Math.round(((metrics.roleDistribution?.ADMIN || 0) / totalUsers) * 100);
 
+  if (loading) {
+    return <OverviewSkeleton />;
+  }
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-rose-950/40 via-[var(--color-surface)] to-[var(--color-surface)] border border-rose-500/20 shadow-xl">
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-rose-500/5 blur-3xl pointer-events-none" />
+      <div className="rounded-3xl p-6 sm:p-8 bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm">
         
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[var(--color-border)]/50 text-rose-700 dark:text-rose-400 border border-[var(--color-border)]">
               <LuShieldAlert size={13} />
               <span>Platform Governance &amp; Administration</span>
             </div>
@@ -97,7 +101,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
               disabled={loading}
               className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[var(--color-background)] border border-[var(--color-border)] hover:border-rose-500/40 text-[var(--color-text)] transition-all cursor-pointer shadow-sm"
             >
-              <LuRefreshCcw size={14} className={loading ? 'animate-spin text-rose-400' : ''} />
+              <LuRefreshCcw size={14} className={loading ? 'animate-spin text-rose-700 dark:text-rose-400' : ''} />
               <span>Refresh Telemetry</span>
             </button>
             <button
@@ -116,13 +120,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Total Users</span>
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-400 flex items-center justify-center">
               <LuUsers size={16} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)]">{metrics.totalUsers}</span>
-            <span className="text-xs text-emerald-400 font-semibold">{metrics.activeUsers} Active</span>
+            <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">{metrics.activeUsers} Active</span>
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">Active registered accounts</p>
         </div>
@@ -130,13 +134,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Content Catalog</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-700 dark:text-blue-400 flex items-center justify-center">
               <LuBookOpen size={16} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)]">{metrics.coursesCount}</span>
-            <span className="text-xs text-indigo-400 font-semibold">{metrics.lessonsCount} Lessons</span>
+            <span className="text-xs text-blue-700 dark:text-blue-400 font-semibold">{metrics.lessonsCount} Lessons</span>
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">{metrics.challengesCount} Interactive Challenges</p>
         </div>
@@ -144,13 +148,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Simulations</span>
-            <div className="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-700 dark:text-teal-400 flex items-center justify-center">
               <LuCpu size={16} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)]">{metrics.simulationsCount}</span>
-            <span className="text-xs text-violet-400 font-semibold">4 Backends</span>
+            <span className="text-xs text-teal-700 dark:text-teal-400 font-semibold">4 Backends</span>
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">{metrics.experimentsCount} Experiments created</p>
         </div>
@@ -158,13 +162,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
         <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">AI Requests</span>
-            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 flex items-center justify-center">
               <LuBrain size={16} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)]">{metrics.aiRequestsCount}</span>
-            <span className="text-xs text-cyan-400 font-semibold">FastAPI</span>
+            <span className="text-xs text-cyan-700 dark:text-cyan-400 font-semibold">FastAPI</span>
           </div>
           <p className="text-[11px] text-[var(--color-muted)]">Quantum Tutor &amp; CodeGen</p>
         </div>
@@ -181,7 +185,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
             </div>
             <button
               onClick={() => onNavigateTab('roles')}
-              className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
+              className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 font-semibold flex items-center gap-1"
             >
               <span>Permissions</span>
               <LuArrowUpRight size={13} />
@@ -191,7 +195,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
           {/* Segmented bar */}
           <div className="space-y-2">
             <div className="h-3.5 w-full rounded-full bg-[var(--color-background)] overflow-hidden flex p-0.5 border border-[var(--color-border)]">
-              <div style={{ width: `${Math.max(learnerPct, 5)}%` }} className="h-full rounded-l-full bg-indigo-500 transition-all" title={`Learners: ${learnerPct}%`} />
+              <div style={{ width: `${Math.max(learnerPct, 5)}%` }} className="h-full rounded-l-full bg-blue-500 transition-all" title={`Learners: ${learnerPct}%`} />
               <div style={{ width: `${Math.max(instructorPct, 5)}%` }} className="h-full bg-emerald-500 transition-all" title={`Instructors: ${instructorPct}%`} />
               <div style={{ width: `${Math.max(adminPct, 5)}%` }} className="h-full rounded-r-full bg-rose-500 transition-all" title={`Admins: ${adminPct}%`} />
             </div>
@@ -204,7 +208,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]/60">
               <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <div>
                   <div className="text-xs font-semibold text-[var(--color-text)]">Learner</div>
                   <div className="text-[10px] text-[var(--color-muted)]">Public signup enabled</div>
@@ -258,7 +262,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
             </div>
             <button
               onClick={() => onNavigateTab('health')}
-              className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
+              className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
             >
               <span>System Health</span>
               <LuArrowUpRight size={13} />
@@ -269,7 +273,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
             {/* API */}
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                   <LuActivity size={18} />
                 </div>
                 <div>
@@ -277,13 +281,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
                   <div className="text-[11px] text-[var(--color-muted)]">Port 5001 &middot; 14ms latency</div>
                 </div>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ONLINE</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">ONLINE</span>
             </div>
 
             {/* Database */}
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
                   <LuDatabase size={18} />
                 </div>
                 <div>
@@ -291,13 +295,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
                   <div className="text-[11px] text-[var(--color-muted)]">Prisma ORM &middot; AWS Cloud</div>
                 </div>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ONLINE</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">ONLINE</span>
             </div>
 
             {/* AI Engine */}
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 flex items-center justify-center">
                   <LuBrain size={18} />
                 </div>
                 <div>
@@ -305,13 +309,13 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
                   <div className="text-[11px] text-[var(--color-muted)]">Gemini / Local &middot; Port 8000</div>
                 </div>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ONLINE</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">ONLINE</span>
             </div>
 
             {/* Quantum Simulators */}
             <div className="p-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center">
                   <LuCpu size={18} />
                 </div>
                 <div>
@@ -319,7 +323,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
                   <div className="text-[11px] text-[var(--color-muted)]">Qiskit, PennyLane, Cirq, qBraid</div>
                 </div>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">4 READY</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">4 READY</span>
             </div>
           </div>
 
@@ -329,28 +333,28 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
               onClick={() => onNavigateTab('ai')}
               className="px-3 py-1.5 rounded-xl bg-[var(--color-background)] hover:bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center gap-1.5"
             >
-              <LuBrain size={13} className="text-cyan-400" />
+              <LuBrain size={13} className="text-cyan-700 dark:text-cyan-400" />
               <span>Configure AI</span>
             </button>
             <button
               onClick={() => onNavigateTab('backends')}
               className="px-3 py-1.5 rounded-xl bg-[var(--color-background)] hover:bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center gap-1.5"
             >
-              <LuCpu size={13} className="text-violet-400" />
+              <LuCpu size={13} className="text-teal-400" />
               <span>Configure Backends</span>
             </button>
             <button
               onClick={() => onNavigateTab('content')}
               className="px-3 py-1.5 rounded-xl bg-[var(--color-background)] hover:bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center gap-1.5"
             >
-              <LuBookOpen size={13} className="text-indigo-400" />
+              <LuBookOpen size={13} className="text-blue-400" />
               <span>Review Content</span>
             </button>
             <button
               onClick={() => onNavigateTab('audit')}
               className="px-3 py-1.5 rounded-xl bg-[var(--color-background)] hover:bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors flex items-center gap-1.5"
             >
-              <LuClock size={13} className="text-rose-400" />
+              <LuClock size={13} className="text-rose-700 dark:text-rose-400" />
               <span>Audit History</span>
             </button>
           </div>
@@ -366,7 +370,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
           </div>
           <button
             onClick={() => onNavigateTab('audit')}
-            className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
+            className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
           >
             <span>View All Logs</span>
             <LuArrowUpRight size={13} />
@@ -380,7 +384,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
             data.recentActivity.map((act) => (
               <div key={act.id} className="py-3 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 rounded-md font-mono text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="px-2 py-0.5 rounded-md font-mono text-[10px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
                     {act.action}
                   </span>
                   <div>

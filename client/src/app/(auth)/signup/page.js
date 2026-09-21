@@ -89,160 +89,127 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--color-background)]">
-      <div className="w-full max-w-lg space-y-8">
-        {/* Logo & Header */}
-        <div className="flex flex-col items-center justify-center text-center space-y-2">
-          <QubitMindLogo iconSize={42} subtitle="Quantum Learning Lab" />
-          <h2 className="text-3xl font-heading font-bold text-[var(--color-text)]">
-            Create your account
-          </h2>
-          <p className="text-sm text-[var(--color-muted)]">
-            Begin your quantum computing and quantum algorithms journey
-          </p>
-        </div>
-
-        {/* Error Alert */}
-        {(error || localError) && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm flex items-center gap-3 animate-shake">
-            <LuCircleAlert size={18} className="flex-shrink-0" />
-            <span>{error || localError}</span>
+    <div className="min-h-screen flex w-full bg-[var(--color-background)]">
+      {/* Left Panel - Minimalist Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 xl:px-32 relative py-12">
+        <div className="w-full max-w-sm mx-auto space-y-8">
+          {/* Header */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
+              Create account
+            </h1>
+            <p className="text-[15px] text-[var(--color-muted)]">
+              Begin your quantum computing journey
+            </p>
           </div>
-        )}
 
-        <div className="p-8 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Account Type Info */}
-            <div>
-              <div className="p-4 rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/20 flex items-center justify-center flex-shrink-0">
-                  <LuBookOpen size={20} className="text-[var(--color-primary)]" />
+          {/* Error Alert */}
+          {(error || localError) && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 text-sm flex items-center gap-2 animate-shake">
+              <LuCircleAlert size={16} />
+              <span>{error || localError}</span>
+            </div>
+          )}
+
+          {/* Signup Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Account Type Toggle */}
+            <div className="p-3 rounded-lg border border-[var(--color-border)] bg-transparent flex items-center justify-between cursor-pointer hover:border-[var(--color-text)] transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded bg-[var(--color-surface)] flex items-center justify-center text-[var(--color-text)]">
+                  <LuBookOpen size={16} />
                 </div>
                 <div>
-                  <div className="font-semibold text-sm text-[var(--color-text)]">Learner Account</div>
-                  <div className="text-xs text-[var(--color-muted)] mt-0.5">Interactive courses, quantum circuit design, AI tutor, experiments & simulations</div>
+                  <div className="text-sm font-medium text-[var(--color-text)] leading-none mb-1">Learner Account</div>
+                  <div className="text-xs text-[var(--color-muted)] leading-none">Access courses & simulations</div>
                 </div>
-                <span className="ml-auto w-2.5 h-2.5 rounded-full bg-[var(--color-primary)] flex-shrink-0" />
               </div>
-              <div className="mt-3 p-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]/70 flex items-start gap-2.5 text-xs text-[var(--color-muted)]">
-                <LuShieldAlert size={16} className="text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
-                <span>
-                  <strong>Notice:</strong> Instructor accounts are provisioned by Institution Administrators. Contact your institution to get faculty access.
-                </span>
-              </div>
+              <div className="w-4 h-4 rounded-full border-[4px] border-[var(--color-text)] bg-[var(--color-background)]" />
             </div>
 
-            {/* Name */}
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 Full Name
               </label>
-              <div className="relative">
-                <LuUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Ada Lovelace"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all"
-                />
-              </div>
+              <input
+                type="text"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ada Lovelace"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
-                Email Address
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
+                Email
               </label>
-              <div className="relative">
-                <LuMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="ada@research.edu"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all"
-                />
-              </div>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="ada@research.edu"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 Password
               </label>
-              <div className="relative">
-                <LuLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Min. 8 characters"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all"
-                />
-              </div>
-
+              <input
+                type="password"
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Min. 8 characters"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
               {/* Password Strength Meter */}
               {formData.password && (
-                <div className="mt-2 space-y-1">
-                  <div className="grid grid-cols-4 gap-1.5 h-1.5">
-                    {[1, 2, 3, 4].map((step) => (
-                      <div
-                        key={step}
-                        className={`rounded-full transition-all ${
-                          passScore >= step
-                            ? passScore <= 2
-                              ? 'bg-rose-500'
-                              : passScore === 3
-                              ? 'bg-amber-500'
-                              : 'bg-emerald-500'
-                            : 'bg-[var(--color-border)]'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between text-[11px] text-[var(--color-muted)]">
-                    <span>Password Strength</span>
-                    <span className="font-medium">
-                      {passScore <= 1 && 'Weak'}
-                      {passScore === 2 && 'Fair'}
-                      {passScore === 3 && 'Good'}
-                      {passScore === 4 && 'Strong (Argon2id)'}
-                    </span>
-                  </div>
+                <div className="mt-2 grid grid-cols-4 gap-1 h-1">
+                  {[1, 2, 3, 4].map((step) => (
+                    <div
+                      key={step}
+                      className={`rounded-full transition-all ${
+                        passScore >= step
+                          ? passScore <= 2
+                            ? 'bg-rose-500'
+                            : passScore === 3
+                            ? 'bg-amber-500'
+                            : 'bg-emerald-500'
+                          : 'bg-[var(--color-border)]'
+                      }`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-xs font-semibold text-[var(--color-text)] uppercase tracking-wider mb-2">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[var(--color-text)]">
                 Confirm Password
               </label>
-              <div className="relative">
-                <LuLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" size={18} />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Repeat password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all"
-                />
-              </div>
+              <input
+                type="password"
+                name="confirmPassword"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Repeat password"
+                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+              />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white shadow-lg shadow-[var(--color-primary)]/25 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-4 py-2.5 rounded-lg font-medium text-[15px] bg-[var(--color-text)] text-[var(--color-background)] hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -250,25 +217,40 @@ export default function SignupPage() {
                   <span>Creating Account...</span>
                 </>
               ) : (
-                <>
-                  <span>Sign Up & Send Code</span>
-                  <LuArrowRight size={18} />
-                </>
+                <span>Sign Up</span>
               )}
             </button>
           </form>
 
-          <div className="pt-4 border-t border-[var(--color-border)]/50 text-center">
-            <p className="text-sm text-[var(--color-muted)]">
+          <div className="text-center pt-2">
+            <p className="text-[14px] text-[var(--color-muted)]">
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="font-semibold text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors"
+                className="font-medium text-[var(--color-text)] hover:underline"
               >
                 Sign in
               </Link>
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Quantum Image Background */}
+      <div className="hidden lg:block w-1/2 relative bg-zinc-950">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
+          style={{ backgroundImage: "url('/images/quantum-bg.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+        
+        <div className="absolute bottom-12 left-12 right-12 text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+            Join the Next Generation
+          </div>
+          <h2 className="text-3xl font-medium tracking-tight mb-2">Empowering Innovators</h2>
+          <p className="text-zinc-400 text-sm">Master quantum algorithms through hands-on circuits and AI-driven tutoring.</p>
         </div>
       </div>
     </div>

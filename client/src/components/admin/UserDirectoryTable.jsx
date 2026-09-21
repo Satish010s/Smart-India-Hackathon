@@ -72,9 +72,9 @@ export default function UserDirectoryTable({
                     <span
                       className={`text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full border ${
                         u.role === 'ADMIN'
-                          ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                          ? 'bg-rose-500/10 text-rose-700 dark:text-rose-500 border-rose-500/20'
                           : u.role === 'INSTRUCTOR'
-                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 border-emerald-500/20'
                           : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20'
                       }`}
                     >
@@ -83,11 +83,11 @@ export default function UserDirectoryTable({
                   </td>
                   <td className="py-3 px-4">
                     {u.isEmailVerified ? (
-                      <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">
+                      <span className="inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-500 font-medium">
                         <LuCircleCheckBig size={14} /> Verified
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
+                      <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-500 font-medium">
                         <LuCircleAlert size={14} /> Unverified
                       </span>
                     )}

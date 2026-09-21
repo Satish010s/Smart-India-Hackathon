@@ -7,9 +7,10 @@ import RoleGuard from '../../components/auth/RoleGuard';
 import { useAuthStore } from '../../store/useAuthStore';
 import { apiFetch } from '../../services/api';
 import { LearnerSidebar } from '../../components/sidebar';
-import DashboardNavbar from '../../components/navbar/DashboardNavbar';
+import DashboardNavbar from '@/components/navbar/DashboardNavbar';
+import LearnerOverview from '@/components/learner/dashboard/LearnerOverview';
+import { DashboardSkeleton } from '@/components/learner/dashboard/DashboardSkeleton';
 import {
-  LearnerOverview,
   ExperimentsView,
   BackendCompareView,
   SimulationHistoryView,
@@ -96,12 +97,7 @@ function LearnerDashboardInner() {
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
               {isOverview ? (
                 loading ? (
-                  <div className="flex items-center justify-center h-64">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] border-t-transparent animate-spin" />
-                      <span className="text-sm text-[var(--color-muted)]">Loading your dashboard...</span>
-                    </div>
-                  </div>
+                  <DashboardSkeleton />
                 ) : (
                   <LearnerOverview user={user} hubData={hubData} />
                 )
@@ -119,8 +115,14 @@ function LearnerDashboardInner() {
 export default function LearnerDashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] border-t-transparent animate-spin" />
+      <div className="min-h-screen bg-[var(--color-background)] flex">
+        <LearnerSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <DashboardNavbar />
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+            <DashboardSkeleton />
+          </main>
+        </div>
       </div>
     }>
       <LearnerDashboardInner />

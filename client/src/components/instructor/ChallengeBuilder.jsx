@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import {
   LuZap, LuPlus, LuTrash2, LuCheck, LuX, LuSave, LuEye,
   LuSettings, LuCode, LuCpu, LuTriangleAlert, LuArrowRight,
-  LuPlay, LuTarget, LuLightbulb, LuToggleLeft, LuToggleRight, LuArrowLeft,
+  LuPlay, LuTarget, LuLightbulb, LuFlaskConical, LuPencil, LuTerminal, LuArrowLeft,
+  LuToggleRight
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { BuilderSkeleton } from './InstructorSkeletons';
 
 const DIFFICULTY_STYLES = {
   Beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -89,7 +91,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
     return (
       <div className="space-y-6 animate-fadeIn">
         {onBack && (
-          <button onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-violet-400 transition-colors cursor-pointer group">
+          <button onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer group">
             <LuArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
             Back to Course Builder
           </button>
@@ -159,7 +161,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
       {onBack && (
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-violet-400 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer group"
         >
           <LuArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Course Builder
@@ -167,9 +169,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
       )}
       
       {loading ? (
-        <div className="flex justify-center p-12">
-          <div className="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-        </div>
+        <BuilderSkeleton />
       ) : (
         <>
           {/* Header */}
@@ -177,14 +177,14 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
         <div className="space-y-1">
           <div className="flex items-center gap-2"><LuZap size={15} className="text-pink-400" /><span className="text-xs text-[var(--color-muted)] font-mono">Assignment Builder</span></div>
           <input type="text" value={form.title} onChange={e => update('title', e.target.value)}
-            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-violet-500 transition-colors w-full" />
+            className="text-xl font-bold bg-transparent text-[var(--color-text)] focus:outline-none border-b border-transparent focus:border-[var(--color-primary)] transition-colors w-full" />
         </div>
         <div className="flex items-center gap-2 flex-wrap shrink-0">
           <button onClick={() => setPreviewMode(true)} className="px-4 py-2 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-muted)] hover:text-[var(--color-text)] cursor-pointer flex items-center gap-1.5"><LuEye size={13} /> Preview</button>
           <button onClick={handleSave} className={`px-4 py-2 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 transition-all ${saved ? 'bg-emerald-600 text-white' : 'border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}>
             {saved ? <><LuCheck size={13} /> Saved</> : <><LuSave size={13} /> Save</>}
           </button>
-          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 cursor-pointer">
+          <select value={status} onChange={e => setStatus(e.target.value)} className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 cursor-pointer">
             <option>Draft</option><option>Review</option><option>Published</option>
           </select>
         </div>
@@ -197,19 +197,19 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Difficulty</label>
               <select value={form.difficulty} onChange={e => update('difficulty', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                 <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
               </select>
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">XP Reward</label>
               <input type="number" value={form.xp} onChange={e => update('xp', Number(e.target.value))}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Eval Type</label>
               <select value={form.evalType} onChange={e => update('evalType', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
                 <option value="statevector">Statevector</option>
                 <option value="unitary">Unitary Matrix</option>
                 <option value="output">Measurement Output</option>
@@ -222,27 +222,27 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           <Section label="Problem Statement" required>
             <textarea rows={4} value={form.problemStatement} onChange={e => update('problemStatement', e.target.value)}
               placeholder="Describe the assignment clearly..."
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none" />
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] resize-none" />
           </Section>
 
           {/* Circuit Requirements */}
           <Section label="Circuit Requirements">
             <input type="text" value={form.circuitRequirements} onChange={e => update('circuitRequirements', e.target.value)}
               placeholder="e.g. Must use exactly 2 qubits. Circuit depth ≤ 3."
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
           </Section>
 
           {/* Starter Code */}
           <Section label="Starter Code">
             <textarea rows={6} value={form.starterCode} onChange={e => update('starterCode', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none font-mono" />
+              className="w-full px-4 py-3 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none font-mono" />
           </Section>
 
           {/* Expected Output */}
           <Section label="Expected Output">
             <input type="text" value={form.expectedOutput} onChange={e => update('expectedOutput', e.target.value)}
               placeholder='{"00": ~512, "11": ~512}'
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 font-mono placeholder:text-[var(--color-muted)]" />
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 font-mono placeholder:text-[var(--color-muted)]" />
           </Section>
 
           {/* Test Cases */}
@@ -255,9 +255,9 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
                     <button onClick={() => removeTC(i)} className="text-rose-400 hover:text-rose-300 cursor-pointer p-1"><LuX size={12} /></button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input type="text" value={tc.description} onChange={e => updateTC(i, 'description', e.target.value)} placeholder="Description" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
-                    <input type="text" value={tc.input} onChange={e => updateTC(i, 'input', e.target.value)} placeholder="Input" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
-                    <input type="text" value={tc.expected} onChange={e => updateTC(i, 'expected', e.target.value)} placeholder="Expected Output" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
+                    <input type="text" value={tc.description} onChange={e => updateTC(i, 'description', e.target.value)} placeholder="Description" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
+                    <input type="text" value={tc.input} onChange={e => updateTC(i, 'input', e.target.value)} placeholder="Input" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
+                    <input type="text" value={tc.expected} onChange={e => updateTC(i, 'expected', e.target.value)} placeholder="Expected Output" className="px-3 py-2 rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
                   </div>
                 </div>
               ))}
@@ -272,7 +272,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
                 <div key={i} className="flex gap-2">
                   <span className="text-[10px] font-mono text-amber-400 px-2 py-2 bg-amber-500/10 rounded-lg shrink-0">#{i + 1}</span>
                   <input type="text" value={hint} onChange={e => updateHint(i, e.target.value)} placeholder={`Hint ${i + 1}...`}
-                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]" />
+                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]" />
                   <button onClick={() => removeHint(i)} className="text-rose-400 hover:text-rose-300 cursor-pointer p-1"><LuX size={12} /></button>
                 </div>
               ))}
@@ -283,7 +283,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           {/* Solution */}
           <Section label="Model Solution (Instructor Only)">
             <textarea rows={8} value={form.solution} onChange={e => update('solution', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none font-mono" />
+              className="w-full px-4 py-3 rounded-xl bg-[#0d1117] border border-[var(--color-border)] text-xs text-cyan-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-none font-mono" />
           </Section>
         </div>
 
@@ -292,7 +292,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
           <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-4">
             <h4 className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider flex items-center gap-2"><LuSettings size={13} className="text-pink-400" /> Auto-Evaluation</h4>
             <label className="flex items-center gap-3 cursor-pointer" onClick={() => update('autoEval', !form.autoEval)}>
-              {form.autoEval ? <LuToggleRight size={22} className="text-violet-400" /> : <LuToggleLeft size={22} className="text-[var(--color-muted)]" />}
+              {form.autoEval ? <LuToggleRight size={22} className="text-[var(--color-primary)]" /> : <LuToggleLeft size={22} className="text-[var(--color-muted)]" />}
               <span className="text-xs text-[var(--color-text)]">Auto-evaluate submissions</span>
             </label>
             {form.autoEval && (
@@ -301,7 +301,7 @@ export default function ChallengeBuilder({ courseId, moduleId, challengeId, onBa
                   <label className="text-[10px] font-mono text-[var(--color-muted)] uppercase">Fidelity Threshold (%)</label>
                   <input type="number" min={0} max={100} step={0.01} value={Math.round(form.fidelityThreshold * 100)}
                     onChange={e => update('fidelityThreshold', Number(e.target.value) / 100)}
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
                 </div>
               </div>
             )}

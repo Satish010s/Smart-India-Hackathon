@@ -21,6 +21,7 @@ import {
   ContentManagement,
   InstructorSettings,
   CoursePreview,
+  InstructorTabSkeleton,
 } from '../../components/instructor';
 import {
   LuChevronRight,
@@ -82,6 +83,7 @@ function InstructorPortalContent() {
   const urlGradingFocus = searchParams.get('grading') === '1';
 
   const [portalData, setPortalData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -95,6 +97,8 @@ function InstructorPortalContent() {
         if (res?.success) setPortalData(res.data);
       } catch (err) {
         console.warn('Could not fetch instructor data:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchPortalData();
@@ -186,7 +190,9 @@ function InstructorPortalContent() {
           <Breadcrumb activeTab={activeTab} />
 
           {/* Tab Content */}
-          {isValidTab ? (
+          {isLoading ? (
+            <InstructorTabSkeleton activeTab={activeTab} />
+          ) : isValidTab ? (
             <div className="animate-fadeIn">
               {activeTab === 'overview' && (
                 <InstructorOverview
@@ -299,7 +305,7 @@ function InstructorPortalContent() {
                 <h3 className="text-lg font-bold">Tab &ldquo;{rawTab}&rdquo; Not Found</h3>
               </div>
               <p className="text-xs text-[var(--color-muted)]">The requested tab doesn&apos;t exist.</p>
-              <Link href="/instructor" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white text-xs font-semibold hover:bg-violet-500 transition-colors">
+              <Link href="/instructor" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-semibold hover:bg-[var(--color-primary)] transition-colors">
                 <LuArrowLeft size={14} /> Return to Dashboard
               </Link>
             </div>

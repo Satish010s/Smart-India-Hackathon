@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   LuHistory, LuSearch, LuFilter, LuDownload, LuRefreshCcw,
-  LuEye, LuX, LuFileText, LuClock, LuShieldAlert,
+  LuUserMinus, LuShieldAlert, LuDatabase, LuArrowUpRight,
+  LuEye, LuX, LuFileText, LuClock,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { TableBodySkeleton } from './AdminSkeletons';
 
 const ACTION_TYPES = [
   'ALL',
@@ -90,10 +92,10 @@ export default function AdminAuditLogs() {
   };
 
   const getActionColor = (action = '') => {
-    if (action.includes('DELETE') || action.includes('SUSPEND')) return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-    if (action.includes('ACTIVATE') || action.includes('PUBLISH') || action.includes('INVITE')) return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-    if (action.includes('AI') || action.includes('BACKEND')) return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
-    return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
+    if (action.includes('DELETE') || action.includes('SUSPEND')) return 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30';
+    if (action.includes('ACTIVATE') || action.includes('PUBLISH') || action.includes('INVITE')) return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30';
+    if (action.includes('AI') || action.includes('BACKEND')) return 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30';
+    return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
   };
 
   return (
@@ -102,7 +104,7 @@ export default function AdminAuditLogs() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuHistory className="text-rose-500" />
+            <LuHistory className="text-rose-700 dark:text-rose-500" />
             Security &amp; Administrative Audit Logs
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -177,10 +179,9 @@ export default function AdminAuditLogs() {
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]/50">
               {loading ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-[var(--color-muted)]">
-                    <LuRefreshCcw className="animate-spin inline-block mr-2" size={16} />
-                    Loading audit trail...
+                <tr className="w-full">
+                  <td colSpan={6} className="p-0 w-full">
+                    <TableBodySkeleton rows={6} />
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
@@ -235,7 +236,7 @@ export default function AdminAuditLogs() {
           <div className="w-full max-w-lg rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
               <h3 className="text-sm font-bold text-[var(--color-text)] flex items-center gap-2">
-                <LuFileText size={16} className="text-rose-400" />
+                <LuFileText size={16} className="text-rose-700 dark:text-rose-400" />
                 Audit Record Details
               </h3>
               <button

@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import {
   LuDatabase, LuSearch, LuFilter, LuCheck, LuX, LuTrash2, LuArchive,
   LuRefreshCcw, LuBookOpen, LuCpu, LuFlaskConical, LuPencil, LuUserCheck,
-  LuCircleCheckBig, LuCircleAlert, LuClock, LuTriangleAlert,
+  LuCircleCheckBig, LuCircleAlert, LuClock, LuTriangleAlert, LuEye, LuHistory, LuAlertOctagon,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { TableBodySkeleton } from './AdminSkeletons';
 
 const CONTENT_TYPES = ['ALL', 'COURSE', 'MODULE', 'LESSON', 'CHALLENGE', 'EXPERIMENT'];
 const STATUSES = ['ALL', 'PUBLISHED', 'IN_REVIEW', 'DRAFT', 'ARCHIVED'];
@@ -113,7 +114,7 @@ export default function AdminContentGovernance() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuDatabase className="text-rose-500" />
+            <LuDatabase className="text-rose-700 dark:text-rose-500" />
             Global Content Governance
           </h2>
           <p className="text-xs text-[var(--color-muted)]">
@@ -138,15 +139,15 @@ export default function AdminContentGovernance() {
           <div className="text-[11px] text-[var(--color-muted)] font-medium">Total Items</div>
         </div>
         <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] text-center">
-          <div className="text-xl font-extrabold text-emerald-400">{stats.published}</div>
+          <div className="text-xl font-extrabold text-emerald-700 dark:text-emerald-400">{stats.published}</div>
           <div className="text-[11px] text-[var(--color-muted)] font-medium">Published</div>
         </div>
         <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-amber-500/30 text-center">
-          <div className="text-xl font-extrabold text-amber-400">{stats.inReview}</div>
-          <div className="text-[11px] text-amber-400/80 font-medium">In Review</div>
+          <div className="text-xl font-extrabold text-amber-700 dark:text-amber-400">{stats.inReview}</div>
+          <div className="text-[11px] text-amber-700 dark:text-amber-400/80 font-medium">In Review</div>
         </div>
         <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] text-center">
-          <div className="text-xl font-extrabold text-indigo-400">{stats.draft}</div>
+          <div className="text-xl font-extrabold text-blue-400">{stats.draft}</div>
           <div className="text-[11px] text-[var(--color-muted)] font-medium">Drafts</div>
         </div>
         <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] text-center">
@@ -212,10 +213,9 @@ export default function AdminContentGovernance() {
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]/50">
               {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-[var(--color-muted)]">
-                    <LuRefreshCcw className="animate-spin inline-block mr-2" size={16} />
-                    Loading content catalog...
+                <tr className="w-full">
+                  <td colSpan={6} className="p-0 w-full">
+                    <TableBodySkeleton rows={5} />
                   </td>
                 </tr>
               ) : items.length === 0 ? (
@@ -243,7 +243,7 @@ export default function AdminContentGovernance() {
                         <span>{item.author}</span>
                         <button
                           onClick={() => { setReassignItem(item); setNewInstructor(item.author); }}
-                          className="text-[var(--color-muted)] hover:text-rose-400"
+                          className="text-[var(--color-muted)] hover:text-rose-700 dark:text-rose-400"
                           title="Reassign instructor"
                         >
                           <LuPencil size={11} />
@@ -255,12 +255,12 @@ export default function AdminContentGovernance() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] border ${
                           item.status === 'PUBLISHED'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                             : item.status === 'IN_REVIEW'
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 animate-pulse'
+                            ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 animate-pulse'
                             : item.status === 'ARCHIVED'
                             ? 'bg-slate-500/10 text-slate-400 border-slate-500/30'
-                            : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
+                            : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                         }`}
                       >
                         {item.status}
@@ -278,14 +278,14 @@ export default function AdminContentGovernance() {
                           <>
                             <button
                               onClick={() => handleUpdateStatus(item.id, 'PUBLISHED')}
-                              className="px-2.5 py-1 rounded-lg text-emerald-400 hover:bg-emerald-500/10 font-semibold text-[11px] flex items-center gap-1 transition-colors"
+                              className="px-2.5 py-1 rounded-lg text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                               title="Approve & Publish"
                             >
                               <LuCheck size={12} /> Approve
                             </button>
                             <button
                               onClick={() => { setRejectModalItem(item); setRejectReason(''); }}
-                              className="px-2.5 py-1 rounded-lg text-rose-400 hover:bg-rose-500/10 font-semibold text-[11px] flex items-center gap-1 transition-colors"
+                              className="px-2.5 py-1 rounded-lg text-rose-700 dark:text-rose-400 hover:bg-rose-500/10 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                               title="Reject with Feedback"
                             >
                               <LuX size={12} /> Reject
@@ -296,7 +296,7 @@ export default function AdminContentGovernance() {
                         {item.status === 'PUBLISHED' && (
                           <button
                             onClick={() => handleUpdateStatus(item.id, 'ARCHIVED')}
-                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
                             title="Unpublish / Archive"
                           >
                             <LuArchive size={13} />
@@ -306,7 +306,7 @@ export default function AdminContentGovernance() {
                         {item.status === 'ARCHIVED' && (
                           <button
                             onClick={() => handleUpdateStatus(item.id, 'PUBLISHED')}
-                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
                             title="Republish"
                           >
                             <LuCheck size={13} />
@@ -316,7 +316,7 @@ export default function AdminContentGovernance() {
                         {item.status === 'DRAFT' && (
                           <button
                             onClick={() => handleUpdateStatus(item.id, 'PUBLISHED')}
-                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
                             title="Direct Publish"
                           >
                             <LuCheck size={13} />
@@ -325,7 +325,7 @@ export default function AdminContentGovernance() {
 
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-rose-700 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
                           title="Delete permanently"
                         >
                           <LuTrash2 size={13} />
@@ -344,7 +344,7 @@ export default function AdminContentGovernance() {
       {rejectModalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-6 space-y-4">
-            <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2 text-rose-400">
+            <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2 text-rose-700 dark:text-rose-400">
               <LuTriangleAlert size={18} />
               Reject &amp; Request Revision
             </h3>
@@ -382,7 +382,7 @@ export default function AdminContentGovernance() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-6 space-y-4">
             <h3 className="text-base font-bold text-[var(--color-text)] flex items-center gap-2">
-              <LuUserCheck size={18} className="text-emerald-400" />
+              <LuUserCheck size={18} className="text-emerald-700 dark:text-emerald-400" />
               Reassign Content Author
             </h3>
             <p className="text-xs text-[var(--color-muted)]">

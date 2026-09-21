@@ -8,6 +8,7 @@ import {
   LuGlobe, LuFlaskConical, LuGraduationCap,
 } from 'react-icons/lu';
 import { apiFetch } from '../../services/api';
+import { ListSkeleton } from './InstructorSkeletons';
 
 const DIFFICULTY_COLORS = {
   Beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -19,7 +20,7 @@ const STATUS_COLORS = {
   Published: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   Draft: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
   Review: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  Archived: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  Archived: 'bg-[var(--color-primary)] text-[var(--color-primary)] border-[var(--color-primary)]/30',
 };
 
 const CATEGORIES = ['All', 'Foundations', 'Algorithms', 'QML', 'Cryptography', 'Error Correction', 'Quantum Chemistry'];
@@ -41,7 +42,7 @@ function CourseCard({ course, onAction, onOpenPreview }) {
   return (
     <div 
       onClick={() => onOpenPreview && onOpenPreview(course)}
-      className="group p-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] hover:border-violet-500/30 transition-all duration-200 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
+      className="group p-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/30 transition-all duration-200 hover:shadow-lg hover:shadow-sm cursor-pointer"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0 space-y-3">
@@ -59,7 +60,7 @@ function CourseCard({ course, onAction, onOpenPreview }) {
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-sm text-[var(--color-text)] leading-snug group-hover:text-violet-300 transition-colors">
+          <h3 className="font-bold text-sm text-[var(--color-text)] leading-snug group-hover:text-[var(--color-primary)] transition-colors">
             {course.title}
           </h3>
 
@@ -68,7 +69,7 @@ function CourseCard({ course, onAction, onOpenPreview }) {
 
           {/* Stats row */}
           <div className="flex items-center flex-wrap gap-4 text-[11px] font-mono text-[var(--color-muted)]">
-            <span className="flex items-center gap-1"><LuUsers size={12} className="text-violet-400" />{course.enrolledStudents} enrolled</span>
+            <span className="flex items-center gap-1"><LuUsers size={12} className="text-[var(--color-primary)]" />{course.enrolledStudents} enrolled</span>
             <span className="flex items-center gap-1"><LuClock size={12} className="text-cyan-400" />{course.duration}</span>
             <span className="flex items-center gap-1"><LuBookOpen size={12} className="text-amber-400" />{course.publishedLessons}/{course.totalLessons} lessons</span>
             {course.rating && <span className="flex items-center gap-1"><LuStar size={12} className="text-amber-400" />{course.rating}</span>}
@@ -79,10 +80,10 @@ function CourseCard({ course, onAction, onOpenPreview }) {
             <div className="space-y-1">
               <div className="flex justify-between text-[10px] text-[var(--color-muted)] font-mono">
                 <span>Avg. completion</span>
-                <span className="text-violet-400 font-bold">{course.completionRate}%</span>
+                <span className="text-[var(--color-primary)] font-bold">{course.completionRate}%</span>
               </div>
               <div className="h-1.5 rounded-full bg-[var(--color-surface)]">
-                <div className="h-1.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all duration-500" style={{ width: `${course.completionRate}%` }} />
+                <div className="h-1.5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-cyan-500 transition-all duration-500" style={{ width: `${course.completionRate}%` }} />
               </div>
             </div>
           )}
@@ -92,7 +93,7 @@ function CourseCard({ course, onAction, onOpenPreview }) {
         <div className="flex flex-col items-end gap-2">
           <button
             onClick={(e) => { e.stopPropagation(); onAction('builder', course); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[10px] font-bold shadow-md shadow-violet-500/20 hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-primary)] text-white text-[10px] font-bold shadow-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
           >
             <LuFlaskConical size={11} /> Build →
           </button>
@@ -176,7 +177,7 @@ function CreateCourseModal({ onClose, onCreated }) {
         <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-[var(--color-border)] bg-[var(--color-surface)] rounded-t-3xl">
           <div>
             <h2 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
-              <LuBookOpen size={18} className="text-violet-400" /> Create New Course
+              <LuBookOpen size={18} className="text-[var(--color-primary)]" /> Create New Course
             </h2>
             <p className="text-xs text-[var(--color-muted)] mt-0.5">Fill in the course details to get started.</p>
           </div>
@@ -190,7 +191,7 @@ function CreateCourseModal({ onClose, onCreated }) {
             <input
               type="text" placeholder="e.g. Quantum Error Correction & Surface Codes"
               value={form.title} onChange={e => updateField('title', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
             />
           </div>
 
@@ -200,7 +201,7 @@ function CreateCourseModal({ onClose, onCreated }) {
             <textarea
               rows={3} placeholder="Describe what students will learn..."
               value={form.description} onChange={e => updateField('description', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)] resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-sm text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)] resize-none"
             />
           </div>
 
@@ -214,7 +215,7 @@ function CreateCourseModal({ onClose, onCreated }) {
                 <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">{label}</label>
                 <select
                   value={form[field]} onChange={e => updateField(field, e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
                 >
                   {options.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
@@ -225,7 +226,7 @@ function CreateCourseModal({ onClose, onCreated }) {
               <input
                 type="text" placeholder="e.g. 12 hrs"
                 value={form.duration} onChange={e => updateField('duration', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
               />
             </div>
           </div>
@@ -238,14 +239,14 @@ function CreateCourseModal({ onClose, onCreated }) {
                 <input
                   type="text" placeholder={`Objective ${i + 1}`}
                   value={obj} onChange={e => updateList('objectives', i, e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
                 />
                 {form.objectives.length > 1 && (
                   <button onClick={() => removeListItem('objectives', i)} className="p-2 text-rose-400 hover:text-rose-300 cursor-pointer"><LuX size={14} /></button>
                 )}
               </div>
             ))}
-            <button onClick={() => addListItem('objectives')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer">
+            <button onClick={() => addListItem('objectives')} className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary)] flex items-center gap-1 cursor-pointer">
               <LuPlus size={13} /> Add objective
             </button>
           </div>
@@ -258,14 +259,14 @@ function CreateCourseModal({ onClose, onCreated }) {
                 <input
                   type="text" placeholder={`Prerequisite ${i + 1}`}
                   value={pre} onChange={e => updateList('prerequisites', i, e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
                 />
                 {form.prerequisites.length > 1 && (
                   <button onClick={() => removeListItem('prerequisites', i)} className="p-2 text-rose-400 hover:text-rose-300 cursor-pointer"><LuX size={14} /></button>
                 )}
               </div>
             ))}
-            <button onClick={() => addListItem('prerequisites')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer">
+            <button onClick={() => addListItem('prerequisites')} className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary)] flex items-center gap-1 cursor-pointer">
               <LuPlus size={13} /> Add prerequisite
             </button>
           </div>
@@ -277,7 +278,7 @@ function CreateCourseModal({ onClose, onCreated }) {
           </button>
           <button
             onClick={handleSubmit} disabled={saving || !form.title.trim()}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/25 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-xs font-bold shadow-lg shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
           >
             {saving ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <LuCheck size={14} />}
             {saving ? 'Creating...' : 'Create Course'}
@@ -363,13 +364,13 @@ export default function CourseManagement({ onOpenBuilder, onOpenPreview, onTabCh
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-[var(--color-text)] flex items-center gap-2">
-            <LuBookOpen size={20} className="text-violet-400" /> Course Management
+            <LuBookOpen size={20} className="text-[var(--color-primary)]" /> Course Management
           </h2>
           <p className="text-xs text-[var(--color-muted)] mt-1">{courses.length} courses · {courses.filter(c => c.status === 'Published').length} published</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-500/20 hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-xs font-bold shadow-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
         >
           <LuPlus size={15} /> New Course
         </button>
@@ -382,7 +383,7 @@ export default function CourseManagement({ onOpenBuilder, onOpenPreview, onTabCh
           <input
             type="text" placeholder="Search courses..."
             value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50 placeholder:text-[var(--color-muted)]"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-[var(--color-muted)]"
           />
         </div>
         {[
@@ -392,7 +393,7 @@ export default function CourseManagement({ onOpenBuilder, onOpenPreview, onTabCh
         ].map(({ label, value, options, set }) => (
           <select
             key={label} value={value} onChange={e => set(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+            className="px-3 py-2.5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
           >
             {options.map(o => <option key={o} value={o}>{label}: {o}</option>)}
           </select>
@@ -402,7 +403,7 @@ export default function CourseManagement({ onOpenBuilder, onOpenPreview, onTabCh
       {/* Stats bar */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Courses', value: courses.length, color: 'text-violet-400' },
+          { label: 'Total Courses', value: courses.length, color: 'text-[var(--color-primary)]' },
           { label: 'Published', value: courses.filter(c => c.status === 'Published').length, color: 'text-emerald-400' },
           { label: 'Draft', value: courses.filter(c => c.status === 'Draft').length, color: 'text-amber-400' },
           { label: 'Total Students', value: courses.reduce((a, c) => a + c.enrolledStudents, 0), color: 'text-cyan-400' },
@@ -414,17 +415,14 @@ export default function CourseManagement({ onOpenBuilder, onOpenPreview, onTabCh
         ))}
       </div>
 
-      {/* Course Cards Grid */}
+      {/* Main Content Area */}
       {loading ? (
-        <div className="py-16 text-center space-y-3">
-          <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-[var(--color-muted)]">Loading courses...</p>
-        </div>
+        <ListSkeleton />
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center space-y-3">
           <LuBookOpen size={32} className="mx-auto text-[var(--color-muted)]" />
           <p className="text-sm text-[var(--color-muted)]">No courses match your filters</p>
-          <button onClick={() => { setSearch(''); setFilterCategory('All'); setFilterDifficulty('All'); setFilterStatus('All'); }} className="text-xs text-violet-400 hover:text-violet-300 cursor-pointer">Clear filters</button>
+          <button onClick={() => { setSearch(''); setFilterCategory('All'); setFilterDifficulty('All'); setFilterStatus('All'); }} className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary)] cursor-pointer">Clear filters</button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">

@@ -19,6 +19,7 @@ import {
   AdminAuditLogs,
   AdminPlatformSettings,
   InstructorProvisionModal,
+  AdminTabSkeleton,
 } from '../../components/admin';
 import {
   LuShieldAlert,
@@ -61,8 +62,16 @@ function AdminPageContent() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isProvisionModalOpen, setIsProvisionModalOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // When activeTab changes, handle the transition state
+  React.useEffect(() => {
+    setIsTransitioning(false);
+  }, [activeTab]);
 
   const handleTabChange = (tabId) => {
+    if (tabId === activeTab || tabId === rawTab) return;
+    setIsTransitioning(true);
     if (tabId === 'overview') {
       router.push('/admin');
     } else {
@@ -96,51 +105,38 @@ function AdminPageContent() {
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
 
           {/* Active Tab Views */}
-          {activeTab === 'overview' && (
+          {isTransitioning ? (
+            <AdminTabSkeleton activeTab={activeTab} />
+          ) : activeTab === 'overview' ? (
             <AdminDashboardOverview
               user={user}
               onNavigateTab={handleTabChange}
             />
-          )}
-
-          {activeTab === 'users' && (
+          ) : activeTab === 'users' ? (
             <AdminUserManager
               currentUserId={user?.id}
               onOpenProvisionModal={() => setIsProvisionModalOpen(true)}
             />
-          )}
-
-          {activeTab === 'roles' && (
+          ) : activeTab === 'roles' ? (
             <AdminRolesPermissions />
-          )}
-
-          {activeTab === 'content' && (
+          ) : activeTab === 'content' ? (
             <AdminContentGovernance />
-          )}
-
-          {activeTab === 'ai' && (
-            <AdminAiManagement />
-          )}
-
-          {activeTab === 'backends' && (
-            <AdminQuantumBackends />
-          )}
-
-          {activeTab === 'analytics' && (
+          ) : activeTab === 'analytics' ? (
             <AdminPlatformAnalytics />
-          )}
-
-          {activeTab === 'health' && (
+          ) : activeTab === 'ai' ? (
+            <AdminAiManagement />
+          ) : activeTab === 'backends' ? (
+            <AdminQuantumBackends />
+          ) : activeTab === 'health' ? (
             <AdminSystemHealth />
-          )}
-
-          {activeTab === 'audit' && (
+          ) : activeTab === 'audit' ? (
             <AdminAuditLogs />
+          ) : activeTab === 'settings' ? (
+            <AdminPlatformSettings />
+          ) : (
+            <AdminDashboardOverview user={user} onNavigateTab={handleTabChange} />
           )}
 
-          {activeTab === 'settings' && (
-            <AdminPlatformSettings />
-          )}
         </main>
       </div>
 

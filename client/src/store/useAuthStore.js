@@ -45,7 +45,13 @@ export const useAuthStore = create((set, get) => ({
   /**
    * Verify session on app mount by querying /api/auth/me (deduplicated)
    */
-  checkAuth: async () => {
+  checkAuth: async (force = false) => {
+    // Skip if already authenticated and not forcing a refresh
+    if (!force && get().isAuthenticated && get().user) {
+      set({ isCheckingAuth: false });
+      return get().user;
+    }
+
     if (checkAuthPromise) {
       return checkAuthPromise;
     }

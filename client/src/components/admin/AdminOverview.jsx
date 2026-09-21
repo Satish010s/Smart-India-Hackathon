@@ -32,7 +32,7 @@ export default function AdminOverview({ user, userCount = 0 }) {
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
           <div className="flex justify-between items-center text-[var(--color-muted)]">
             <span className="text-xs font-semibold uppercase tracking-wider">Password Standard</span>
-            <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full">Enforced</span>
+            <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 rounded-full">Enforced</span>
           </div>
           <div className="text-2xl font-bold font-mono text-[var(--color-primary)]">
             Argon2id
@@ -43,9 +43,9 @@ export default function AdminOverview({ user, userCount = 0 }) {
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
           <div className="flex justify-between items-center text-[var(--color-muted)]">
             <span className="text-xs font-semibold uppercase tracking-wider">Session Policy</span>
-            <span className="text-xs font-semibold px-2 py-0.5 bg-cyan-500/10 text-cyan-500 rounded-full">Rotated</span>
+            <span className="text-xs font-semibold px-2 py-0.5 bg-cyan-500/10 text-cyan-700 dark:text-cyan-500 rounded-full">Rotated</span>
           </div>
-          <div className="text-2xl font-bold font-mono text-cyan-500">
+          <div className="text-2xl font-bold font-mono text-cyan-700 dark:text-cyan-500">
             HttpOnly Cookies
           </div>
           <p className="text-xs text-[var(--color-muted)] font-mono">SameSite=Lax &bull; Family reuse detection</p>
@@ -54,9 +54,9 @@ export default function AdminOverview({ user, userCount = 0 }) {
         <div className="p-6 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
           <div className="flex justify-between items-center text-[var(--color-muted)]">
             <span className="text-xs font-semibold uppercase tracking-wider">Email Verification</span>
-            <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-500/10 text-indigo-400 rounded-full">Resend</span>
+            <span className="text-xs font-semibold px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded-full">Resend</span>
           </div>
-          <div className="text-2xl font-bold font-mono text-indigo-400">
+          <div className="text-2xl font-bold font-mono text-blue-400">
             6-Digit OTP
           </div>
           <p className="text-xs text-[var(--color-muted)] font-mono">SHA-256 Hashed &bull; 60s cooldown limit</p>
