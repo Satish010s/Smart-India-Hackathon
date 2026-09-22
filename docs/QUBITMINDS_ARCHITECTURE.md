@@ -18,76 +18,78 @@ QubitMinds is built upon five fundamental design tenets:
 ## 2. The 6-Layer QubitMinds Architecture Stack
 
 ```mermaid
-flowchart TB
-    subgraph L1 ["Layer 1: Cognitive Interaction & Presentation Layer (client/ - Next.js 14 @ :3000)"]
-        Canvas["Interactive Quantum Canvas\n(Drag & Drop Gates, Transpiler, Bloch Sphere)"]
-        Studio["Quantum Agent Studio\n(Multi-Agent Chat, Code Terminal, Plot Viewer)"]
-        LMS_UI["LMS & Assessment Center\n(Curriculum, Quizzes, Coding Challenges)"]
-        Portals["Role-Based Portals\n(Learner Dashboard · Instructor Studio · Admin Console)"]
-        GamifyUI["Gamification Hub\n(XP, Levels, Daily Goals, Streak Tracking, Badges)"]
-        ClientAuth["Auth State & Interceptor\n(Zustand Store, Silent Refresh on 401)"]
+flowchart TD
+    %% Styling Classes
+    classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef gateway fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
+    classDef ai fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef agentic fill:#4a044e,stroke:#f472b6,stroke-width:2px,color:#f8fafc;
+    classDef sandbox fill:#451a03,stroke:#fb923c,stroke-width:2px,color:#f8fafc;
+    classDef data fill:#1e293b,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 4 4,color:#f8fafc;
+
+    %% 1. PRESENTATION TIER
+    subgraph L1 ["Layer 1: Cognitive Interaction & UI (client/ — Next.js 14 @ Port 3000)"]
+        direction LR
+        UI_CANVAS["Interactive Quantum Canvas\n(Drag & Drop Gates · Transpiler)"]:::client
+        UI_STUDIO["Quantum Agent Studio\n(Multi-Agent Chat · Plot Viewer)"]:::client
+        UI_LMS["LMS & Portals\n(Learner · Instructor · Admin)"]:::client
+        UI_GAMIFY["Gamification Engine\n(XP · Badges · Daily Streaks)"]:::client
     end
 
-    subgraph L2 ["Layer 2: Identity, Gateway & LMS Orchestration Layer (server/ - Express @ :5001)"]
-        Gateway["Express Gateway & Rate Limiter"]
-        AuthModule["Auth & Cryptographic Core\n(Argon2id, Dual-Token Rotation, Family Tracking)"]
-        RBAC["3-Tier RBAC Guard\n(LEARNER, INSTRUCTOR, ADMIN)"]
-        LMSModule["LMS & Curriculum Manager\n(Courses, Modules, Lessons, Enrollments, Submissions)"]
-        ExpModule["Experiment & Simulation Hub\n(Circuit persistence, Metrics, Benchmarks)"]
-        PrismaORM["Prisma Client ORM (6.4.1)"]
+    %% 2. GATEWAY TIER
+    subgraph L2 ["Layer 2: Identity & LMS Orchestration (server/ — Express.js + Prisma @ Port 5001)"]
+        direction LR
+        AUTH_CORE["Auth & Cryptography\n(Argon2id · JWT Family Rotation)"]:::gateway
+        RBAC_CORE["3-Tier RBAC Guard\n(LEARNER · INSTRUCTOR · ADMIN)"]:::gateway
+        LMS_ENGINE["LMS & Curriculum Hub\n(Courses · Quizzes · Challenges)"]:::gateway
+        EXP_ENGINE["Experiment Hub\n(Circuit Metrics & Persistence)"]:::gateway
     end
 
-    subgraph L3 ["Layer 3: Cognitive AI & Storyboard Service (ai-engine/ - FastAPI @ :8000)"]
-        AIFastAPI["FastAPI App Core"]
-        TutorService["Conversational Quantum Tutor\n(Grounding Contexts: General, Playground, Debug)"]
-        StoryboardGen["Video Storyboard Generator\n(Structured Scene JSON, Voiceover, Checkpoint Quizzes)"]
-        GenAISDK["Google GenAI SDK (gemini-2.5-flash)"]
-        DirectDBSync["SQLAlchemy Telemetry Engine\n(AiChatHistory, AiGeneratedVideo)"]
-    end
-
-    subgraph L4 ["Layer 4: Autonomous Agentic Orchestration Layer (agentic-engine/ - FastAPI @ :8001)"]
-        HardGuardrail["Zero-LLM Hard Guardrail\n(Deterministic Regex & Keyword Filtration)"]
-        LangGraphSuper["Supervisor Coordinator (LangGraph)\n(Intent Classification & State Machine)"]
-        subgraph AgentTeam ["Specialist Cognitive Agent Squad"]
-            TeacherAgent["Teaching Agent\n(RAG Textbook Retrieval + Live Tavily Search)"]
-            CodingAgent["Coding Agent\n(Qiskit / Cirq Synthesis & Self-Healing Loop)"]
-            AssessmentAgent["Assessment Agent\n(Adaptive MCQs & Misconception Diagnosis)"]
-            ResearcherAgent["Research / Paper Agent\n(PyPDF Ingestion & Algorithm Extraction)"]
+    %% 3 & 4. INTELLIGENCE TIER
+    subgraph L34 ["Layers 3 & 4: Cognitive AI & Autonomous Multi-Agent Orchestration"]
+        direction LR
+        subgraph L3 ["Layer 3: Cognitive AI (ai-engine/ @ Port 8000)"]
+            TUTOR_SVC["Conversational Quantum Tutor\n(Context Grounding)"]:::ai
+            STORY_SVC["Video Storyboard Generator\n(Narration & Quizzes)"]:::ai
+        end
+        subgraph L4 ["Layer 4: Agentic Engine (agentic-engine/ @ Port 8001)"]
+            GUARD_SVC["Zero-LLM Guardrail\n(Deterministic Filter)"]:::agentic
+            SUPER_SVC["Supervisor Router\n(LangGraph State Machine)"]:::agentic
+            SQUAD_SVC["Specialist Agents\n(Teacher · Coder · Assessor · Researcher)"]:::agentic
         end
     end
 
-    subgraph L5 ["Layer 5: Execution Sandbox & MCP Tooling Layer"]
-        PySandbox["Quantum Python Sandbox\n(Subprocess Runner, 15s Timeout, Agg Plot Interceptor)"]
-        MCPHub["Model Context Protocol (MCP) Client\n(qiskit-mcp-server, qiskit-docs-mcp-server via Stdio)"]
-        VectorDB["Quantum RAG Vector Store\n(Section Chunks, Cosine Similarity, Embeddings)"]
-        SimEngines["Simulation Engines\n(Qiskit Aer, Cirq, PennyLane, qBraid)"]
+    %% 5. TOOLING & SANDBOX TIER
+    subgraph L5 ["Layer 5: Execution Sandbox & Hardware Tooling"]
+        direction LR
+        SANDBOX_SVC["Quantum Subprocess Sandbox\n(15s Limit · Agg Matplotlib Capture)"]:::sandbox
+        MCP_SVC["Model Context Protocol (MCP)\n(Qiskit MCP Tool Servers via Stdio)"]:::sandbox
+        SIM_SVC["Quantum Simulators\n(Qiskit Aer · Cirq · PennyLane)"]:::sandbox
     end
 
-    subgraph L6 ["Layer 6: Data, Memory & External Services Layer"]
-        PostgresDB[("Neon Serverless PostgreSQL (SSL + Pooling)\n(Users, Auth Tokens, LMS, Experiments, Telemetry)")]
-        ResendMail["Resend Email API\n(OTP Verification, Password Resets)"]
-        GeminiCloud["Google Gemini Cloud API"]
-        TavilyAPI["Tavily Quantum Web Search API"]
+    %% 6. PERSISTENCE TIER
+    subgraph L6 ["Layer 6: Data, Memory & Cloud Infrastructure Layer"]
+        direction LR
+        DB_POSTGRES[("Neon Serverless PostgreSQL (SSL + Pooling)\n(Users · Tokens · LMS · Experiments · Telemetry)")]:::data
+        CLOUD_GEMINI["Google Gemini Cloud LLM\n(gemini-2.5-flash)"]:::data
+        CLOUD_RESEND["Resend Email API\n(Transactional OTP)"]:::data
     end
 
-    %% Interactions
-    L1 -- "REST / HttpOnly Cookies" --> L2
-    L1 -- "Tutor & Video Storyboard" --> L3
-    L1 -- "Multi-Agent Workflows & RAG" --> L4
+    %% CLEAN VERTICAL CONNECTORS
+    L1 ==>|"HTTPS / HttpOnly Cookie Transport"| L2
+    L1 -->|"REST API / Storyboards"| L3
+    L1 -->|"REST API / Agentic Workflows"| L4
 
-    L2 --> PrismaORM --> PostgresDB
-    L2 --> ResendMail
+    L2 ==>|"Prisma ORM (SQL Pool)"| DB_POSTGRES
+    L2 -->|"Transactional Emails"| CLOUD_RESEND
 
-    L3 --> GenAISDK --> GeminiCloud
-    L3 --> DirectDBSync --> PostgresDB
+    L3 -->|"Direct DB Telemetry Sync"| DB_POSTGRES
+    L3 -->|"Prompt Engineering"| CLOUD_GEMINI
 
-    L4 --> HardGuardrail --> LangGraphSuper --> AgentTeam
-    TeacherAgent --> VectorDB & TavilyAPI
-    CodingAgent <--> PySandbox
-    CodingAgent <--> MCPHub
-    ResearcherAgent --> VectorDB
-    AgentTeam --> GeminiCloud
-    PySandbox --> SimEngines
+    L4 -->|"Reasoning & Synthesis"| CLOUD_GEMINI
+    L4 ==>|"Subprocess Execution"| SANDBOX_SVC
+    L4 -->|"Stdio JSON-RPC"| MCP_SVC
+    SANDBOX_SVC ==>|"Simulate Quantum Circuits"| SIM_SVC
 ```
 
 ---

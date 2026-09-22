@@ -17,89 +17,77 @@ Data persistence is consolidated via **PostgreSQL (Neon DB)** with SSL connectio
 ## 2. High-Level System Architecture Diagram
 
 ```mermaid
-flowchart TB
-    subgraph ClientTier ["Presentation Layer (client/ - Next.js 14 @ :3000)"]
-        UI_Learner["Learner Portal\n(Dashboard, Canvas, Courses, Quizzes)"]
-        UI_Instructor["Instructor Studio\n(Curriculum, Challenges, Analytics)"]
-        UI_Admin["Admin Console\n(RBAC, Moderation, System Health)"]
-        UI_Agentic["Quantum Agent Studio\n(Self-Healing Coder, Visualizer, RAG)"]
-        ZustandAuth["Zustand Auth Store\n(State, Role, Profile)"]
-        FetchClient["Universal Fetch Client\n(Auto Silent Refresh, HttpOnly)"]
+flowchart TD
+    %% Styling Classes
+    classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef gateway fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
+    classDef ai fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef agentic fill:#4a044e,stroke:#f472b6,stroke-width:2px,color:#f8fafc;
+    classDef sandbox fill:#451a03,stroke:#fb923c,stroke-width:2px,color:#f8fafc;
+    classDef data fill:#1e293b,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 4 4,color:#f8fafc;
+
+    %% 1. PRESENTATION TIER
+    subgraph TIER1 ["1. Presentation Layer (client/ — Next.js 14 App Router @ Port 3000)"]
+        direction LR
+        UI_LEARNER["Learner Studio & Circuit Canvas"]:::client
+        UI_INSTRUCTOR["Instructor Authoring & Grading"]:::client
+        UI_ADMIN["Admin Governance & Audit"]:::client
+        UI_STUDIO["Quantum Agent Studio"]:::client
     end
 
-    subgraph GatewayTier ["Backend API Gateway (server/ - Express + Prisma @ :5001)"]
-        AuthMiddleware["Auth & RBAC Guards\n(Argon2id, Access JWT, Refresh Family)"]
-        AuthRouter["/api/auth\n(Login, Signup, OTP, Token Rotation)"]
-        LearnerRouter["/api/learner\n(Progress, Badges, XP, Goals)"]
-        InstructorRouter["/api/instructor\n(Course CRUD, Challenge Grading)"]
-        AdminRouter["/api/admin\n(Governance, Audit Logs, Settings)"]
-        SimRouter["/api/experiments & simulations\n(Circuit persistence, Metrics)"]
-        PrismaClient["Prisma ORM (6.4.1)"]
+    %% 2. GATEWAY TIER
+    subgraph TIER2 ["2. API Gateway & LMS Core (server/ — Express.js + Prisma @ Port 5001)"]
+        direction LR
+        AUTH_CORE["Auth & RBAC Core\n(Argon2id · JWT Token Family Rotation)"]:::gateway
+        LMS_CORE["LMS Curriculum Engine\n(Courses · Modules · Quizzes · Challenges)"]:::gateway
+        EXP_CORE["Experiment & Simulation Hub\n(Saved Circuits · Run Telemetry)"]:::gateway
     end
 
-    subgraph AIClassicTier ["Generative AI Engine (ai-engine/ - FastAPI @ :8000)"]
-        FastAPI_AI["FastAPI Server"]
-        TutorChat["Quantum Tutor Service\n(Context Grounding: General, Playground, Debug)"]
-        VideoStoryboard["Storyboard Generator\n(Slide scenes, Voice scripts, Quiz hooks)"]
-        GoogleGenAI["Google Gemini 2.5/1.5 Flash SDK"]
-        SQLAlchemyEngine["SQLAlchemy Direct DB Writer"]
-    end
-
-    subgraph AgenticTier ["Autonomous Agentic Engine (agentic-engine/ - FastAPI @ :8001)"]
-        FastAPI_Agentic["FastAPI Server"]
-        Guardrail["Input Guardrail (core/guardrails.py)\n(Zero-LLM Hard Rejection)"]
-        Supervisor["Supervisor Router (LangGraph)\n(Intent Classification & State Machine)"]
-        
-        subgraph MultiAgentCore ["Multi-Agent Specialist Team"]
-            TeachingAgent["Teaching Agent\n(Conceptual Pedagogical RAG)"]
-            CodingAgent["Coding Agent (Self-Healing Loop)\n(Qiskit / Cirq Generation & Debug <= 5 iters)"]
-            AssessorAgent["Assessment Agent\n(Adaptive MCQs & Misconception Diagnosis)"]
-            ResearchAgent["Research / Paper Agent\n(PDF Ingestion & Section-level RAG)"]
+    %% 3. INTELLIGENCE TIER
+    subgraph TIER3 ["3. AI & Multi-Agent Intelligence Services"]
+        direction LR
+        subgraph AI_BOX ["ai-engine (FastAPI @ Port 8000)"]
+            TUTOR_API["Context-Grounded Tutor\n(Playground · Debug · Theory)"]:::ai
+            STORY_API["Video Storyboard Generator\n(Scenes · Narration · Quizzes)"]:::ai
         end
-
-        Sandbox["Execution Sandbox\n(Subprocess Runner, Timeout = 15s)"]
-        Visualizer["Matplotlib Base64 Visualizer\n(Bloch Sphere, State Probabilities, Circuit)"]
-        MCPClient["Model Context Protocol (MCP) Client\n(Qiskit MCP Servers via Stdio)"]
-        VectorStore["Quantum Vector Store\n(Textbook RAG & Paper Embeddings)"]
-        TavilySearch["Tavily Live Web Search API"]
+        subgraph AGENT_BOX ["agentic-engine (LangGraph + FastAPI @ Port 8001)"]
+            GUARD_API["Input Guardrail\n(Deterministic Filter)"]:::agentic
+            SUPER_API["Supervisor Coordinator\n(Intent Classifier)"]:::agentic
+            SQUAD_API["Specialist Agent Squad\n(Teacher · Coder · Assessor · Researcher)"]:::agentic
+        end
     end
 
-    subgraph DataStorage ["Data & External Persistence Layer"]
-        Postgres["PostgreSQL (Neon Serverless DB with Pooling)\n(Users, Auth, LMS, Gamification, Circuits, Chat History)"]
-        ResendAPI["Resend Email Service\n(OTP Verification & Password Reset)"]
-        GeminiAPI["Google Gemini LLM Cloud"]
+    %% 4. EXECUTION & TOOLING TIER
+    subgraph TIER4 ["4. Execution Sandbox & Hardware Tooling"]
+        direction LR
+        SANDBOX["Quantum Subprocess Sandbox\n(15s Limit · Agg Headless Plots)"]:::sandbox
+        MCP_SERVERS["Qiskit MCP Tool Servers\n(Documentation & Circuit Tools)"]:::sandbox
+        SIMULATORS["Quantum Simulation Backends\n(Qiskit Aer · Cirq · PennyLane)"]:::sandbox
     end
 
-    %% Client Interactions
-    UI_Learner & UI_Instructor & UI_Admin --> ZustandAuth
-    ZustandAuth --> FetchClient
-    FetchClient -- "REST / Cookies (JWT)" --> GatewayTier
-    UI_Learner -- "REST / Storyboard & Tutor" --> FastAPI_AI
-    UI_Agentic -- "REST / Autonomous Multi-Agent Loop" --> FastAPI_Agentic
+    %% 5. PERSISTENCE TIER
+    subgraph TIER5 ["5. Persistence & Cloud Infrastructure Layer"]
+        direction LR
+        DB_POSTGRES[("PostgreSQL Database (Neon Serverless)\n(Users · Auth Tokens · LMS · Experiments · Chat History)")]:::data
+        CLOUD_GEMINI["Google Gemini Cloud LLM\n(gemini-2.5-flash)"]:::data
+        CLOUD_RESEND["Resend Email Service\n(Transactional OTP)"]:::data
+    end
 
-    %% Gateway to Data
-    AuthRouter & LearnerRouter & InstructorRouter & AdminRouter & SimRouter --> PrismaClient
-    PrismaClient --> Postgres
-    AuthRouter -- "Transactional Emails" --> ResendAPI
+    %% CLEAN VERTICAL CONNECTORS
+    TIER1 ==>|"HTTPS / Credentials Include (HttpOnly Cookie)"| TIER2
+    TIER1 -->|"REST API / Video Storyboards"| AI_BOX
+    TIER1 -->|"REST API / Multi-Agent Studio Workflows"| AGENT_BOX
 
-    %% AI Engine Interactions
-    FastAPI_AI --> TutorChat & VideoStoryboard
-    TutorChat & VideoStoryboard --> GoogleGenAI
-    GoogleGenAI --> GeminiAPI
-    FastAPI_AI --> SQLAlchemyEngine
-    SQLAlchemyEngine --> Postgres
+    TIER2 ==>|"Prisma ORM (Connection Pool)"| DB_POSTGRES
+    TIER2 -->|"Transactional OTP Emails"| CLOUD_RESEND
 
-    %% Agentic Engine Interactions
-    FastAPI_Agentic --> Guardrail
-    Guardrail -- "Pass" --> Supervisor
-    Supervisor --> MultiAgentCore
-    TeachingAgent --> VectorStore & TavilySearch
-    CodingAgent <--> Sandbox
-    CodingAgent <--> MCPClient
-    Sandbox --> Visualizer
-    ResearchAgent --> VectorStore
-    AssessorAgent --> MultiAgentCore
-    MultiAgentCore --> GeminiAPI
+    AI_BOX -->|"Direct SQLAlchemy Sync"| DB_POSTGRES
+    AI_BOX -->|"Prompt Engineering"| CLOUD_GEMINI
+
+    AGENT_BOX -->|"Reasoning & Synthesis"| CLOUD_GEMINI
+    AGENT_BOX ==>|"Subprocess Execution"| SANDBOX
+    AGENT_BOX -->|"Stdio JSON-RPC"| MCP_SERVERS
+    SANDBOX ==>|"Statevector / Counts"| SIMULATORS
 ```
 
 ---
