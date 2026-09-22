@@ -20,40 +20,33 @@ const NAV_LINKS = [
 
 const NAV_CSS = `
 .qm-nav{
-  --n-bg:#fafaf9;
+  --n-bg:rgba(250,250,249,0.85);
   --n-surface:#ffffff;
   --n-surface2:#f4f4f5;
-  --n-border:rgba(214,74,23,0.35);
+  --n-border:rgba(214,74,23,0.22);
   --n-border-strong:#d64a17;
   --n-text:#09090b;
-  --n-muted:#27272a;
+  --n-muted:#52525b;
   --n-accent:#0f766e;
-  --n-accent-soft:rgba(15,118,110,0.12);
+  --n-accent-soft:rgba(15,118,110,0.09);
   --n-danger:#be123c;
   --n-danger-soft:rgba(190,18,60,0.08);
-  --n-shadow:0 20px 50px -20px rgba(214,74,23,0.2);
+  --n-shadow:0 12px 30px -15px rgba(15,23,42,0.12);
 }
 .dark .qm-nav,
 [data-theme="dark"] .qm-nav{
-  --n-bg:#0a0c0f;
+  --n-bg:rgba(10,12,15,0.88);
   --n-surface:#0f1318;
   --n-surface2:#141a21;
-  --n-border:rgba(222,230,76,0.38);
-  --n-border-strong:#dee64c;
+  --n-border:rgba(255,107,0,0.25);
+  --n-border-strong:#ff7a00;
   --n-text:#ffffff;
-  --n-muted:#f1f5f9;
+  --n-muted:#a1a1aa;
   --n-accent:#5eead4;
-  --n-accent-soft:rgba(94,234,212,0.15);
+  --n-accent-soft:rgba(94,234,212,0.12);
   --n-danger:#fb7185;
   --n-danger-soft:rgba(251,113,133,0.1);
-  --n-shadow:0 24px 60px -20px rgba(0,0,0,0.85);
-}
-.qm-nav-link {
-  text-shadow: 0 1px 2px rgba(255,255,255,0.65);
-}
-.dark .qm-nav-link,
-[data-theme="dark"] .qm-nav-link {
-  text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+  --n-shadow:0 20px 40px -15px rgba(0,0,0,0.75);
 }
 html{scroll-padding-top:6rem;}
 `;
@@ -141,7 +134,7 @@ export default function Navbar() {
     <button
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`w-10 h-10 inline-flex items-center justify-center rounded-full bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-800 dark:text-zinc-100 hover:text-zinc-950 dark:hover:text-white shadow-xs transition-colors cursor-pointer ${focusRing}`}
+      className={`w-10 h-10 inline-flex items-center justify-center rounded-full border border-[color:var(--n-border)] text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] hover:border-[color:var(--n-border-strong)] transition-colors cursor-pointer ${focusRing}`}
     >
       {isDark ? <LuSun size={17} /> : <LuMoon size={17} />}
     </button>
@@ -151,88 +144,69 @@ export default function Navbar() {
 
   return (
     <>
-      {/* FIXED header: always pinned to the viewport top, never changes on scroll */}
+      {/* FIXED header: unified glassmorphic navbar with bottom wave accent */}
       <header
-        className="qm-nav fixed top-0 left-0 right-0 z-[100] border-b"
+        className="qm-nav fixed top-0 left-0 right-0 z-[100] backdrop-blur-xl border-b transition-colors duration-300"
         style={{ background: "var(--n-bg)", borderColor: "var(--n-border)" }}
       >
         <style>{NAV_CSS}</style>
 
-        {/* Wavy Background Contained Inside Navbar */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0" style={{ transform: "rotate(180deg) scaleX(-1)" }}>
+        {/* Top vibrant orange highlight line */}
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#ff5500] via-[#ff9500] to-[#ea580c] z-20 pointer-events-none opacity-90 shadow-[0_0_8px_rgba(255,107,0,0.5)]" />
+
+        {/* Bottom edge multi-tone wave ribbon (Orange + Burnt Sienna + Olive) */}
+        <div className="absolute bottom-0 inset-x-0 h-4 sm:h-5 overflow-hidden pointer-events-none z-0">
           <svg
-            className="block w-full h-full"
+            className="absolute bottom-0 w-full h-full"
             preserveAspectRatio="none"
-            viewBox="0 0 1440 320"
+            viewBox="0 0 1440 80"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              {/* Top Wave Gradient: High-Contrast Vibrant Electric Orange */}
-              <linearGradient id="navWaveTopOrange" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ff5500" stopOpacity={isDark ? "0.95" : "0.90"} />
-                <stop offset="30%" stopColor="#ff7a00" stopOpacity={isDark ? "1" : "0.95"} />
-                <stop offset="70%" stopColor="#ff9500" stopOpacity={isDark ? "1" : "0.95"} />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.90"} />
+              <linearGradient id="bottomWaveOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ff5500" stopOpacity="0.95" />
+                <stop offset="30%" stopColor="#ff7a00" stopOpacity="1" />
+                <stop offset="70%" stopColor="#ff9500" stopOpacity="0.95" />
+                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.9" />
               </linearGradient>
-
-              {/* Middle Wave Gradient: Deep Rich Burnt Sienna */}
-              <linearGradient id="navWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#d64a17" stopOpacity={isDark ? "0.90" : "0.82"} />
-                <stop offset="50%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.88"} />
-                <stop offset="100%" stopColor="#c2410c" stopOpacity={isDark ? "0.90" : "0.82"} />
+              <linearGradient id="bottomWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#d64a17" stopOpacity="0.85" />
+                <stop offset="50%" stopColor="#ea580c" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#c2410c" stopOpacity="0.85" />
               </linearGradient>
-
-              {/* Lower Wave Gradient: Radiant Olive / Yellow Green */}
-              <linearGradient id="navWaveOlive" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#dee64c" stopOpacity={isDark ? "0.88" : "0.78"} />
-                <stop offset="50%" stopColor="#d4e320" stopOpacity={isDark ? "0.95" : "0.85"} />
-                <stop offset="100%" stopColor="#b5c418" stopOpacity={isDark ? "0.88" : "0.75"} />
+              <linearGradient id="bottomWaveOlive" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#dee64c" stopOpacity="0.85" />
+                <stop offset="50%" stopColor="#d4e320" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#b5c418" stopOpacity="0.8" />
               </linearGradient>
             </defs>
 
-            {/* Base Ambient Fill (Warm Orange Glow) */}
-            <rect
-              width="1440"
-              height="320"
-              fill="#ff6b00"
-              fillOpacity={isDark ? "0.32" : "0.20"}
+            {/* Olive lower wave */}
+            <path
+              fill="url(#bottomWaveOlive)"
+              d="M0,45 C240,75 480,15 720,45 C960,75 1200,15 1440,40 L1440,80 L0,80 Z"
             />
 
-            {/* Layer 1 (Lower Wave — Radiant Olive / Yellow Green) */}
+            {/* Sienna middle wave */}
             <path
-              fill="url(#navWaveOlive)"
-              d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
+              fill="url(#bottomWaveSienna)"
+              d="M0,30 C280,60 520,8 760,35 C1000,65 1220,10 1440,28 L1440,80 L0,80 Z"
+            />
 
-            {/* Layer 2 (Middle Wave — Deep Burnt Sienna) */}
+            {/* Top high-contrast electric orange wave */}
             <path
-              fill="url(#navWaveSienna)"
-              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-
-            {/* Layer 3 (Top Wave — High-Contrast Vibrant Electric Orange) */}
-            <path
-              fill="url(#navWaveTopOrange)"
-              d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,133.3C672,139,768,181,864,208C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
+              fill="url(#bottomWaveOrange)"
+              d="M0,15 C320,48 560,4 800,24 C1040,44 1260,8 1440,15 L1440,80 L0,80 Z"
+            />
           </svg>
         </div>
-
-        {/* Top vibrant orange highlight bar */}
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#ff5500] via-[#ff9500] to-[#ea580c] z-20 pointer-events-none opacity-90 shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
-
-        {/* Crisp glass contrast scrim protecting navigation readability */}
-        <div className="absolute inset-0 bg-white/10 dark:bg-black/25 backdrop-blur-[1.5px] pointer-events-none z-0" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 
-            {/* Desktop links inside a high-contrast frosted glass pill */}
-            <nav
-              className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/85 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 shadow-sm"
-              aria-label="Main navigation"
-            >
+            {/* Desktop links - clean, integrated typography */}
+            <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
               {NAV_LINKS.map((link) => {
                 const active = activeId === link.href.slice(1);
                 return (
@@ -240,13 +214,15 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`relative px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 ${
-                      active
-                        ? "bg-[#ff5500]/15 dark:bg-[#ff5500]/25 text-[#d64a17] dark:text-[#ff9500] font-bold shadow-xs"
-                        : "text-zinc-800 dark:text-zinc-100 hover:text-zinc-950 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                    } ${focusRing}`}
+                    className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
+                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
                   >
                     {link.name}
+                    <span
+                      className="absolute left-3 right-3 bottom-0 h-0.5 rounded-full transition-opacity duration-200 bg-gradient-to-r from-[#ff5500] to-[#dee64c]"
+                      style={{ opacity: active ? 1 : 0 }}
+                      aria-hidden="true"
+                    />
                   </a>
                 );
               })}
@@ -261,7 +237,7 @@ export default function Navbar() {
                   <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 shadow-xs transition-colors cursor-pointer ${focusRing}`}
+                      className={`flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
                       aria-label="User menu"
                       aria-haspopup="menu"
                       aria-expanded={profileOpen}
@@ -342,7 +318,7 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className={`px-5 py-2 rounded-full text-sm font-semibold text-zinc-900 dark:text-white hover:text-zinc-950 dark:hover:text-white bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 shadow-xs transition-colors ${focusRing}`}
+                      className={`px-5 py-2.5 rounded-full text-sm font-medium text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] transition-colors ${focusRing}`}
                     >
                       Log In
                     </Link>
@@ -364,7 +340,7 @@ export default function Navbar() {
               {/* Hamburger */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-xl bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 shadow-xs transition-colors cursor-pointer ${focusRing}`}
+                className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
                 aria-label="Toggle navigation"
                 aria-expanded={mobileOpen}
               >
