@@ -5,19 +5,19 @@ import { LuBrain, LuBlocks, LuCpu, LuSparkles } from "react-icons/lu";
 
 const STEPS = [
   {
-    num: "01", icon: LuBrain, color: "from-indigo-500 to-purple-600", accentHex: "#6366f1",
+    num: "01", icon: LuBrain, color: "from-[#d64a17] to-[#d64a17]", accentHex: "#d64a17",
     title: "Pick a Concept", desc: "Choose from our structured curriculum — from superposition basics to Grover's algorithm — and start with an interactive visual explainer.",
   },
   {
-    num: "02", icon: LuBlocks, color: "from-cyan-500 to-blue-600", accentHex: "#22d3ee",
+    num: "02", icon: LuBlocks, color: "from-[#e7b46a] to-[#e7b46a]", accentHex: "#e7b46a",
     title: "Build the Circuit", desc: "Drag and drop quantum gates onto the canvas, or type code. Visual and code views stay perfectly in sync as you experiment.",
   },
   {
-    num: "03", icon: LuCpu, color: "from-violet-500 to-indigo-600", accentHex: "#8b5cf6",
+    num: "03", icon: LuCpu, color: "from-[#dee64c] to-[#d64a17]", accentHex: "#dee64c",
     title: "Run the Simulation", desc: "Hit Run. Qiskit Aer, PennyLane, Cirq, or qBraid executes your circuit instantly — no queue, no cloud setup required.",
   },
   {
-    num: "04", icon: LuSparkles, color: "from-amber-500 to-orange-600", accentHex: "#f59e0b",
+    num: "04", icon: LuSparkles, color: "from-[#d64a17] to-[#d64a17]", accentHex: "#d64a17",
     title: "Ask the AI Tutor", desc: "Got a question? The AI knows your circuit, your current lesson, and your code. Ask it anything — from concept explanations to bug fixes.",
   },
 ];

@@ -14,9 +14,9 @@ const TABS = [
     icon: LuBlocks,
     headline: "Visual + Code — always in sync.",
     desc: "Drag quantum gates onto the canvas and watch Qiskit or Cirq code generate live. Switch between visual and code mode at any time.",
-    color: "from-cyan-500 to-blue-600",
+    color: "from-[#e7b46a] to-[#e7b46a]",
     accent: "cyan",
-    accentHex: "#22d3ee",
+    accentHex: "#e7b46a",
     demo: "CircuitBuilderDemo",
   },
   {
@@ -25,9 +25,9 @@ const TABS = [
     icon: LuCpu,
     headline: "One circuit. Four frameworks.",
     desc: "Click a backend — Qiskit Aer, PennyLane, Cirq, or qBraid — and compare outputs side by side. No queue wait.",
-    color: "from-violet-500 to-indigo-600",
+    color: "from-[#dee64c] to-[#d64a17]",
     accent: "violet",
-    accentHex: "#6366f1",
+    accentHex: "#d64a17",
     demo: "BackendSwitcherDemo",
   },
   {
@@ -36,9 +36,9 @@ const TABS = [
     icon: LuActivity,
     headline: "See inside the quantum state.",
     desc: "Bloch spheres, statevectors, density matrices, and probability histograms update live as you build.",
-    color: "from-emerald-500 to-teal-600",
+    color: "from-[#f1a17e] to-[#f1a17e]",
     accent: "emerald",
-    accentHex: "#10b981",
+    accentHex: "#f1a17e",
     demo: "VisualizationsDemo",
   },
   {
@@ -47,9 +47,9 @@ const TABS = [
     icon: LuBot,
     headline: "Ask. Generate. Debug. Learn.",
     desc: "Context-aware AI understands your circuit, current lesson, and recent errors. It explains, generates code, and guides without giving answers away.",
-    color: "from-amber-500 to-orange-600",
+    color: "from-[#d64a17] to-[#d64a17]",
     accent: "amber",
-    accentHex: "#f59e0b",
+    accentHex: "#d64a17",
     demo: "AiTutorDemo",
   },
 ];
@@ -64,7 +64,7 @@ function CircuitBuilderDemo() {
     { n: 4, parts: [{ t: "va", v: "qc" }, { t: "tx", v: "." }, { t: "fn", v: "h" }, { t: "tx", v: "(" }, { t: "nu", v: "0" }, { t: "tx", v: ")" }] },
     { n: 5, parts: [{ t: "va", v: "qc" }, { t: "tx", v: "." }, { t: "fn", v: "cx" }, { t: "tx", v: "(" }, { t: "nu", v: "0" }, { t: "tx", v: ", " }, { t: "nu", v: "1" }, { t: "tx", v: ")" }] },
   ];
-  const colors = { kw: "text-pink-400", fn: "text-green-300", va: "text-blue-400", nu: "text-purple-400", op: "text-pink-400", tx: "text-gray-300" };
+  const colors = { kw: "text-pink-400", fn: "text-green-300", va: "text-[#e7b46a]", nu: "text-[#d64a17]", op: "text-pink-400", tx: "text-gray-300" };
 
   return (
     <div className="grid lg:grid-cols-2 gap-4 h-full">
@@ -74,7 +74,7 @@ function CircuitBuilderDemo() {
         <div className="flex gap-2 flex-wrap">
           {GATES.map(g => (
             <button key={g} onClick={() => setActiveGate(g)}
-              className={`px-3 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${activeGate === g ? "border-cyan-500 bg-cyan-500/15 text-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-cyan-500/40"}`}>
+              className={`px-3 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${activeGate === g ? "border-[#e7b46a] bg-[#e7b46a]/15 text-[#e7b46a] shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-[#e7b46a]/40"}`}>
               {g}
             </button>
           ))}
@@ -82,23 +82,23 @@ function CircuitBuilderDemo() {
         <div className="flex flex-col gap-6 relative flex-1">
           {/* Wire 1 */}
           <div className="absolute top-[20px] left-6 right-6 h-px bg-[var(--color-border)]/60 overflow-hidden">
-            <div className="animate-wire-pulse absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
+            <div className="animate-wire-pulse absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-[#e7b46a] to-transparent" />
           </div>
           {/* Wire 2 */}
           <div className="absolute top-[76px] left-6 right-6 h-px bg-[var(--color-border)]/60 overflow-hidden">
-            <div className="animate-wire-pulse absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-violet-400 to-transparent" style={{ animationDelay: "0.7s" }} />
+            <div className="animate-wire-pulse absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-[#dee64c] to-transparent" style={{ animationDelay: "0.7s" }} />
           </div>
           <div className="flex items-center gap-4 relative z-10">
             <span className="text-[var(--color-muted)] font-mono text-xs w-4">q0</span>
-            <div className="w-11 h-11 rounded-xl border border-cyan-500 bg-cyan-500/15 flex items-center justify-center font-mono font-bold text-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.2)] text-sm">H</div>
-            <div className="relative"><div className="w-4 h-4 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_rgba(99,102,241,0.5)]" /><div className="absolute top-full left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/20" /></div>
+            <div className="w-11 h-11 rounded-xl border border-[#e7b46a] bg-[#e7b46a]/15 flex items-center justify-center font-mono font-bold text-[#e7b46a] shadow-[0_0_12px_rgba(34,211,238,0.2)] text-sm">H</div>
+            <div className="relative"><div className="w-4 h-4 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_rgba(214, 74, 23,0.5)]" /><div className="absolute top-full left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/20" /></div>
             <div className="flex-1" />
             <div className="w-11 h-11 rounded-xl bg-[var(--color-surface)]/50 border border-[var(--color-border)]/50 flex items-center justify-center text-[var(--color-muted)] font-bold text-sm font-mono">M</div>
           </div>
           <div className="flex items-center gap-4 relative z-10">
             <span className="text-[var(--color-muted)] font-mono text-xs w-4">q1</span>
             <div className="w-[72px]" />
-            <div className="w-11 h-11 rounded-full border-2 border-[var(--color-primary)] bg-[var(--color-background)]/60 flex items-center justify-center relative shadow-[0_0_12px_rgba(99,102,241,0.15)]">
+            <div className="w-11 h-11 rounded-full border-2 border-[var(--color-primary)] bg-[var(--color-background)]/60 flex items-center justify-center relative shadow-[0_0_12px_rgba(214, 74, 23,0.15)]">
               <div className="absolute w-5 h-px bg-[var(--color-primary)]" /><div className="absolute w-px h-5 bg-[var(--color-primary)]" />
             </div>
             <div className="flex-1" />
@@ -125,7 +125,7 @@ function CircuitBuilderDemo() {
           ))}
         </div>
         <button className="mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-sans text-sm font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: "linear-gradient(135deg, #22d3ee, #6366f1)" }}>
+          style={{ background: "linear-gradient(135deg, #e7b46a, #d64a17)" }}>
           <LuPlay size={14} fill="currentColor" /> Run Circuit
         </button>
       </div>
@@ -136,10 +136,10 @@ function CircuitBuilderDemo() {
 function BackendSwitcherDemo() {
   const [active, setActive] = useState(0);
   const backends = [
-    { name: "Qiskit Aer", color: "#6366f1", result: { "00": 511, "11": 513 }, shots: 1024 },
-    { name: "PennyLane", color: "#22d3ee", result: { "00": 508, "11": 516 }, shots: 1024 },
-    { name: "Cirq", color: "#e879f9", result: { "00": 497, "11": 527 }, shots: 1024 },
-    { name: "qBraid", color: "#f59e0b", result: { "00": 512, "11": 512 }, shots: 1024 },
+    { name: "Qiskit Aer", color: "#d64a17", result: { "00": 511, "11": 513 }, shots: 1024 },
+    { name: "PennyLane", color: "#e7b46a", result: { "00": 508, "11": 516 }, shots: 1024 },
+    { name: "Cirq", color: "#dee64c", result: { "00": 497, "11": 527 }, shots: 1024 },
+    { name: "qBraid", color: "#d64a17", result: { "00": 512, "11": 512 }, shots: 1024 },
   ];
   const b = backends[active];
 
@@ -190,10 +190,10 @@ function VisualizationsDemo() {
         <svg viewBox="0 0 200 200" className="w-full max-h-[120px]">
           <defs>
             <radialGradient id="bvg" cx="35%" cy="30%" r="65%">
-              <stop offset="0%" stopColor="#1e2d45" stopOpacity="0.8" /><stop offset="100%" stopColor="#6366f1" stopOpacity="0.15" />
+              <stop offset="0%" stopColor="#1e2d45" stopOpacity="0.8" /><stop offset="100%" stopColor="#d64a17" stopOpacity="0.15" />
             </radialGradient>
             <marker id="bva" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L0,6 L8,3 z" fill="#6366f1" />
+              <path d="M0,0 L0,6 L8,3 z" fill="#d64a17" />
             </marker>
           </defs>
           <circle cx="100" cy="100" r="80" fill="url(#bvg)" stroke="#1e2d45" strokeWidth="1.5" />
@@ -202,8 +202,8 @@ function VisualizationsDemo() {
           <line x1="18" y1="100" x2="182" y2="100" stroke="#334155" strokeWidth="1" opacity="0.6" />
           <text x="105" y="14" fill="#94a3b8" fontSize="10" fontFamily="monospace">|0⟩</text>
           <text x="105" y="192" fill="#94a3b8" fontSize="10" fontFamily="monospace">|1⟩</text>
-          <line x1="100" y1="100" x2="150" y2="50" stroke="#6366f1" strokeWidth="2.5" markerEnd="url(#bva)" />
-          <circle cx="100" cy="100" r="3.5" fill="#6366f1" />
+          <line x1="100" y1="100" x2="150" y2="50" stroke="#d64a17" strokeWidth="2.5" markerEnd="url(#bva)" />
+          <circle cx="100" cy="100" r="3.5" fill="#d64a17" />
           <text x="154" y="45" fill="#f1f5f9" fontSize="11" fontFamily="monospace" fontWeight="bold">|ψ⟩</text>
         </svg>
         <div className="font-mono text-[10px] text-[var(--color-muted)] mt-1">θ=π/4 φ=0</div>
@@ -212,7 +212,7 @@ function VisualizationsDemo() {
       <div className="rounded-2xl border border-[var(--color-border)]/50 bg-[var(--color-background)]/70 p-4">
         <div className="text-[10px] font-mono font-bold text-[var(--color-muted)] uppercase tracking-wider mb-3">Probabilities</div>
         <div className="flex items-end gap-1.5 h-24 mb-2">
-          {[{ s: "|00⟩", v: 50, c: "#6366f1" }, { s: "|01⟩", v: 3, c: "#334155" }, { s: "|10⟩", v: 2, c: "#334155" }, { s: "|11⟩", v: 50, c: "#22d3ee" }].map(b => (
+          {[{ s: "|00⟩", v: 50, c: "#d64a17" }, { s: "|01⟩", v: 3, c: "#334155" }, { s: "|10⟩", v: 2, c: "#334155" }, { s: "|11⟩", v: 50, c: "#e7b46a" }].map(b => (
             <div key={b.s} className="flex-1 flex flex-col items-center gap-1">
               <div className="w-full rounded-t relative overflow-hidden" style={{ height: "100%" }}>
                 <div className="w-full rounded-t absolute bottom-0 transition-all duration-700" style={{ height: `${b.v}%`, background: b.c, boxShadow: b.v > 20 ? `0 0 10px ${b.c}50` : "none" }} />
@@ -250,7 +250,7 @@ function AiTutorDemo() {
     <div className="flex flex-col h-full">
       <div className="flex-1 rounded-2xl border border-[var(--color-border)]/50 bg-[var(--color-background)]/60 overflow-hidden flex flex-col">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--color-border)]/50 bg-[var(--color-surface)]/30">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white" style={{ background: "linear-gradient(135deg, #6366f1, #e879f9)" }}>
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white" style={{ background: "linear-gradient(135deg, #d64a17, #dee64c)" }}>
             <LuSparkles size={14} />
           </div>
           <span className="text-xs font-bold text-[var(--color-text)]">QubitMinds AI</span>
@@ -262,7 +262,7 @@ function AiTutorDemo() {
           {msgs.map((m, i) => (
             <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               {m.role === "ai" && (
-                <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white mt-0.5" style={{ background: "linear-gradient(135deg, #6366f1, #e879f9)" }}>
+                <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white mt-0.5" style={{ background: "linear-gradient(135deg, #d64a17, #dee64c)" }}>
                   <LuSparkles size={12} />
                 </div>
               )}
@@ -283,7 +283,7 @@ function AiTutorDemo() {
           ))}
           {/* typing indicator */}
           <div className="flex gap-2.5 justify-start">
-            <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white" style={{ background: "linear-gradient(135deg, #6366f1, #e879f9)" }}>
+            <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white" style={{ background: "linear-gradient(135deg, #d64a17, #dee64c)" }}>
               <LuSparkles size={12} />
             </div>
             <div className="bg-[var(--color-surface)]/40 border border-[var(--color-border)]/40 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1">

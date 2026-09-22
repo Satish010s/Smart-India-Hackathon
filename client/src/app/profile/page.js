@@ -10,29 +10,21 @@ import {
   LuUser, LuMail, LuCalendar, LuPencil, LuSave, LuX,
   LuTrophy, LuBookOpen, LuFlame, LuZap, LuTarget,
   LuStar, LuClock, LuActivity, LuGraduationCap, LuMedal,
-  LuCheck, LuCamera, LuShield,
+  LuCheck, LuCamera, LuShield, LuAward, LuKey, LuBook, LuGlobe,
+  LuCheckCircle2,
 } from 'react-icons/lu';
+import { ProfileSkeleton } from './ProfileSkeleton';
 
-const ACTIVITY_HEATMAP = Array.from({ length: 52 * 7 }, (_, i) => ({
-  value: Math.random() > 0.6 ? Math.floor(Math.random() * 4) : 0,
-}));
 
-const ENROLLED_COURSES = [
-  { title: 'Quantum Fundamentals', progress: 100, modules: 5 },
-  { title: 'Quantum Algorithms Masterclass', progress: 62, modules: 6 },
-  { title: 'Variational Quantum Eigensolver', progress: 25, modules: 5 },
-];
 
-const RECENT_CERTS = [
-  { title: 'Quantum Fundamentals', date: 'Aug 2026', icon: '🎓' },
-];
-
-function HeatmapCalendar() {
+function HeatmapCalendar({ heatmapData }) {
   const weeks = [];
+  const data = heatmapData?.length >= 364 ? heatmapData : Array(364).fill({ value: 0 });
+  
   for (let w = 0; w < 52; w++) {
     const week = [];
     for (let d = 0; d < 7; d++) {
-      week.push(ACTIVITY_HEATMAP[w * 7 + d]);
+      week.push(data[w * 7 + d]);
     }
     weeks.push(week);
   }
@@ -47,8 +39,8 @@ function HeatmapCalendar() {
             {week.map((day, di) => (
               <div
                 key={di}
-                title={`Activity level: ${day.value}`}
-                className={`w-3 h-3 rounded-sm ${colorMap[day.value] || colorMap[0]} transition-colors hover:ring-1 hover:ring-[var(--color-primary)] cursor-default`}
+                title={`Activity level: ${day?.value || 0}`}
+                className={`w-3 h-3 rounded-sm ${colorMap[day?.value || 0] || colorMap[0]} transition-colors hover:ring-1 hover:ring-[var(--color-primary)] cursor-default`}
               />
             ))}
           </div>
@@ -64,42 +56,40 @@ export default function ProfilePage() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [bio, setBio] = useState("Quantum computing enthusiast with a background in physics. Passionate about quantum algorithms and their applications in cryptography and machine learning.");
   const [tempBio, setTempBio] = useState(bio);
 
   useEffect(() => {
+    let mounted = true;
     apiFetch('/learner/profile')
       .then(res => {
-        if (res?.success && res.data) {
+        if (res?.success && res.data && mounted) {
           setApiData(res.data);
           if (res.data.bio) { setBio(res.data.bio); setTempBio(res.data.bio); }
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, []);
 
-  const profileStats = apiData?.stats || { xp: 4250, lessons: 54, streak: 12, challenges: 13, hours: 38.5, rank: 42 };
+  const profileStats = apiData?.stats || { xp: 0, lessons: 0, streak: 0, challenges: 0, hours: 0, rank: 0 };
 
   const profileData = {
-    name: user?.name || 'Arjun Sharma',
-    email: user?.email || 'arjun.sharma@iit.ac.in',
-    joined: apiData?.joined || 'August 2026',
-    institution: apiData?.institution || 'IIT Bombay',
-    level: apiData?.level || 7,
+    name: apiData?.user?.name || user?.name || '...',
+    email: apiData?.user?.email || user?.email || '...',
+    joined: apiData?.joined || '...',
+    institution: apiData?.institution || '...',
+    level: apiData?.level || 1,
     xp: profileStats.xp,
     streak: profileStats.streak,
     rank: `#${profileStats.rank}`,
   };
 
-  const enrolledCourses = apiData?.enrolledCourses || [
-    { title: 'Quantum Fundamentals', progress: 100, modules: 5 },
-    { title: 'Quantum Algorithms Masterclass', progress: 62, modules: 6 },
-    { title: 'Variational Quantum Eigensolver', progress: 25, modules: 5 },
-  ];
-
-  const certificates = apiData?.certificates || [
-    { title: 'Quantum Fundamentals', date: 'Aug 2026', icon: '🎓' },
-  ];
+  const enrolledCourses = apiData?.enrolledCourses || [];
+  const certificates = Array.isArray(apiData?.certificates) ? apiData.certificates : [];
+  const heatmapData = apiData?.heatmap || [];
 
   const stats = [
     { label: 'XP Earned', value: profileStats.xp?.toLocaleString?.() || '4,250', icon: LuZap, color: 'text-amber-400' },
@@ -138,8 +128,12 @@ export default function ProfilePage() {
           />
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-            {/* Profile header card */}
-            <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-primary)]/15 via-[var(--color-surface)] to-[var(--color-secondary)]/10 p-6 sm:p-8">
+            {loading ? (
+              <ProfileSkeleton />
+            ) : (
+              <>
+                {/* Profile header card */}
+                <div className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-primary)]/15 via-[var(--color-surface)] to-[var(--color-secondary)]/10 p-6 sm:p-8">
               <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--color-primary)]/10 blur-3xl pointer-events-none" />
 
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
@@ -238,7 +232,7 @@ export default function ProfilePage() {
                 <h2 className="font-semibold text-base text-[var(--color-text)]">Activity Heatmap</h2>
                 <span className="text-xs font-mono text-[var(--color-muted)]">Last 52 weeks</span>
               </div>
-              <HeatmapCalendar />
+              <HeatmapCalendar heatmapData={heatmapData} />
               <div className="flex items-center gap-2 text-[10px] text-[var(--color-muted)]">
                 <span>Less</span>
                 {['bg-[var(--color-border)]/20', 'bg-[var(--color-primary)]/20', 'bg-[var(--color-primary)]/50', 'bg-[var(--color-primary)]/80', 'bg-[var(--color-primary)]'].map((c, i) => (
@@ -254,7 +248,7 @@ export default function ProfilePage() {
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
                 <h2 className="font-semibold text-base text-[var(--color-text)]">Enrolled Courses</h2>
                 <div className="space-y-3">
-                  {ENROLLED_COURSES.map(c => (
+                  {enrolledCourses.length > 0 ? enrolledCourses.map(c => (
                     <div key={c.title} className="space-y-2">
                       <div className="flex justify-between items-center">
                         <div className="text-sm font-medium text-[var(--color-text)] truncate pr-4">{c.title}</div>
@@ -267,14 +261,16 @@ export default function ProfilePage() {
                         />
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-xs text-[var(--color-muted)] py-2">No courses enrolled yet.</div>
+                  )}
                 </div>
               </div>
 
               {/* Certificates */}
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 space-y-4">
                 <h2 className="font-semibold text-base text-[var(--color-text)]">Certificates</h2>
-                {RECENT_CERTS.map(cert => (
+                {certificates.map(cert => (
                   <div key={cert.title} className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-[var(--color-surface)] border border-amber-500/20 hover:shadow-md transition-all">
                     <span className="text-3xl">{cert.icon}</span>
                     <div>
@@ -316,6 +312,8 @@ export default function ProfilePage() {
                 })}
               </div>
             </div>
+              </>
+            )}
           </main>
         </div>
       </div>

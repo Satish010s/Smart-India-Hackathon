@@ -499,6 +499,45 @@ export const getLearnerProgress = async (req, res) => {
     const simulationsRun = await prisma.simulationRun.count({ where: { userId } });
     const circuitsBuilt = await prisma.savedCircuit.count({ where: { userId } });
 
+    // Challenges and Quizzes
+    const challengeSubmissions = await prisma.submission.findMany({ where: { userId, type: 'Challenge' } });
+    const challengesAttempted = challengeSubmissions.length;
+    const challengesSolved = challengeSubmissions.filter(s => s.status === 'GRADED').length;
+
+    const quizSubmissions = await prisma.submission.findMany({ where: { userId, type: 'Quiz', status: 'GRADED' } });
+    const quizAvgScore = quizSubmissions.length > 0
+      ? Math.round(quizSubmissions.reduce((s, q) => s + (q.score || 0), 0) / quizSubmissions.length)
+      : 0;
+
+    const aiInteractions = await prisma.aiChatHistory.count({ where: { userId } });
+
+    // Weekly activity (mock logic replacing 0 array: count runs per day for last 7 days)
+    const weeklyActivity = [0, 0, 0, 0, 0, 0, 0];
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentSims = await prisma.simulationRun.findMany({
+      where: { userId, createdAt: { gte: sevenDaysAgo } }
+    });
+    recentSims.forEach(sim => {
+      const dayDiff = Math.floor((new Date() - new Date(sim.createdAt)) / (1000 * 60 * 60 * 24));
+      if (dayDiff >= 0 && dayDiff < 7) {
+        weeklyActivity[6 - dayDiff] += 1;
+      }
+    });
+
+    // Milestones from courses
+    const milestones = enrollments.slice(0, 4).map(e => ({
+      title: e.course.title,
+      status: e.progress >= 100 ? 'Completed' : e.progress > 0 ? 'In Progress' : 'Upcoming',
+      date: new Date(e.updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      xp: e.progress >= 100 ? 500 : (Math.round(e.progress) * 5)
+    }));
+
+    // If less than 4, pad with some defaults
+    if (milestones.length === 0) {
+      milestones.push({ title: 'Enroll in your first course', status: 'Upcoming', date: 'Pending', xp: 100 });
+    }
+
     return res.status(200).json({
       success: true,
       data: {
@@ -507,17 +546,17 @@ export const getLearnerProgress = async (req, res) => {
         totalCourses,
         lessonsCompleted,
         totalLessons,
-        challengesSolved: 0,
-        challengesAttempted: 0,
-        quizAvgScore: 0,
+        challengesSolved,
+        challengesAttempted,
+        quizAvgScore,
         learningHours: profile?.learningHours || 0,
         currentStreak: profile?.streak || 0,
         longestStreak: profile?.longestStreak || 0,
-        weeklyActivity: [0, 0, 0, 0, 0, 0, 0],
-        milestones: [],
+        weeklyActivity,
+        milestones,
         circuitsBuilt,
         simulationsRun,
-        aiInteractions: 0,
+        aiInteractions,
       },
     });
   } catch (error) {
@@ -531,6 +570,8 @@ export const getLearnerAchievements = async (req, res) => {
     const profile = await prisma.learnerProfile.findUnique({
       where: { userId: req.user.id }
     });
+
+    const userXp = profile?.xp || 0;
 
     const userBadges = await prisma.userBadge.findMany({
       where: { userId: req.user.id },
@@ -553,24 +594,80 @@ export const getLearnerAchievements = async (req, res) => {
       };
     });
 
+    const MILESTONES_DEF = [
+      { xp: 0, label: 'Novice', icon: '🌱' },
+      { xp: 500, label: 'Apprentice', icon: '⚗️' },
+      { xp: 1000, label: 'Explorer', icon: '🔭' },
+      { xp: 2000, label: 'Practitioner', icon: '⚛️' },
+      { xp: 3500, label: 'Specialist', icon: '🧬' },
+      { xp: 5000, label: 'Expert', icon: '🌌' },
+      { xp: 8000, label: 'Master', icon: '🏆' },
+    ];
+
+    const milestones = MILESTONES_DEF.map(m => ({
+      ...m,
+      reached: userXp >= m.xp
+    }));
+
+    // Generate real leaderboard
+    const topProfiles = await prisma.learnerProfile.findMany({
+      orderBy: { xp: 'desc' },
+      take: 10,
+      include: { user: { select: { name: true } } }
+    });
+
+    let userRank = null;
+    const leaderboard = topProfiles.map((p, index) => {
+      const rank = index + 1;
+      let badge = null;
+      if (rank === 1) badge = '🏆';
+      else if (rank === 2) badge = '🥈';
+      else if (rank === 3) badge = '🥉';
+
+      const isYou = p.userId === req.user.id;
+      if (isYou) userRank = rank;
+
+      return {
+        rank,
+        name: p.user?.name || 'Unknown',
+        xp: p.xp,
+        avatar: (p.user?.name || 'U').charAt(0).toUpperCase(),
+        badge,
+        isYou
+      };
+    });
+
+    // If user is not in top 10, append them at the end
+    if (!userRank && profile) {
+      // Find actual rank
+      const higherXpCount = await prisma.learnerProfile.count({
+        where: { xp: { gt: userXp } }
+      });
+      userRank = higherXpCount + 1;
+      leaderboard.push({
+        rank: userRank,
+        name: req.user.name,
+        xp: userXp,
+        avatar: (req.user.name || 'U').charAt(0).toUpperCase(),
+        badge: null,
+        isYou: true
+      });
+    }
+
     return res.status(200).json({
       success: true,
       data: {
-        xp: profile?.xp || 0,
+        xp: userXp,
         level: profile?.level || 1,
-        rank: profile?.rank || 42,
+        rank: userRank || 42,
         streak: profile?.streak || 0,
         badges: formattedBadges,
-        milestones: [
-          { xp: 0, label: 'Novice', icon: '🌱', reached: true },
-          { xp: 500, label: 'Apprentice', icon: '⚗️', reached: (profile?.xp || 0) >= 500 }
-        ],
-        leaderboard: [
-          { rank: 42, name: req.user.name, xp: profile?.xp || 0, isYou: true }
-        ],
+        milestones,
+        leaderboard,
       },
     });
   } catch (error) {
+    console.error('Error fetching achievements:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch achievements' });
   }
 };
@@ -582,6 +679,59 @@ export const getLearnerProfile = async (req, res) => {
       where: { userId: id }
     });
 
+    const enrollments = await prisma.enrollment.findMany({
+      where: { userId: id },
+      include: {
+        course: {
+          include: { modules: { include: { lessons: { select: { id: true } } } } }
+        }
+      }
+    });
+
+    let lessonsCompleted = 0;
+    const enrolledCourses = enrollments.map(enroll => {
+      const moduleProgress = enroll.moduleProgress ? { ...enroll.moduleProgress } : {};
+      
+      let courseLessonsCompleted = 0;
+      Object.values(moduleProgress).forEach(m => {
+        courseLessonsCompleted += (m.completedLessons?.length || 0);
+      });
+      lessonsCompleted += courseLessonsCompleted;
+
+      return {
+        title: enroll.course.title,
+        progress: Math.round(enroll.progress),
+        modules: enroll.course.modules.length,
+      };
+    });
+
+    const challengesCompleted = await prisma.submission.count({
+      where: { userId: id, type: 'Challenge' }
+    });
+
+    // Generate heatmap data: last 364 days (52 weeks * 7 days)
+    const heatmapDates = new Set();
+    const [simRuns, goals] = await Promise.all([
+      prisma.simulationRun.findMany({ where: { userId: id }, select: { createdAt: true } }),
+      prisma.dailyGoal.findMany({ where: { userId: id, done: true }, select: { date: true } })
+    ]);
+
+    simRuns.forEach(r => heatmapDates.add(new Date(r.createdAt).toISOString().slice(0, 10)));
+    goals.forEach(g => heatmapDates.add(g.date));
+
+    const ACTIVITY_HEATMAP = [];
+    const today = new Date();
+    for (let i = 363; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().slice(0, 10);
+      
+      // Calculate activity "intensity" for the day (0 to 4 range based on frontend mapping)
+      // Here we just use 0 (none) or 2 (active) to signify engagement.
+      const activityCount = heatmapDates.has(dateStr) ? 2 : 0;
+      ACTIVITY_HEATMAP.push({ value: activityCount });
+    }
+
     return res.status(200).json({
       success: true,
       data: {
@@ -591,17 +741,19 @@ export const getLearnerProfile = async (req, res) => {
         joined: new Date(createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }),
         stats: { 
           xp: profile?.xp || 0, 
-          lessons: 0, 
+          lessons: lessonsCompleted, 
           streak: profile?.streak || 0, 
-          challenges: 0, 
+          challenges: challengesCompleted, 
           hours: profile?.learningHours || 0, 
-          rank: profile?.rank || 0 
+          rank: profile?.rank || 42 
         },
-        enrolledCourses: [],
+        enrolledCourses,
         certificates: profile?.certificates || [],
+        heatmap: ACTIVITY_HEATMAP
       },
     });
   } catch (error) {
+    console.error('Error fetching profile:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch profile' });
   }
 };

@@ -16,9 +16,9 @@ const HEATMAP_DATA = [
 ];
 
 function heatColor(v) {
-  if (v > 70) return "bg-emerald-500/80";
-  if (v > 50) return "bg-cyan-500/60";
-  if (v > 30) return "bg-amber-500/60";
+  if (v > 70) return "bg-[#f1a17e]/80";
+  if (v > 50) return "bg-[#e7b46a]/60";
+  if (v > 30) return "bg-[#d64a17]/60";
   return "bg-rose-500/60";
 }
 
@@ -75,7 +75,7 @@ export default function ForInstructors() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/signup"
                 className="group flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm text-white shadow-lg hover:-translate-y-0.5 transition-all"
-                style={{ background: "linear-gradient(135deg, #22d3ee, #6366f1)" }}
+                style={{ background: "linear-gradient(135deg, #e7b46a, #d64a17)" }}
                 id="instructor-cta">
                 Request Instructor Demo
                 <LuArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -107,9 +107,9 @@ export default function ForInstructors() {
                 {/* Stats row */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: "Students", value: "32", icon: LuUsers, color: "text-cyan-400" },
-                    { label: "Avg Progress", value: "68%", icon: LuTrendingUp, color: "text-emerald-400" },
-                    { label: "Assignments", value: "8/12", icon: LuBookOpen, color: "text-violet-400" },
+                    { label: "Students", value: "32", icon: LuUsers, color: "text-[#e7b46a]" },
+                    { label: "Avg Progress", value: "68%", icon: LuTrendingUp, color: "text-[#f1a17e]" },
+                    { label: "Assignments", value: "8/12", icon: LuBookOpen, color: "text-[#dee64c]" },
                   ].map(stat => {
                     const Icon = stat.icon;
                     return (
@@ -150,7 +150,7 @@ export default function ForInstructors() {
                   </div>
                   <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[var(--color-border)]/40">
                     <span className="text-[9px] text-[var(--color-muted)]">Legend:</span>
-                    {[["Excellent", "bg-emerald-500/80"], ["Good", "bg-cyan-500/60"], ["Needs work", "bg-amber-500/60"], ["Struggling", "bg-rose-500/60"]].map(([label, cls]) => (
+                    {[["Excellent", "bg-[#f1a17e]/80"], ["Good", "bg-[#e7b46a]/60"], ["Needs work", "bg-[#d64a17]/60"], ["Struggling", "bg-rose-500/60"]].map(([label, cls]) => (
                       <div key={label} className="flex items-center gap-1">
                         <div className={`w-3 h-3 rounded ${cls}`} aria-hidden="true" />
                         <span className="text-[9px] text-[var(--color-muted)]">{label}</span>
@@ -164,9 +164,9 @@ export default function ForInstructors() {
                   <div className="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider mb-3">Recent Activity</div>
                   <div className="space-y-2">
                     {[
-                      { name: "Arjun K.", action: "Completed Bell State Challenge", xp: "+120 XP", color: "text-emerald-400" },
-                      { name: "Priya M.", action: "Started Grover's Algorithm", xp: "+50 XP", color: "text-cyan-400" },
-                      { name: "Rahul S.", action: "Submitted QFT circuit (needs review)", xp: "pending", color: "text-amber-400" },
+                      { name: "Arjun K.", action: "Completed Bell State Challenge", xp: "+120 XP", color: "text-[#f1a17e]" },
+                      { name: "Priya M.", action: "Started Grover's Algorithm", xp: "+50 XP", color: "text-[#e7b46a]" },
+                      { name: "Rahul S.", action: "Submitted QFT circuit (needs review)", xp: "pending", color: "text-[#d64a17]" },
                     ].map((s, i) => (
                       <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--color-border)]/30 last:border-0">
                         <div>

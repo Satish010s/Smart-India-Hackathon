@@ -20,10 +20,10 @@ const levels = [
     title: "Quantum Mechanics & Qubit Principles",
     desc: "Master superposition, state vector rotations, and entanglement through visual Bloch sphere intuition before tackling matrix algebra.",
     icon: LuBrain,
-    color: "from-indigo-500 to-purple-600",
-    borderColor: "border-indigo-500/40",
-    textColor: "text-indigo-400",
-    bgColor: "bg-indigo-500/10",
+    color: "from-[#d64a17] to-[#d64a17]",
+    borderColor: "border-[#d64a17]/40",
+    textColor: "text-[#d64a17]",
+    bgColor: "bg-[#d64a17]/10",
     time: "2 Hours",
     topics: ["Qubit Superposition", "Statevectors", "Entanglement", "Bloch Spheres"]
   },
@@ -33,10 +33,10 @@ const levels = [
     title: "Quantum Gate Primitives",
     desc: "Construct single and multi-qubit transformations using Hadamard, Pauli X/Y/Z, Phase (S/T), and CNOT entangling gates.",
     icon: LuBlocks,
-    color: "from-cyan-500 to-blue-600",
-    borderColor: "border-cyan-500/40",
-    textColor: "text-cyan-400",
-    bgColor: "bg-cyan-500/10",
+    color: "from-[#e7b46a] to-[#e7b46a]",
+    borderColor: "border-[#e7b46a]/40",
+    textColor: "text-[#e7b46a]",
+    bgColor: "bg-[#e7b46a]/10",
     time: "3.5 Hours",
     topics: ["Hadamard Gate", "Pauli Matrices", "CNOT & SWAP", "Phase Interference"]
   },
@@ -46,10 +46,10 @@ const levels = [
     title: "Multi-Qubit Circuit Engineering",
     desc: "Build complex quantum circuits, generate Bell states, implement quantum teleportation, and observe phase kickback in action.",
     icon: LuLayers,
-    color: "from-violet-500 to-indigo-600",
-    borderColor: "border-violet-500/40",
-    textColor: "text-violet-400",
-    bgColor: "bg-violet-500/10",
+    color: "from-[#dee64c] to-[#d64a17]",
+    borderColor: "border-[#dee64c]/40",
+    textColor: "text-[#dee64c]",
+    bgColor: "bg-[#dee64c]/10",
     time: "4.5 Hours",
     topics: ["Bell States", "Teleportation", "Phase Kickback", "Quantum Fourier Transform"]
   },
@@ -59,10 +59,10 @@ const levels = [
     title: "Quantum Algorithms & Hardware Execution",
     desc: "Implement Grover's search, Deutsch-Jozsa, QAOA, and VQE algorithms, and transpile circuits to Qiskit and Cirq backends.",
     icon: LuSparkles,
-    color: "from-emerald-500 to-teal-600",
-    borderColor: "border-emerald-500/40",
-    textColor: "text-emerald-400",
-    bgColor: "bg-emerald-500/10",
+    color: "from-[#f1a17e] to-[#f1a17e]",
+    borderColor: "border-[#f1a17e]/40",
+    textColor: "text-[#f1a17e]",
+    bgColor: "bg-[#f1a17e]/10",
     time: "6 Hours",
     topics: ["Grover's Algorithm", "Deutsch-Jozsa", "QAOA & VQE", "Qiskit / Cirq Transpilation"]
   }
@@ -81,7 +81,7 @@ export default function LearningPath() {
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-4xl sm:text-5xl font-heading font-bold mb-6 tracking-tight leading-tight">
             A Structured Pathway. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-purple-500 to-[var(--color-secondary)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-[#d64a17] to-[var(--color-secondary)]">
               From Qubit Zero to Quantum Engineer.
             </span>
           </h2>
@@ -95,7 +95,7 @@ export default function LearningPath() {
           
           {/* Vertical Central Timeline Conduit Line (Desktop) */}
           <div className="absolute left-4 md:left-1/2 top-8 bottom-8 w-[2px] bg-[var(--color-border)] -translate-x-1/2 rounded-full overflow-hidden hidden md:block">
-            <div className="w-full h-full bg-gradient-to-b from-[var(--color-primary)] via-cyan-500 to-[var(--color-secondary)] opacity-60" />
+            <div className="w-full h-full bg-gradient-to-b from-[var(--color-primary)] via-[#e7b46a] to-[var(--color-secondary)] opacity-60" />
           </div>
 
           <div className="space-y-12 md:space-y-16">
@@ -116,7 +116,7 @@ export default function LearningPath() {
                   {/* Timeline Badge Node (Center) */}
                   <div className="absolute left-4 md:left-1/2 top-6 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-20 hidden md:flex items-center justify-center">
                     <div className={`w-12 h-12 rounded-2xl bg-[var(--color-surface)] border ${
-                      isActive ? `${level.borderColor} shadow-[0_0_25px_rgba(99,102,241,0.4)] scale-110` : 'border-[var(--color-border)]'
+                      isActive ? `${level.borderColor} shadow-[0_0_25px_rgba(214, 74, 23,0.4)] scale-110` : 'border-[var(--color-border)]'
                     } flex items-center justify-center font-mono font-bold text-sm text-[var(--color-text)] transition-all duration-300 shadow-md`}>
                       <span className={isActive ? level.textColor : 'text-[var(--color-muted)]'}>{level.num}</span>
                     </div>

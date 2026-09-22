@@ -33,30 +33,39 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex w-full bg-[var(--color-background)]">
-      {/* Left Panel - Minimalist Form */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 xl:px-32 relative py-12">
-        <div className="w-full max-w-sm mx-auto space-y-8">
+    <div className="min-h-screen flex w-full items-center justify-center relative bg-black">
+      {/* Full Page Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/quantum-warm-bg.jpg')" }}
+      />
+      
+      {/* Subtle Dark Overlay */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Centered Form */}
+      <div className="relative z-10 w-full max-w-md p-6 sm:p-10 flex flex-col justify-center">
+        <div className="w-full space-y-8">
           {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
+          <div className="space-y-2 text-center text-white">
+            <h1 className="text-4xl font-bold tracking-tight">
               Reset password
             </h1>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="text-[15px] text-white/70">
               Enter your email to receive a recovery code
             </p>
           </div>
 
           {(error || localError) && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 text-sm flex items-center gap-2 animate-shake">
+            <div className="p-3 rounded-xl bg-rose-500/20 backdrop-blur-md border border-rose-500/30 text-rose-100 text-sm flex items-center gap-2 animate-shake">
               <LuCircleAlert size={16} />
               <span>{error || localError}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--color-text)]">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5 text-white">
+              <label className="block text-sm font-medium">
                 Email
               </label>
               <input
@@ -69,14 +78,15 @@ export default function ForgotPasswordPage() {
                   setEmail(e.target.value);
                 }}
                 placeholder="name@institution.edu"
-                className="w-full px-4 py-2.5 rounded-lg bg-transparent border border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-muted)] text-[15px] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#e7b46a] focus:ring-1 focus:ring-[#e7b46a] focus:bg-white/15 transition-all shadow-inner"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-4 py-2.5 rounded-lg font-medium text-[15px] bg-[var(--color-text)] text-[var(--color-background)] hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-6 py-3 rounded-xl font-bold text-[15px] text-white shadow-[0_0_20px_rgba(214,74,23,0.3)] hover:shadow-[0_0_30px_rgba(231,180,106,0.5)] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #d64a17, #e7b46a)" }}
             >
               {isLoading ? (
                 <>
@@ -92,7 +102,7 @@ export default function ForgotPasswordPage() {
           <div className="text-center pt-2">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-[14px] font-medium text-[var(--color-text)] hover:underline"
+              className="inline-flex items-center gap-1.5 text-[14px] font-bold text-white hover:text-[#e7b46a] transition-colors"
             >
               <LuArrowLeft size={16} />
               Back to Login
@@ -101,21 +111,11 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
 
-      {/* Right Panel - Quantum Image Background */}
-      <div className="hidden lg:block w-1/2 relative bg-zinc-950">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
-          style={{ backgroundImage: "url('/images/quantum-bg.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
-        
-        <div className="absolute bottom-12 left-12 right-12 text-white">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-            Secure Authentication
-          </div>
-          <h2 className="text-3xl font-medium tracking-tight mb-2">Account Recovery</h2>
-          <p className="text-zinc-400 text-sm">Security is a process, not a product. Recover your access securely.</p>
+      {/* Floating System Status */}
+      <div className="absolute bottom-8 left-8 hidden sm:block z-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md border border-white/10 text-xs font-medium text-white/80 shadow-xl">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Secure Authentication
         </div>
       </div>
     </div>

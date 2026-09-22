@@ -47,7 +47,7 @@ export default function SimulationVisuals() {
                 
                 <div className="relative w-64 h-64 mt-8 flex items-center justify-center">
                   {/* Detailed SVG Bloch Sphere */}
-                  <svg className="absolute inset-0 w-full h-full drop-shadow-[0_0_20px_rgba(99,102,241,0.2)]" viewBox="0 0 200 200">
+                  <svg className="absolute inset-0 w-full h-full drop-shadow-[0_0_20px_rgba(214, 74, 23,0.2)]" viewBox="0 0 200 200">
                     <defs>
                       <radialGradient id="sphereGrad" cx="30%" cy="30%" r="70%">
                         <stop offset="0%" stopColor="var(--color-surface)" stopOpacity="0.1"/>
@@ -145,7 +145,7 @@ export default function SimulationVisuals() {
                   
                   {/* Bars */}
                   <div className="w-12 bg-gray-800 rounded-t h-[5%]" />
-                  <div className="w-12 bg-gradient-to-t from-[var(--color-primary)]/50 to-[var(--color-primary)] rounded-t shadow-[0_0_15px_rgba(99,102,241,0.3)] relative group cursor-pointer" style={{height: "48%"}}>
+                  <div className="w-12 bg-gradient-to-t from-[var(--color-primary)]/50 to-[var(--color-primary)] rounded-t shadow-[0_0_15px_rgba(214, 74, 23,0.3)] relative group cursor-pointer" style={{height: "48%"}}>
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--color-surface)] px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 border border-[var(--color-border)]">0.482</div>
                   </div>
                   <div className="w-12 bg-gradient-to-t from-[var(--color-secondary)]/50 to-[var(--color-secondary)] rounded-t shadow-[0_0_15px_rgba(236,72,153,0.3)] relative group cursor-pointer" style={{height: "52%"}}>
@@ -213,7 +213,7 @@ export default function SimulationVisuals() {
                 <div className="absolute w-full h-[1px] bg-[var(--color-border)]" />
                 <div className="absolute h-full w-[1px] bg-[var(--color-border)]" />
                 {/* Vector */}
-                <div className="absolute w-1/2 h-[2px] bg-[var(--color-primary)] origin-left rotate-45 top-1/2 left-1/2 shadow-[0_0_10px_rgba(99,102,241,0.8)]">
+                <div className="absolute w-1/2 h-[2px] bg-[var(--color-primary)] origin-left rotate-45 top-1/2 left-1/2 shadow-[0_0_10px_rgba(214, 74, 23,0.8)]">
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-sm" />
                 </div>
                 {/* Equator */}
@@ -225,7 +225,7 @@ export default function SimulationVisuals() {
             <div className="viz-card p-6 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] flex flex-col items-center">
               <div className="text-sm font-bold text-[var(--color-muted)] uppercase tracking-wider mb-8 w-full">Q-Sphere</div>
               <div className="relative w-40 h-40 flex flex-wrap gap-2 items-center justify-center">
-                 <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-xs font-mono font-bold text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]">|00⟩</div>
+                 <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-xs font-mono font-bold text-white shadow-[0_0_15px_rgba(214, 74, 23,0.5)]">|00⟩</div>
                  <div className="w-12 h-12 rounded-full bg-[var(--color-background)] border-2 border-[var(--color-border)]" />
                  <div className="w-12 h-12 rounded-full bg-[var(--color-background)] border-2 border-[var(--color-border)]" />
                  <div className="w-12 h-12 rounded-full bg-[var(--color-secondary)] flex items-center justify-center text-xs font-mono font-bold text-[var(--color-background)] shadow-[0_0_15px_rgba(34,211,238,0.5)]">|11⟩</div>

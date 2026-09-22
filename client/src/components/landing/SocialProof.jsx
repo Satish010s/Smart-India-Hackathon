@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { LuStar, LuQuote, LuUsers, LuActivity, LuTarget } from "react-icons/lu";
 
 const STATS = [
-  { label: "Circuits Run", value: 18400, suffix: "+", icon: LuActivity, color: "text-cyan-400" },
-  { label: "Active Learners", value: 3800, suffix: "+", icon: LuUsers, color: "text-violet-400" },
+  { label: "Circuits Run", value: 18400, suffix: "+", icon: LuActivity, color: "text-[#e7b46a]" },
+  { label: "Active Learners", value: 3800, suffix: "+", icon: LuUsers, color: "text-[#dee64c]" },
   { label: "Challenges Solved", value: 940, suffix: "+", icon: LuTarget, color: "text-pink-400" },
-  { label: "Avg. Rating", value: 4.9, suffix: "/5", icon: LuStar, color: "text-amber-400", decimal: true },
+  { label: "Avg. Rating", value: 4.9, suffix: "/5", icon: LuStar, color: "text-[#d64a17]", decimal: true },
 ];
 
 const TESTIMONIALS = [
@@ -16,7 +16,7 @@ const TESTIMONIALS = [
     name: "Arjun Kapoor",
     role: "B.Tech CSE, IIT Bombay",
     initials: "AK",
-    color: "from-cyan-500 to-blue-600",
+    color: "from-[#e7b46a] to-[#e7b46a]",
     rating: 5,
   },
   {
@@ -24,7 +24,7 @@ const TESTIMONIALS = [
     name: "Dr. Priya Sharma",
     role: "Assistant Professor, Quantum Computing",
     initials: "PS",
-    color: "from-violet-500 to-purple-600",
+    color: "from-[#dee64c] to-[#d64a17]",
     rating: 5,
   },
   {
@@ -32,7 +32,7 @@ const TESTIMONIALS = [
     name: "Ravi Menon",
     role: "Senior SWE → Quantum ML researcher",
     initials: "RM",
-    color: "from-emerald-500 to-teal-600",
+    color: "from-[#f1a17e] to-[#f1a17e]",
     rating: 5,
   },
 ];
@@ -142,7 +142,7 @@ export default function SocialProof() {
                 {/* Stars */}
                 <div className="flex gap-0.5" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: t.rating }).map((_, si) => (
-                    <LuStar key={si} size={14} className="text-amber-400 fill-amber-400" aria-hidden="true" />
+                    <LuStar key={si} size={14} className="text-[#d64a17] fill-[#d64a17]" aria-hidden="true" />
                   ))}
                 </div>
 

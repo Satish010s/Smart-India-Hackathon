@@ -24,27 +24,22 @@ import {
 } from 'react-icons/lu';
 
 const DEFAULT_PROGRESS = {
-  overallProgress: 62,
-  coursesCompleted: 1,
-  totalCourses: 6,
-  lessonsCompleted: 54,
-  totalLessons: 87,
-  challengesSolved: 13,
-  challengesAttempted: 18,
-  quizAvgScore: 84,
-  learningHours: 38.5,
-  currentStreak: 12,
-  longestStreak: 18,
-  weeklyActivity: [2, 4, 3, 5, 4, 6, 3],
-  milestones: [
-    { title: 'Superposition & Qubit Measurement', status: 'Completed', date: 'Aug 2026', xp: 200 },
-    { title: 'Quantum Teleportation Protocol', status: 'Completed', date: 'Aug 2026', xp: 350 },
-    { title: "Grover's Oracles", status: 'In Progress', date: 'Expected Oct 2026', xp: 500 },
-    { title: 'Variational Quantum Eigensolver', status: 'Upcoming', date: 'Expected Nov 2026', xp: 800 },
-  ],
-  circuitsBuilt: 18,
-  simulationsRun: 84,
-  aiInteractions: 42,
+  overallProgress: 0,
+  coursesCompleted: 0,
+  totalCourses: 0,
+  lessonsCompleted: 0,
+  totalLessons: 0,
+  challengesSolved: 0,
+  challengesAttempted: 0,
+  quizAvgScore: 0,
+  learningHours: 0,
+  currentStreak: 0,
+  longestStreak: 0,
+  weeklyActivity: [0, 0, 0, 0, 0, 0, 0],
+  milestones: [],
+  circuitsBuilt: 0,
+  simulationsRun: 0,
+  aiInteractions: 0,
 };
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -74,8 +69,8 @@ export default function ProgressPage() {
   }, []);
 
   const stats = [
-    { label: 'Circuits Created', value: progress.circuitsBuilt, icon: LuCpu, color: 'text-cyan-400', change: '+3 this week' },
-    { label: 'Simulations Run', value: progress.simulationsRun, icon: LuActivity, color: 'text-violet-400', change: '+12 this week' },
+    { label: 'Circuits Created', value: progress.circuitsBuilt, icon: LuCpu, color: 'text-cyan-400', change: 'Total circuits' },
+    { label: 'Simulations Run', value: progress.simulationsRun, icon: LuActivity, color: 'text-violet-400', change: 'Total runs' },
     { label: 'Challenges Solved', value: `${progress.challengesSolved}/${progress.challengesAttempted}`, icon: LuTrophy, color: 'text-amber-400', change: `${Math.round((progress.challengesSolved / (progress.challengesAttempted || 1)) * 100)}% Accuracy` },
     { label: 'Learning Hours', value: `${progress.learningHours}h`, icon: LuClock, color: 'text-emerald-400', change: `${progress.currentStreak} day streak 🔥` },
   ];
@@ -195,7 +190,7 @@ export default function ProgressPage() {
                 </div>
 
                 <div className="h-44 flex items-end justify-between gap-3 pt-6 px-2">
-                  {(progress.weeklyActivity || [2, 4, 3, 5, 4, 6, 3]).map((hrs, idx) => {
+                  {(progress.weeklyActivity || [0, 0, 0, 0, 0, 0, 0]).map((hrs, idx) => {
                     const heightPct = Math.round((hrs / maxWeeklyHours) * 100);
                     return (
                       <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">

@@ -74,7 +74,3 @@ class VideoResponse(BaseModel):
     data: VideoData
 
 
-class KeyStatusResponse(BaseModel):
-    success: bool = True
-    hasServerKey: bool
-    model: str = "gemini-2.5-flash"

@@ -21,10 +21,10 @@ const loopNodes = [
     subtitle: "Interactive Intuition",
     desc: "Deconstruct superposition, state vector rotations, and entanglement through interactive visual modules before approaching complex linear algebra.",
     icon: LuBrain,
-    color: "from-indigo-500 to-purple-600",
-    borderColor: "border-indigo-500/50",
-    glowColor: "rgba(99, 102, 241, 0.25)",
-    textColor: "text-indigo-400",
+    color: "from-[#d64a17] to-[#d64a17]",
+    borderColor: "border-[#d64a17]/50",
+    glowColor: "rgba(214, 74, 23, 0.25)",
+    textColor: "text-[#d64a17]",
     badge: "Stage 01 // Theory"
   },
   {
@@ -34,10 +34,10 @@ const loopNodes = [
     subtitle: "Multi-Qubit Design",
     desc: "Assemble multi-qubit quantum circuits using drag-and-drop gate primitives (Hadamard, Pauli, CNOT) with real-time Qiskit and Cirq code generation.",
     icon: LuBlocks,
-    color: "from-cyan-500 to-blue-600",
-    borderColor: "border-cyan-500/50",
-    glowColor: "rgba(6, 182, 212, 0.25)",
-    textColor: "text-cyan-400",
+    color: "from-[#e7b46a] to-[#e7b46a]",
+    borderColor: "border-[#e7b46a]/50",
+    glowColor: "rgba(231, 180, 106, 0.25)",
+    textColor: "text-[#e7b46a]",
     badge: "Stage 02 // Composition"
   },
   {
@@ -47,10 +47,10 @@ const loopNodes = [
     subtitle: "Zero-Latency Backends",
     desc: "Execute algorithms instantly across high-performance web backends, bypassing queue latency and enabling immediate state iteration.",
     icon: LuCpu,
-    color: "from-violet-500 to-indigo-600",
-    borderColor: "border-violet-500/50",
-    glowColor: "rgba(139, 92, 246, 0.25)",
-    textColor: "text-violet-400",
+    color: "from-[#dee64c] to-[#d64a17]",
+    borderColor: "border-[#dee64c]/50",
+    glowColor: "rgba(222, 230, 76, 0.25)",
+    textColor: "text-[#dee64c]",
     badge: "Stage 03 // Execution"
   },
   {
@@ -60,10 +60,10 @@ const loopNodes = [
     subtitle: "3D Visual Analytics",
     desc: "Analyze 3D Bloch Spheres, statevectors, density matrices, and measurement outcome probability distributions with precision.",
     icon: LuSparkles,
-    color: "from-emerald-500 to-teal-600",
-    borderColor: "border-emerald-500/50",
-    glowColor: "rgba(16, 185, 129, 0.25)",
-    textColor: "text-emerald-400",
+    color: "from-[#f1a17e] to-[#f1a17e]",
+    borderColor: "border-[#f1a17e]/50",
+    glowColor: "rgba(241, 161, 126, 0.25)",
+    textColor: "text-[#f1a17e]",
     badge: "Stage 04 // Analytics"
   },
   {
@@ -73,10 +73,10 @@ const loopNodes = [
     subtitle: "Adaptive Debugging",
     desc: "Receive real-time circuit debugging, contextual math explanations, and personalized optimization hints to continuously refine your knowledge loop.",
     icon: LuBot,
-    color: "from-amber-500 to-orange-600",
-    borderColor: "border-amber-500/50",
-    glowColor: "rgba(245, 158, 11, 0.25)",
-    textColor: "text-amber-400",
+    color: "from-[#d64a17] to-[#d64a17]",
+    borderColor: "border-[#d64a17]/50",
+    glowColor: "rgba(214, 74, 23, 0.25)",
+    textColor: "text-[#d64a17]",
     badge: "Stage 05 // AI Feedback"
   }
 ];
@@ -169,12 +169,12 @@ export default function ProblemSolution() {
               <div className="bento-glow" />
               <div className="relative z-10 flex-1">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center shadow-inner">
+                  <div className="w-16 h-16 rounded-2xl bg-[#d64a17]/10 text-[#d64a17] border border-[#d64a17]/20 flex items-center justify-center shadow-inner">
                     <LuCpu size={32} />
                   </div>
-                  <div className="text-indigo-500/40 font-mono text-5xl font-black">03</div>
+                  <div className="text-[#d64a17]/40 font-mono text-5xl font-black">03</div>
                 </div>
-                <span className="text-xs font-mono font-bold tracking-wider text-indigo-400 uppercase mb-2 block">
+                <span className="text-xs font-mono font-bold tracking-wider text-[#d64a17] uppercase mb-2 block">
                   Infrastructure Bottlenecks
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-bold mb-3">Hardware Execution Queues</h3>
@@ -190,7 +190,7 @@ export default function ProblemSolution() {
                      <div className="absolute top-1/2 left-4 -translate-y-1/2 w-8 h-8 bg-[var(--color-surface)] border border-[var(--color-primary)]/40 text-[var(--color-primary)] rounded shadow flex items-center justify-center text-xs font-mono font-bold">H</div>
                    </div>
                    <div className="w-full h-[2px] bg-[var(--color-border)] relative">
-                     <div className="absolute top-1/2 left-16 -translate-y-1/2 w-8 h-8 bg-[var(--color-surface)] border border-cyan-500/40 text-cyan-400 rounded shadow flex items-center justify-center text-xs font-mono font-bold">X</div>
+                     <div className="absolute top-1/2 left-16 -translate-y-1/2 w-8 h-8 bg-[var(--color-surface)] border border-[#e7b46a]/40 text-[#e7b46a] rounded shadow flex items-center justify-center text-xs font-mono font-bold">X</div>
                    </div>
                  </div>
               </div>
@@ -207,7 +207,7 @@ export default function ProblemSolution() {
           <div className="text-center max-w-3xl mx-auto mb-20">
             <h2 className="text-4xl sm:text-5xl font-heading font-bold mb-6">
               One Integrated Platform. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-purple-500 to-[var(--color-secondary)]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-[#d64a17] to-[var(--color-secondary)]">
                 The Quantum Learning Pipeline
               </span>
             </h2>
@@ -226,8 +226,8 @@ export default function ProblemSolution() {
                   <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="var(--color-primary)" />
                     <stop offset="35%" stopColor="#06b6d4" />
-                    <stop offset="65%" stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#f59e0b" />
+                    <stop offset="65%" stopColor="#dee64c" />
+                    <stop offset="100%" stopColor="#d64a17" />
                   </linearGradient>
 
                   <filter id="snakeGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -297,16 +297,16 @@ export default function ProblemSolution() {
                 <div 
                   onClick={() => setActiveStep(0)}
                   className={`bento-card p-8 cursor-pointer transition-all duration-500 relative ${
-                    activeStep === 0 ? "border-indigo-500 shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
+                    activeStep === 0 ? "border-[#d64a17] shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-[#d64a17]/10 text-[#d64a17] border border-[#d64a17]/20 flex items-center justify-center shadow-inner">
                       <LuBrain size={28} />
                     </div>
-                    <span className="font-mono text-4xl font-black text-indigo-500/40">01</span>
+                    <span className="font-mono text-4xl font-black text-[#d64a17]/40">01</span>
                   </div>
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full inline-block mb-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#d64a17] bg-[#d64a17]/10 border border-[#d64a17]/20 px-3 py-1 rounded-full inline-block mb-3">
                     {loopNodes[0].badge}
                   </span>
                   <h3 className="text-2xl font-bold mb-3">{loopNodes[0].title}</h3>
@@ -319,16 +319,16 @@ export default function ProblemSolution() {
                 <div 
                   onClick={() => setActiveStep(1)}
                   className={`bento-card p-8 cursor-pointer transition-all duration-500 relative lg:translate-y-6 ${
-                    activeStep === 1 ? "border-cyan-500 shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
+                    activeStep === 1 ? "border-[#e7b46a] shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-[#e7b46a]/10 text-[#e7b46a] border border-[#e7b46a]/20 flex items-center justify-center shadow-inner">
                       <LuBlocks size={28} />
                     </div>
-                    <span className="font-mono text-4xl font-black text-cyan-500/40">02</span>
+                    <span className="font-mono text-4xl font-black text-[#e7b46a]/40">02</span>
                   </div>
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 rounded-full inline-block mb-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#e7b46a] bg-[#e7b46a]/10 border border-[#e7b46a]/20 px-3 py-1 rounded-full inline-block mb-3">
                     {loopNodes[1].badge}
                   </span>
                   <h3 className="text-2xl font-bold mb-3">{loopNodes[1].title}</h3>
@@ -343,16 +343,16 @@ export default function ProblemSolution() {
                 <div 
                   onClick={() => setActiveStep(2)}
                   className={`bento-card p-8 cursor-pointer transition-all duration-500 w-full max-w-xl relative ${
-                    activeStep === 2 ? "border-violet-500 shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
+                    activeStep === 2 ? "border-[#dee64c] shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-violet-500/10 text-violet-500 border border-violet-500/20 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-[#dee64c]/10 text-[#dee64c] border border-[#dee64c]/20 flex items-center justify-center shadow-inner">
                       <LuCpu size={28} />
                     </div>
-                    <span className="font-mono text-4xl font-black text-violet-500/40">03</span>
+                    <span className="font-mono text-4xl font-black text-[#dee64c]/40">03</span>
                   </div>
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-violet-400 bg-violet-500/10 border border-violet-500/20 px-3 py-1 rounded-full inline-block mb-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#dee64c] bg-[#dee64c]/10 border border-[#dee64c]/20 px-3 py-1 rounded-full inline-block mb-3">
                     {loopNodes[2].badge}
                   </span>
                   <h3 className="text-2xl font-bold mb-3">{loopNodes[2].title}</h3>
@@ -368,16 +368,16 @@ export default function ProblemSolution() {
                 <div 
                   onClick={() => setActiveStep(3)}
                   className={`bento-card p-8 cursor-pointer transition-all duration-500 relative ${
-                    activeStep === 3 ? "border-emerald-500 shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
+                    activeStep === 3 ? "border-[#f1a17e] shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-[#f1a17e]/10 text-[#f1a17e] border border-[#f1a17e]/20 flex items-center justify-center shadow-inner">
                       <LuSparkles size={28} />
                     </div>
-                    <span className="font-mono text-4xl font-black text-emerald-500/40">04</span>
+                    <span className="font-mono text-4xl font-black text-[#f1a17e]/40">04</span>
                   </div>
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block mb-3">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#f1a17e] bg-[#f1a17e]/10 border border-[#f1a17e]/20 px-3 py-1 rounded-full inline-block mb-3">
                     {loopNodes[3].badge}
                   </span>
                   <h3 className="text-2xl font-bold mb-3">{loopNodes[3].title}</h3>
@@ -390,17 +390,17 @@ export default function ProblemSolution() {
                 <div 
                   onClick={() => setActiveStep(4)}
                   className={`bento-card p-8 cursor-pointer transition-all duration-500 relative lg:translate-y-6 ${
-                    activeStep === 4 ? "border-amber-500 shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
+                    activeStep === 4 ? "border-[#d64a17] shadow-2xl scale-[1.02] bg-[var(--color-surface)]" : "hover:border-[var(--color-border)]/80"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-[#d64a17]/10 text-[#d64a17] border border-[#d64a17]/20 flex items-center justify-center shadow-inner">
                       <LuBot size={28} />
                     </div>
-                    <span className="font-mono text-4xl font-black text-amber-500/40">05</span>
+                    <span className="font-mono text-4xl font-black text-[#d64a17]/40">05</span>
                   </div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#d64a17] bg-[#d64a17]/10 border border-[#d64a17]/20 px-3 py-1 rounded-full">
                       {loopNodes[4].badge}
                     </span>
                     <span className="text-[11px] font-mono text-[var(--color-primary)] flex items-center gap-1">

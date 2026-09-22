@@ -10,37 +10,7 @@ import {
   LuLock, LuCpu, LuBookOpen, LuBrain, LuTarget, LuCalendar,
   LuActivity, LuSparkles, LuGraduationCap,
 } from 'react-icons/lu';
-
-const BADGES = [
-  { id: 'b1', title: 'Qubit Pioneer', desc: 'Completed your first quantum lesson', icon: '⚛️', earned: true, xp: 50, date: 'Aug 12', rarity: 'Common' },
-  { id: 'b2', title: 'Bell State Builder', desc: 'Successfully created a Bell entangled pair', icon: '🔔', earned: true, xp: 150, date: 'Aug 18', rarity: 'Uncommon' },
-  { id: 'b3', title: 'Grover Explorer', desc: "Completed Grover's search module", icon: '🔍', earned: true, xp: 250, date: 'Sep 2', rarity: 'Rare' },
-  { id: 'b4', title: 'Circuit Architect', desc: 'Built 10+ unique quantum circuits in playground', icon: '🏗️', earned: true, xp: 200, date: 'Sep 5', rarity: 'Uncommon' },
-  { id: 'b5', title: '7-Day Streak', desc: 'Learned for 7 consecutive days', icon: '🔥', earned: true, xp: 100, date: 'Sep 8', rarity: 'Common' },
-  { id: 'b6', title: 'Quiz Ace', desc: 'Scored 100% on 3 consecutive quizzes', icon: '🎯', earned: true, xp: 300, date: 'Sep 10', rarity: 'Rare' },
-  { id: 'b7', title: 'Shor Specialist', desc: "Master Shor's factoring algorithm", icon: '🔐', earned: false, xp: 500, rarity: 'Epic' },
-  { id: 'b8', title: 'QML Trailblazer', desc: 'Complete the Quantum ML track', icon: '🤖', earned: false, xp: 600, rarity: 'Epic' },
-  { id: 'b9', title: 'Grand Quantum Master', desc: 'Complete all courses with 90%+ quiz avg', icon: '🏆', earned: false, xp: 2000, rarity: 'Legendary' },
-];
-
-const MILESTONES = [
-  { xp: 0, label: 'Novice', icon: '🌱', reached: true },
-  { xp: 500, label: 'Apprentice', icon: '⚗️', reached: true },
-  { xp: 1000, label: 'Explorer', icon: '🔭', reached: true },
-  { xp: 2000, label: 'Practitioner', icon: '⚛️', reached: true },
-  { xp: 3500, label: 'Specialist', icon: '🧬', reached: false },
-  { xp: 5000, label: 'Expert', icon: '🌌', reached: false },
-  { xp: 8000, label: 'Master', icon: '🏆', reached: false },
-];
-
-const LEADERBOARD = [
-  { rank: 1, name: 'Neha Gupta', xp: 8420, avatar: 'N', badge: '🏆' },
-  { rank: 2, name: 'Rohan Verma', xp: 7890, avatar: 'R', badge: '🥈' },
-  { rank: 3, name: 'Aisha Khan', xp: 7230, avatar: 'A', badge: '🥉' },
-  { rank: 4, name: 'Vijay Patil', xp: 6540, avatar: 'V', badge: null },
-  { rank: 5, name: 'Priya Reddy', xp: 5980, avatar: 'P', badge: null },
-  { rank: 42, name: 'Arjun Sharma', xp: 4250, avatar: 'A', badge: null, isYou: true },
-];
+import { AchievementSkeleton } from './AchievementSkeleton';
 
 const RARITY_STYLES = {
   Common: 'text-slate-400 border-slate-400/30 bg-slate-400/10',
@@ -50,31 +20,33 @@ const RARITY_STYLES = {
   Legendary: 'text-amber-400 border-amber-400/30 bg-amber-400/10',
 };
 
-const USER_XP = 4250;
-
 export default function AchievementPage() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [filter, setFilter] = useState('all');
   const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     apiFetch('/learner/achievements')
-      .then(res => { if (res?.success) setApiData(res.data); })
-      .catch(() => {}); // fallback to embedded mock data below
+      .then(res => { if (res?.success && mounted) setApiData(res.data); })
+      .catch(() => {})
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, []);
 
-  const badges = apiData?.badges || BADGES;
-  const milestones = apiData?.milestones || MILESTONES;
-  const leaderboard = apiData?.leaderboard || LEADERBOARD;
-  const userXp = apiData?.xp || USER_XP;
+  const badges = apiData?.badges || [];
+  const milestones = apiData?.milestones || [];
+  const leaderboard = apiData?.leaderboard || [];
+  const userXp = apiData?.xp || 0;
 
   const earned = badges.filter(b => b.earned);
   const locked = badges.filter(b => !b.earned);
   const filtered = filter === 'earned' ? earned : filter === 'locked' ? locked : badges;
 
   // XP milestone progress
-  const currentMilestone = milestones.filter(m => userXp >= m.xp).slice(-1)[0];
+  const currentMilestone = milestones.filter(m => userXp >= m.xp).slice(-1)[0] || { xp: 0, label: 'Novice' };
   const nextMilestone = milestones.find(m => userXp < m.xp);
   const pct = nextMilestone ? Math.round(((userXp - currentMilestone.xp) / (nextMilestone.xp - currentMilestone.xp)) * 100) : 100;
 
@@ -97,8 +69,12 @@ export default function AchievementPage() {
           />
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
-            {/* Hero */}
-            <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-[var(--color-surface)] to-[var(--color-primary)]/10 p-6 sm:p-8">
+            {loading ? (
+              <AchievementSkeleton />
+            ) : (
+              <>
+                {/* Hero */}
+                <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-[var(--color-surface)] to-[var(--color-primary)]/10 p-6 sm:p-8">
               <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-4xl shadow-xl flex-shrink-0">
@@ -111,10 +87,10 @@ export default function AchievementPage() {
                   </div>
                   <div className="flex items-center gap-4 flex-wrap">
                     {[
-                      { label: 'XP', value: '4,250', icon: LuZap, color: 'text-amber-400' },
-                      { label: 'Badges', value: `${earned.length}/${BADGES.length}`, icon: LuMedal, color: 'text-violet-400' },
-                      { label: 'Streak', value: '12 days', icon: LuFlame, color: 'text-rose-400' },
-                      { label: 'Global Rank', value: '#42', icon: LuTrophy, color: 'text-cyan-400' },
+                      { label: 'XP', value: userXp.toLocaleString(), icon: LuZap, color: 'text-amber-400' },
+                      { label: 'Badges', value: `${earned.length}/${badges.length}`, icon: LuMedal, color: 'text-violet-400' },
+                      { label: 'Streak', value: `${apiData?.streak || 0} days`, icon: LuFlame, color: 'text-rose-400' },
+                      { label: 'Global Rank', value: `#${apiData?.rank || '--'}`, icon: LuTrophy, color: 'text-cyan-400' },
                     ].map(s => {
                       const Icon = s.icon;
                       return (
@@ -252,11 +228,12 @@ export default function AchievementPage() {
                         {user.isYou && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/20">YOU</span>}
                       </div>
                     </div>
-                    <div className="text-sm font-bold font-mono text-amber-400">{user.xp.toLocaleString()} XP</div>
                   </div>
                 ))}
               </div>
             </div>
+            </>
+            )}
           </main>
         </div>
       </div>

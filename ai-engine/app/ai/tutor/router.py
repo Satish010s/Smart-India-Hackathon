@@ -7,7 +7,6 @@ from app.schemas.ai import (
     ChatResponse,
     VideoRequest,
     VideoResponse,
-    KeyStatusResponse,
 )
 from app.ai.tutor.service import (
     chat_with_tutor,
@@ -81,12 +80,4 @@ async def tutor_generate_video(
         raise HTTPException(status_code=500, detail=f"Video generator error: {str(e)}")
 
 
-@router.get("/key-status", response_model=KeyStatusResponse)
-async def get_key_status():
-    """Returns whether the FastAPI AI Engine has a configured Gemini API key."""
-    has_key = bool(settings.GEMINI_API_KEY and len(settings.GEMINI_API_KEY.strip()) > 5)
-    return KeyStatusResponse(
-        success=True,
-        hasServerKey=has_key,
-        model="gemini-3.6-flash",
-    )
+

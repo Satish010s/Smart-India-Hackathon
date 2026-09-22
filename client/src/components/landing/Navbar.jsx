@@ -151,7 +151,32 @@ export default function Navbar() {
       >
         <style>{NAV_CSS}</style>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Wavy Background Contained Inside Navbar */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0" style={{ transform: "rotate(180deg) scaleX(-1)" }}>
+          <svg
+            className="block w-full h-full"
+            preserveAspectRatio="none"
+            viewBox="0 0 1440 320"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Base Background (Solid Soft Peach) */}
+            <rect width="1440" height="320" fill="#f1a17e" fillOpacity={isDark ? "0.2" : "0.1"} />
+            {/* Layer 1 (Soft Peach) */}
+            <path
+              fill="#f1a17e"
+              fillOpacity={isDark ? "0.4" : "0.2"}
+              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+            {/* Layer 2 (Soft Olive / Yellow Green) */}
+            <path
+              fill="#dee64c"
+              fillOpacity={isDark ? "0.4" : "0.2"}
+              d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+          </svg>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 

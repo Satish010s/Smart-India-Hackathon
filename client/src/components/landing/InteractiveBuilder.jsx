@@ -79,7 +79,7 @@ export default function InteractiveBuilder() {
                   <div className="font-bold text-[var(--color-muted)] w-6">q0</div>
                   <div className="w-12 h-12 rounded-xl border border-[var(--color-secondary)] bg-[var(--color-secondary)]/10 flex items-center justify-center font-bold text-[var(--color-secondary)] shadow-[0_0_15px_rgba(236,72,153,0.15)] backdrop-blur-sm">H</div>
                   <div className="w-8" />
-                  <div className="w-4 h-4 rounded-full bg-[var(--color-primary)] shadow-[0_0_10px_rgba(99,102,241,0.5)] relative mx-4">
+                  <div className="w-4 h-4 rounded-full bg-[var(--color-primary)] shadow-[0_0_10px_rgba(214, 74, 23,0.5)] relative mx-4">
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-[2px] h-[52px] bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/50" />
                   </div>
                   <div className="flex-1" />
@@ -90,7 +90,7 @@ export default function InteractiveBuilder() {
                 <div className="flex items-center gap-6 relative z-10">
                   <div className="font-bold text-[var(--color-muted)] w-6">q1</div>
                   <div className="w-[112px]" />
-                  <div className="w-12 h-12 rounded-full border border-[var(--color-primary)] bg-[var(--color-background)] flex items-center justify-center text-[var(--color-primary)] shadow-[0_0_15px_rgba(99,102,241,0.15)] relative backdrop-blur-sm">
+                  <div className="w-12 h-12 rounded-full border border-[var(--color-primary)] bg-[var(--color-background)] flex items-center justify-center text-[var(--color-primary)] shadow-[0_0_15px_rgba(214, 74, 23,0.15)] relative backdrop-blur-sm">
                     <div className="absolute w-6 h-[2px] bg-[var(--color-primary)] rotate-45" />
                     <div className="absolute w-6 h-[2px] bg-[var(--color-primary)] -rotate-45" />
                   </div>
@@ -113,14 +113,14 @@ export default function InteractiveBuilder() {
                   <div className="flex flex-col text-gray-300">
                     <div><span className="text-pink-500">from</span> qiskit <span className="text-pink-500">import</span> <span className="text-yellow-300">QuantumCircuit</span></div>
                     <br/>
-                    <div><span className="text-blue-400">qc</span> <span className="text-pink-500">=</span> <span className="text-yellow-300">QuantumCircuit</span>(<span className="text-purple-400">2</span>)</div>
-                    <div><span className="text-blue-400">qc</span>.<span className="text-green-300">h</span>(<span className="text-purple-400">0</span>)</div>
-                    <div><span className="text-blue-400">qc</span>.<span className="text-green-300">cx</span>(<span className="text-purple-400">0</span>, <span className="text-purple-400">1</span>)</div>
+                    <div><span className="text-[#e7b46a]">qc</span> <span className="text-pink-500">=</span> <span className="text-yellow-300">QuantumCircuit</span>(<span className="text-[#d64a17]">2</span>)</div>
+                    <div><span className="text-[#e7b46a]">qc</span>.<span className="text-green-300">h</span>(<span className="text-[#d64a17]">0</span>)</div>
+                    <div><span className="text-[#e7b46a]">qc</span>.<span className="text-green-300">cx</span>(<span className="text-[#d64a17]">0</span>, <span className="text-[#d64a17]">1</span>)</div>
                   </div>
                 </div>
               </div>
               <div className="mt-4 flex justify-end">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white rounded-lg font-sans text-sm font-semibold hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:scale-105 transition-all duration-300">
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white rounded-lg font-sans text-sm font-semibold hover:shadow-[0_0_20px_rgba(214, 74, 23,0.4)] hover:scale-105 transition-all duration-300">
                   <LuPlay size={16} fill="currentColor" /> Run Circuit
                 </button>
               </div>

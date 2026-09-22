@@ -135,8 +135,8 @@ export default function ChallengesAndEcosystem() {
               <p className="text-[var(--color-muted)]">Design experiments, compare backends, simulate circuits, and export to industry frameworks.</p>
             </div>
             
-            <div className="audience-card p-8 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex flex-col items-center text-center hover:border-indigo-500/50 transition-colors">
-              <div className="w-14 h-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-6">
+            <div className="audience-card p-8 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] flex flex-col items-center text-center hover:border-[#d64a17]/50 transition-colors">
+              <div className="w-14 h-14 rounded-full bg-[#d64a17]/10 text-[#d64a17] flex items-center justify-center mb-6">
                 <LuUserCheck size={28} />
               </div>
               <h3 className="text-xl font-bold mb-3">Instructors</h3>
