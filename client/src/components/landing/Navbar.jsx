@@ -141,7 +141,7 @@ export default function Navbar() {
     <button
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`w-10 h-10 inline-flex items-center justify-center rounded-full border border-[color:var(--n-border)] text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] hover:border-[color:var(--n-border-strong)] transition-colors cursor-pointer ${focusRing}`}
+      className={`w-10 h-10 inline-flex items-center justify-center rounded-full bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-800 dark:text-zinc-100 hover:text-zinc-950 dark:hover:text-white shadow-xs transition-colors cursor-pointer ${focusRing}`}
     >
       {isDark ? <LuSun size={17} /> : <LuMoon size={17} />}
     </button>
@@ -228,8 +228,11 @@ export default function Navbar() {
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 
-            {/* Desktop links */}
-            <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
+            {/* Desktop links inside a high-contrast frosted glass pill */}
+            <nav
+              className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/85 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 shadow-sm"
+              aria-label="Main navigation"
+            >
               {NAV_LINKS.map((link) => {
                 const active = activeId === link.href.slice(1);
                 return (
@@ -237,15 +240,13 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`qm-nav-link relative px-4 py-2.5 text-sm font-semibold rounded-md transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
-                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
+                    className={`relative px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 ${
+                      active
+                        ? "bg-[#ff5500]/15 dark:bg-[#ff5500]/25 text-[#d64a17] dark:text-[#ff9500] font-bold shadow-xs"
+                        : "text-zinc-800 dark:text-zinc-100 hover:text-zinc-950 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                    } ${focusRing}`}
                   >
                     {link.name}
-                    <span
-                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-opacity duration-200"
-                      style={{ background: isDark ? "#dee64c" : "var(--n-border-strong)", opacity: active ? 1 : 0 }}
-                      aria-hidden="true"
-                    />
                   </a>
                 );
               })}
@@ -260,7 +261,7 @@ export default function Navbar() {
                   <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
+                      className={`flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 shadow-xs transition-colors cursor-pointer ${focusRing}`}
                       aria-label="User menu"
                       aria-haspopup="menu"
                       aria-expanded={profileOpen}
@@ -341,7 +342,7 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className={`px-5 py-2.5 rounded-full text-sm font-medium text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] transition-colors ${focusRing}`}
+                      className={`px-5 py-2 rounded-full text-sm font-semibold text-zinc-900 dark:text-white hover:text-zinc-950 dark:hover:text-white bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 shadow-xs transition-colors ${focusRing}`}
                     >
                       Log In
                     </Link>
@@ -363,7 +364,7 @@ export default function Navbar() {
               {/* Hamburger */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
+                className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-xl bg-white/80 dark:bg-[#0a0c0f]/85 backdrop-blur-md border border-black/10 dark:border-white/15 text-zinc-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 shadow-xs transition-colors cursor-pointer ${focusRing}`}
                 aria-label="Toggle navigation"
                 aria-expanded={mobileOpen}
               >
