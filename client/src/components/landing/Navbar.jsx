@@ -154,6 +154,37 @@ export default function Navbar() {
         {/* Top vibrant orange highlight line */}
         <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#ff5500] via-[#ff9500] to-[#ea580c] z-20 pointer-events-none opacity-90 shadow-[0_0_8px_rgba(255,107,0,0.5)]" />
 
+        {/* Ambient Color Wash Fill: warm orange glow on the left, radiant olive/teal on the right, smooth warm gradient across */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          {/* Left Warm Orange/Sienna Ambient Aura */}
+          <div
+            className="absolute -top-10 -left-12 w-80 h-36 rounded-full blur-2xl opacity-40 dark:opacity-30 pointer-events-none"
+            style={{
+              background: "radial-gradient(circle, #ff5500 0%, #d64a17 50%, transparent 80%)",
+            }}
+          />
+
+          {/* Center Smooth Ambient Gradient */}
+          <div
+            className="absolute inset-0 opacity-25 dark:opacity-20 pointer-events-none"
+            style={{
+              background: isDark
+                ? "linear-gradient(90deg, rgba(255,85,0,0.2) 0%, rgba(214,74,23,0.1) 40%, rgba(222,230,76,0.15) 100%)"
+                : "linear-gradient(90deg, rgba(255,107,0,0.25) 0%, rgba(251,146,60,0.12) 45%, rgba(222,230,76,0.22) 100%)",
+            }}
+          />
+
+          {/* Right Radiant Olive/Teal Ambient Aura */}
+          <div
+            className="absolute -top-10 -right-12 w-80 h-36 rounded-full blur-2xl opacity-40 dark:opacity-30 pointer-events-none"
+            style={{
+              background: isDark
+                ? "radial-gradient(circle, #dee64c 0%, #14b8a6 50%, transparent 80%)"
+                : "radial-gradient(circle, #c8d626 0%, #0f766e 50%, transparent 80%)",
+            }}
+          />
+        </div>
+
         {/* Bottom edge multi-tone wave ribbon (Orange + Burnt Sienna + Olive) */}
         <div className="absolute bottom-0 inset-x-0 h-4 sm:h-5 overflow-hidden pointer-events-none z-0">
           <svg
@@ -205,7 +236,7 @@ export default function Navbar() {
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 
-            {/* Desktop links - clean, integrated typography */}
+            {/* Desktop links - clean, integrated typography with subtle active tint */}
             <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
               {NAV_LINKS.map((link) => {
                 const active = activeId === link.href.slice(1);
@@ -214,8 +245,12 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
-                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
+                    className={`relative px-3.5 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200 hover:text-[color:var(--n-text)] ${
+                      active
+                        ? "bg-[#ff5500]/12 dark:bg-[#ff5500]/18 text-[#d64a17] dark:text-[#ff9500]"
+                        : "hover:bg-black/5 dark:hover:bg-white/5"
+                    } ${focusRing}`}
+                    style={{ color: active ? undefined : "var(--n-muted)" }}
                   >
                     {link.name}
                     <span
