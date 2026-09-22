@@ -167,46 +167,59 @@ export default function Navbar() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <linearGradient id="navWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#d64a17" stopOpacity={isDark ? "0.88" : "0.78"} />
-                <stop offset="50%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.85"} />
-                <stop offset="100%" stopColor="#c2410c" stopOpacity={isDark ? "0.88" : "0.78"} />
+              {/* Top Wave Gradient: High-Contrast Vibrant Electric Orange */}
+              <linearGradient id="navWaveTopOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ff5500" stopOpacity={isDark ? "0.95" : "0.90"} />
+                <stop offset="30%" stopColor="#ff7a00" stopOpacity={isDark ? "1" : "0.95"} />
+                <stop offset="70%" stopColor="#ff9500" stopOpacity={isDark ? "1" : "0.95"} />
+                <stop offset="100%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.90"} />
               </linearGradient>
+
+              {/* Middle Wave Gradient: Deep Rich Burnt Sienna */}
+              <linearGradient id="navWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#d64a17" stopOpacity={isDark ? "0.90" : "0.82"} />
+                <stop offset="50%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.88"} />
+                <stop offset="100%" stopColor="#c2410c" stopOpacity={isDark ? "0.90" : "0.82"} />
+              </linearGradient>
+
+              {/* Lower Wave Gradient: Radiant Olive / Yellow Green */}
               <linearGradient id="navWaveOlive" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#dee64c" stopOpacity={isDark ? "0.85" : "0.75"} />
-                <stop offset="50%" stopColor="#d4e320" stopOpacity={isDark ? "0.92" : "0.82"} />
-                <stop offset="100%" stopColor="#b5c418" stopOpacity={isDark ? "0.85" : "0.72"} />
+                <stop offset="0%" stopColor="#dee64c" stopOpacity={isDark ? "0.88" : "0.78"} />
+                <stop offset="50%" stopColor="#d4e320" stopOpacity={isDark ? "0.95" : "0.85"} />
+                <stop offset="100%" stopColor="#b5c418" stopOpacity={isDark ? "0.88" : "0.75"} />
               </linearGradient>
             </defs>
 
-            {/* Base Ambient Fill (Warm Burnt Sienna Glow) */}
+            {/* Base Ambient Fill (Warm Orange Glow) */}
             <rect
               width="1440"
               height="320"
-              fill="#d64a17"
-              fillOpacity={isDark ? "0.35" : "0.22"}
+              fill="#ff6b00"
+              fillOpacity={isDark ? "0.32" : "0.20"}
             />
 
-            {/* Layer 1 (Back Wave — Rich Burnt Sienna) */}
-            <path
-              fill="url(#navWaveSienna)"
-              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-
-            {/* Layer 2 (Middle Wave — Radiant Olive / Yellow Green) */}
+            {/* Layer 1 (Lower Wave — Radiant Olive / Yellow Green) */}
             <path
               fill="url(#navWaveOlive)"
               d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
 
-            {/* Layer 3 (Front Crest Wave — Background Contrast Cutout) */}
+            {/* Layer 2 (Middle Wave — Deep Burnt Sienna) */}
             <path
-              fill={isDark ? "#0a0c0f" : "#fafaf9"}
-              fillOpacity={isDark ? "0.6" : "0.5"}
+              fill="url(#navWaveSienna)"
+              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+
+            {/* Layer 3 (Top Wave — High-Contrast Vibrant Electric Orange) */}
+            <path
+              fill="url(#navWaveTopOrange)"
               d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,133.3C672,139,768,181,864,208C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
           </svg>
         </div>
+
+        {/* Top vibrant orange highlight bar */}
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#ff5500] via-[#ff9500] to-[#ea580c] z-20 pointer-events-none opacity-90 shadow-[0_0_12px_rgba(255,107,0,0.6)]" />
 
         {/* Crisp glass contrast scrim protecting navigation readability */}
         <div className="absolute inset-0 bg-white/10 dark:bg-black/25 backdrop-blur-[1.5px] pointer-events-none z-0" />
@@ -335,11 +348,13 @@ export default function Navbar() {
                     <Link
                       href="/signup"
                       id="nav-cta"
-                      className={`group inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] ${focusRing}`}
-                      style={primaryCta}
+                      className={`group relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_4px_18px_rgba(255,107,0,0.38)] hover:shadow-[0_6px_24px_rgba(255,107,0,0.55)] border border-white/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden ${focusRing}`}
                     >
-                      Start Learning Free
-                      <LuArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                      <div className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out skew-x-12 pointer-events-none" />
+                      <span className="relative z-10 flex items-center gap-2 drop-shadow-sm">
+                        Start Learning Free
+                        <LuArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                      </span>
                     </Link>
                   </>
                 )}
@@ -428,10 +443,9 @@ export default function Navbar() {
                   <Link
                     href="/signup"
                     onClick={() => setMobileOpen(false)}
-                    className="text-center px-4 py-3 rounded-lg text-sm font-semibold"
-                    style={primaryCta}
+                    className="text-center px-4 py-3 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-md shadow-orange-500/30 border border-white/20 active:scale-[0.98] transition-transform"
                   >
-                    Start Free
+                    Start Learning Free
                   </Link>
                 </div>
               )}
