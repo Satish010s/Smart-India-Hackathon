@@ -23,30 +23,37 @@ const NAV_CSS = `
   --n-bg:#fafaf9;
   --n-surface:#ffffff;
   --n-surface2:#f4f4f5;
-  --n-border:#e4e4e7;
-  --n-border-strong:#d4d4d8;
-  --n-text:#111418;
-  --n-muted:#5b6572;
+  --n-border:rgba(214,74,23,0.35);
+  --n-border-strong:#d64a17;
+  --n-text:#09090b;
+  --n-muted:#27272a;
   --n-accent:#0f766e;
-  --n-accent-soft:rgba(15,118,110,0.09);
+  --n-accent-soft:rgba(15,118,110,0.12);
   --n-danger:#be123c;
   --n-danger-soft:rgba(190,18,60,0.08);
-  --n-shadow:0 20px 50px -20px rgba(15,23,42,0.22);
+  --n-shadow:0 20px 50px -20px rgba(214,74,23,0.2);
 }
 .dark .qm-nav,
 [data-theme="dark"] .qm-nav{
   --n-bg:#0a0c0f;
   --n-surface:#0f1318;
   --n-surface2:#141a21;
-  --n-border:#1f2730;
-  --n-border-strong:#2b3540;
-  --n-text:#e8ecf1;
-  --n-muted:#8a95a3;
+  --n-border:rgba(222,230,76,0.38);
+  --n-border-strong:#dee64c;
+  --n-text:#ffffff;
+  --n-muted:#f1f5f9;
   --n-accent:#5eead4;
-  --n-accent-soft:rgba(94,234,212,0.1);
+  --n-accent-soft:rgba(94,234,212,0.15);
   --n-danger:#fb7185;
   --n-danger-soft:rgba(251,113,133,0.1);
-  --n-shadow:0 24px 60px -20px rgba(0,0,0,0.75);
+  --n-shadow:0 24px 60px -20px rgba(0,0,0,0.85);
+}
+.qm-nav-link {
+  text-shadow: 0 1px 2px rgba(255,255,255,0.65);
+}
+.dark .qm-nav-link,
+[data-theme="dark"] .qm-nav-link {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.75);
 }
 html{scroll-padding-top:6rem;}
 `;
@@ -159,22 +166,50 @@ export default function Navbar() {
             viewBox="0 0 1440 320"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Base Background (Solid Soft Peach) */}
-            <rect width="1440" height="320" fill="#f1a17e" fillOpacity={isDark ? "0.2" : "0.1"} />
-            {/* Layer 1 (Soft Peach) */}
+            <defs>
+              <linearGradient id="navWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#d64a17" stopOpacity={isDark ? "0.88" : "0.78"} />
+                <stop offset="50%" stopColor="#ea580c" stopOpacity={isDark ? "0.95" : "0.85"} />
+                <stop offset="100%" stopColor="#c2410c" stopOpacity={isDark ? "0.88" : "0.78"} />
+              </linearGradient>
+              <linearGradient id="navWaveOlive" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#dee64c" stopOpacity={isDark ? "0.85" : "0.75"} />
+                <stop offset="50%" stopColor="#d4e320" stopOpacity={isDark ? "0.92" : "0.82"} />
+                <stop offset="100%" stopColor="#b5c418" stopOpacity={isDark ? "0.85" : "0.72"} />
+              </linearGradient>
+            </defs>
+
+            {/* Base Ambient Fill (Warm Burnt Sienna Glow) */}
+            <rect
+              width="1440"
+              height="320"
+              fill="#d64a17"
+              fillOpacity={isDark ? "0.35" : "0.22"}
+            />
+
+            {/* Layer 1 (Back Wave — Rich Burnt Sienna) */}
             <path
-              fill="#f1a17e"
-              fillOpacity={isDark ? "0.4" : "0.2"}
+              fill="url(#navWaveSienna)"
               d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
-            {/* Layer 2 (Soft Olive / Yellow Green) */}
+
+            {/* Layer 2 (Middle Wave — Radiant Olive / Yellow Green) */}
             <path
-              fill="#dee64c"
-              fillOpacity={isDark ? "0.4" : "0.2"}
+              fill="url(#navWaveOlive)"
               d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+
+            {/* Layer 3 (Front Crest Wave — Background Contrast Cutout) */}
+            <path
+              fill={isDark ? "#0a0c0f" : "#fafaf9"}
+              fillOpacity={isDark ? "0.6" : "0.5"}
+              d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,133.3C672,139,768,181,864,208C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
           </svg>
         </div>
+
+        {/* Crisp glass contrast scrim protecting navigation readability */}
+        <div className="absolute inset-0 bg-white/10 dark:bg-black/25 backdrop-blur-[1.5px] pointer-events-none z-0" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className={`flex items-center justify-between ${NAV_H}`}>
@@ -189,13 +224,13 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`relative px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
+                    className={`qm-nav-link relative px-4 py-2.5 text-sm font-semibold rounded-md transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
                     style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
                   >
                     {link.name}
                     <span
-                      className="absolute left-4 right-4 bottom-0 h-px transition-opacity duration-200"
-                      style={{ background: "var(--n-accent)", opacity: active ? 1 : 0 }}
+                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-opacity duration-200"
+                      style={{ background: isDark ? "#dee64c" : "var(--n-border-strong)", opacity: active ? 1 : 0 }}
                       aria-hidden="true"
                     />
                   </a>
