@@ -236,7 +236,7 @@ export default function Navbar() {
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 
-            {/* Desktop links - clean, integrated typography with subtle active tint */}
+            {/* Desktop links - clean text, NO color box */}
             <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
               {NAV_LINKS.map((link) => {
                 const active = activeId === link.href.slice(1);
@@ -245,16 +245,12 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`relative px-3.5 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200 hover:text-[color:var(--n-text)] ${
-                      active
-                        ? "bg-[#ff5500]/12 dark:bg-[#ff5500]/18 text-[#d64a17] dark:text-[#ff9500]"
-                        : "hover:bg-black/5 dark:hover:bg-white/5"
-                    } ${focusRing}`}
-                    style={{ color: active ? undefined : "var(--n-muted)" }}
+                    className={`relative px-4 py-2 text-sm font-semibold transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
+                    style={{ color: active ? (isDark ? "#ff9500" : "#d64a17") : "var(--n-muted)" }}
                   >
                     {link.name}
                     <span
-                      className="absolute left-3 right-3 bottom-0 h-0.5 rounded-full transition-opacity duration-200 bg-gradient-to-r from-[#ff5500] to-[#dee64c]"
+                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-opacity duration-200 bg-gradient-to-r from-[#ff5500] to-[#dee64c]"
                       style={{ opacity: active ? 1 : 0 }}
                       aria-hidden="true"
                     />
