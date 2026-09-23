@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070c14"/>
+      <stop offset="50%" stop-color="#0c1524"/>
+      <stop offset="100%" stop-color="#09101c"/>
+    </linearGradient>
+
+    <!-- Border Glow -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#0284c7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0f766e" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <!-- Ring 1 Gradient (Bright Cyan/Teal) -->
+    <linearGradient id="ringGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Ring 2 Gradient (Violet/Cyan) -->
+    <linearGradient id="ringGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="60%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Core Glow Filter -->
+    <radialGradient id="coreAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.45"/>
+      <stop offset="50%" stop-color="#0284c7" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Center Nucleus Glow -->
+    <radialGradient id="nucleusGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#5eead4"/>
+      <stop offset="80%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Container Squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="1.75"/>
+
+  <!-- Subtle Center Energy Field -->
+  <circle cx="32" cy="32" r="22" fill="url(#coreAura)"/>
+
+  <!-- Orbital Ring 1 (Rotated -35 deg) -->
+  <ellipse cx="32" cy="32" rx="20.5" ry="8.8" transform="rotate(-35 32 32)" fill="none" stroke="url(#ringGrad1)" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Orbital Ring 2 (Rotated 35 deg) -->
+  <ellipse cx="32" cy="32" rx="20.5" ry="8.8" transform="rotate(35 32 32)" fill="none" stroke="url(#ringGrad2)" stroke-width="2.4" stroke-opacity="0.85" stroke-dasharray="32 1.5 8 1.5" stroke-linecap="round"/>
+
+  <!-- Center Quantum Core -->
+  <circle cx="32" cy="32" r="4.6" fill="url(#nucleusGrad)"/>
+
+  <!-- Node Qubit on Orbit 1 -->
+  <circle cx="47" cy="22" r="2.5" fill="#f0fdfa"/>
+  <circle cx="47" cy="22" r="4" fill="none" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.7"/>
+
+  <!-- Subtle Node Qubit on Orbit 2 -->
+  <circle cx="17.5" cy="22" r="2" fill="#bae6fd"/>
+</svg>

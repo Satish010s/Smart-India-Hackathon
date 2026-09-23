@@ -20,33 +20,33 @@ const NAV_LINKS = [
 
 const NAV_CSS = `
 .qm-nav{
-  --n-bg:rgba(250,250,249,0.85);
+  --n-bg:#fafaf9;
   --n-surface:#ffffff;
   --n-surface2:#f4f4f5;
-  --n-border:rgba(214,74,23,0.22);
-  --n-border-strong:#d64a17;
-  --n-text:#09090b;
-  --n-muted:#52525b;
+  --n-border:#e4e4e7;
+  --n-border-strong:#d4d4d8;
+  --n-text:#111418;
+  --n-muted:#5b6572;
   --n-accent:#0f766e;
   --n-accent-soft:rgba(15,118,110,0.09);
   --n-danger:#be123c;
   --n-danger-soft:rgba(190,18,60,0.08);
-  --n-shadow:0 12px 30px -15px rgba(15,23,42,0.12);
+  --n-shadow:0 20px 50px -20px rgba(15,23,42,0.22);
 }
 .dark .qm-nav,
 [data-theme="dark"] .qm-nav{
-  --n-bg:rgba(10,12,15,0.88);
+  --n-bg:rgba(10,12,15,0.85);
   --n-surface:#0f1318;
-  --n-surface2:#141a21;
-  --n-border:rgba(255,107,0,0.25);
-  --n-border-strong:#ff7a00;
+  --n-surface2:#161d26;
+  --n-border:rgba(255,255,255,0.08);
+  --n-border-strong:rgba(255,255,255,0.18);
   --n-text:#ffffff;
-  --n-muted:#a1a1aa;
+  --n-muted:#cbd5e1;
   --n-accent:#5eead4;
-  --n-accent-soft:rgba(94,234,212,0.12);
+  --n-accent-soft:rgba(94,234,212,0.14);
   --n-danger:#fb7185;
-  --n-danger-soft:rgba(251,113,133,0.1);
-  --n-shadow:0 20px 40px -15px rgba(0,0,0,0.75);
+  --n-danger-soft:rgba(251,113,133,0.12);
+  --n-shadow:0 24px 60px -20px rgba(0,0,0,0.85);
 }
 html{scroll-padding-top:6rem;}
 `;
@@ -66,7 +66,7 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
 
   useEffect(() => {
@@ -128,13 +128,20 @@ export default function Navbar() {
     return { color: "var(--n-muted)", background: "var(--n-surface2)", borderColor: "var(--n-border-strong)" };
   };
 
-  const primaryCta = { background: "var(--n-text)", color: "var(--n-bg)" };
+  const primaryCta = isDark
+    ? { background: "#ffffff", color: "#0a0c0f", boxShadow: "0 4px 20px rgba(94,234,212,0.22)" }
+    : { background: "var(--n-text)", color: "var(--n-bg)" };
 
   const themeButton = mounted ? (
     <button
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`w-10 h-10 inline-flex items-center justify-center rounded-full border border-[color:var(--n-border)] text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] hover:border-[color:var(--n-border-strong)] transition-colors cursor-pointer ${focusRing}`}
+      className={`w-10 h-10 inline-flex items-center justify-center rounded-full border transition-colors cursor-pointer ${focusRing}`}
+      style={{
+        background: isDark ? "rgba(255,255,255,0.05)" : "var(--n-surface2)",
+        borderColor: isDark ? "rgba(255,255,255,0.12)" : "var(--n-border)",
+        color: isDark ? "#fde047" : "var(--n-muted)",
+      }}
     >
       {isDark ? <LuSun size={17} /> : <LuMoon size={17} />}
     </button>
@@ -144,99 +151,57 @@ export default function Navbar() {
 
   return (
     <>
-      {/* FIXED header: unified glassmorphic navbar with bottom wave accent */}
+      {/* FIXED header: always pinned to the viewport top with frosted glass in dark mode */}
       <header
-        className="qm-nav fixed top-0 left-0 right-0 z-[100] backdrop-blur-xl border-b transition-colors duration-300"
-        style={{ background: "var(--n-bg)", borderColor: "var(--n-border)" }}
+        className="qm-nav fixed top-0 left-0 right-0 z-[100] border-b backdrop-blur-xl transition-[background-color,border-color] duration-300"
+        style={{
+          background: isDark ? "rgba(10, 12, 15, 0.88)" : "var(--n-bg)",
+          borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "var(--n-border)",
+          boxShadow: isDark ? "0 10px 30px -10px rgba(0,0,0,0.8)" : "var(--n-shadow)",
+        }}
       >
         <style>{NAV_CSS}</style>
 
-        {/* Top vibrant orange highlight line */}
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#ff5500] via-[#ff9500] to-[#ea580c] z-20 pointer-events-none opacity-90 shadow-[0_0_8px_rgba(255,107,0,0.5)]" />
-
-        {/* Ambient Color Wash Fill: warm orange glow on the left, radiant olive/teal on the right, smooth warm gradient across */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-          {/* Left Warm Orange/Sienna Ambient Aura */}
-          <div
-            className="absolute -top-10 -left-12 w-80 h-36 rounded-full blur-2xl opacity-40 dark:opacity-30 pointer-events-none"
-            style={{
-              background: "radial-gradient(circle, #ff5500 0%, #d64a17 50%, transparent 80%)",
-            }}
-          />
-
-          {/* Center Smooth Ambient Gradient */}
-          <div
-            className="absolute inset-0 opacity-25 dark:opacity-20 pointer-events-none"
-            style={{
-              background: isDark
-                ? "linear-gradient(90deg, rgba(255,85,0,0.2) 0%, rgba(214,74,23,0.1) 40%, rgba(222,230,76,0.15) 100%)"
-                : "linear-gradient(90deg, rgba(255,107,0,0.25) 0%, rgba(251,146,60,0.12) 45%, rgba(222,230,76,0.22) 100%)",
-            }}
-          />
-
-          {/* Right Radiant Olive/Teal Ambient Aura */}
-          <div
-            className="absolute -top-10 -right-12 w-80 h-36 rounded-full blur-2xl opacity-40 dark:opacity-30 pointer-events-none"
-            style={{
-              background: isDark
-                ? "radial-gradient(circle, #dee64c 0%, #14b8a6 50%, transparent 80%)"
-                : "radial-gradient(circle, #c8d626 0%, #0f766e 50%, transparent 80%)",
-            }}
-          />
-        </div>
-
-        {/* Bottom edge multi-tone wave ribbon (Orange + Burnt Sienna + Olive) */}
-        <div className="absolute bottom-0 inset-x-0 h-4 sm:h-5 overflow-hidden pointer-events-none z-0">
+        {/* Wavy Background Contained Inside Navbar */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0" style={{ transform: "rotate(180deg) scaleX(-1)" }}>
           <svg
-            className="absolute bottom-0 w-full h-full"
+            className="block w-full h-full"
             preserveAspectRatio="none"
-            viewBox="0 0 1440 80"
+            viewBox="0 0 1440 320"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <defs>
-              <linearGradient id="bottomWaveOrange" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ff5500" stopOpacity="0.95" />
-                <stop offset="30%" stopColor="#ff7a00" stopOpacity="1" />
-                <stop offset="70%" stopColor="#ff9500" stopOpacity="0.95" />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.9" />
-              </linearGradient>
-              <linearGradient id="bottomWaveSienna" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#d64a17" stopOpacity="0.85" />
-                <stop offset="50%" stopColor="#ea580c" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#c2410c" stopOpacity="0.85" />
-              </linearGradient>
-              <linearGradient id="bottomWaveOlive" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#dee64c" stopOpacity="0.85" />
-                <stop offset="50%" stopColor="#d4e320" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#b5c418" stopOpacity="0.8" />
-              </linearGradient>
-            </defs>
-
-            {/* Olive lower wave */}
-            <path
-              fill="url(#bottomWaveOlive)"
-              d="M0,45 C240,75 480,15 720,45 C960,75 1200,15 1440,40 L1440,80 L0,80 Z"
+            {/* Base Background: soft peach in light mode, transparent in dark mode */}
+            <rect
+              width="1440"
+              height="320"
+              fill={isDark ? "transparent" : "#f1a17e"}
+              fillOpacity={isDark ? "0" : "0.1"}
             />
-
-            {/* Sienna middle wave */}
+            {/* Layer 1: Soft Peach in light / Subtle Warm Amber glow in dark */}
             <path
-              fill="url(#bottomWaveSienna)"
-              d="M0,30 C280,60 520,8 760,35 C1000,65 1220,10 1440,28 L1440,80 L0,80 Z"
-            />
-
-            {/* Top high-contrast electric orange wave */}
+              fill={isDark ? "#f97316" : "#f1a17e"}
+              fillOpacity={isDark ? "0.08" : "0.2"}
+              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+            {/* Layer 2: Soft Olive in light / Quantum Teal accent in dark */}
             <path
-              fill="url(#bottomWaveOrange)"
-              d="M0,15 C320,48 560,4 800,24 C1040,44 1260,8 1440,15 L1440,80 L0,80 Z"
-            />
+              fill={isDark ? "#2dd4bf" : "#dee64c"}
+              fillOpacity={isDark ? "0.10" : "0.2"}
+              d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
           </svg>
         </div>
+
+        {/* Subtle Bottom Accent Glow in Dark Mode */}
+        {isDark && (
+          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[rgba(94,234,212,0.3)] to-transparent pointer-events-none" />
+        )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className={`flex items-center justify-between ${NAV_H}`}>
             <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
 
-            {/* Desktop links - clean text, NO color box */}
+            {/* Desktop links */}
             <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
               {NAV_LINKS.map((link) => {
                 const active = activeId === link.href.slice(1);
@@ -245,13 +210,17 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     aria-current={active ? "true" : undefined}
-                    className={`relative px-4 py-2 text-sm font-semibold transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
-                    style={{ color: active ? (isDark ? "#ff9500" : "#d64a17") : "var(--n-muted)" }}
+                    className={`relative px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
+                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
                   >
                     {link.name}
                     <span
-                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-opacity duration-200 bg-gradient-to-r from-[#ff5500] to-[#dee64c]"
-                      style={{ opacity: active ? 1 : 0 }}
+                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-all duration-200"
+                      style={{
+                        background: "var(--n-accent)",
+                        opacity: active ? 1 : 0,
+                        boxShadow: isDark && active ? "0 0 8px rgba(94, 234, 212, 0.7)" : "none",
+                      }}
                       aria-hidden="true"
                     />
                   </a>
@@ -356,7 +325,7 @@ export default function Navbar() {
                     <Link
                       href="/signup"
                       id="nav-cta"
-                      className={`group relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_4px_18px_rgba(255,107,0,0.38)] hover:shadow-[0_6px_24px_rgba(255,107,0,0.55)] border border-white/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden ${focusRing}`}
+                      className={`group relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_4px_18px_rgba(234,88,12,0.38)] hover:shadow-[0_6px_25px_rgba(255,85,0,0.55)] border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden ${focusRing}`}
                     >
                       <div className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out skew-x-12 pointer-events-none" />
                       <span className="relative z-10 flex items-center gap-2 drop-shadow-sm">
@@ -384,8 +353,12 @@ export default function Navbar() {
         {/* Mobile drawer (overlays content) */}
         {mobileOpen && (
           <div
-            className="lg:hidden absolute top-full inset-x-0 mt-2 mx-4 rounded-2xl border border-[color:var(--n-border)] p-3 space-y-3 max-h-[calc(100svh-6rem)] overflow-y-auto"
-            style={{ background: "var(--n-surface)", boxShadow: "var(--n-shadow)" }}
+            className="lg:hidden absolute top-full inset-x-0 mt-2 mx-4 rounded-2xl border border-[color:var(--n-border)] p-3 space-y-3 max-h-[calc(100svh-6rem)] overflow-y-auto backdrop-blur-2xl"
+            style={{
+              background: isDark ? "rgba(15, 19, 24, 0.95)" : "var(--n-surface)",
+              boxShadow: "var(--n-shadow)",
+              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--n-border)",
+            }}
           >
             <nav className="flex flex-col gap-0.5" aria-label="Mobile navigation">
               {NAV_LINKS.map((link) => {
@@ -453,7 +426,7 @@ export default function Navbar() {
                     onClick={() => setMobileOpen(false)}
                     className="text-center px-4 py-3 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-md shadow-orange-500/30 border border-white/20 active:scale-[0.98] transition-transform"
                   >
-                    Start Learning Free
+                    Start Free
                   </Link>
                 </div>
               )}

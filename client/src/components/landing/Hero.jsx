@@ -162,21 +162,24 @@ export default function Hero() {
             <Link
               href="/signup"
               id="hero-cta-primary"
-              className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 overflow-hidden"
-              style={{ background: C.text, color: C.bg }}
+              className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 overflow-hidden bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_10px_35px_-8px_rgba(234,88,12,0.5)] hover:shadow-[0_14px_45px_-6px_rgba(255,85,0,0.65)] border border-white/20 active:scale-[0.98]"
             >
-              <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -translate-x-full skew-x-12" />
-              <span className="relative z-10 flex items-center gap-2">
+              <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-out -translate-x-full skew-x-12 pointer-events-none" />
+              <span className="relative z-10 flex items-center gap-2.5 drop-shadow-sm">
                 Start Learning Free
-                <LuArrowRight size={20} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                <LuArrowRight size={20} className="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true" />
               </span>
             </Link>
 
             <Link
               href="/playground"
               id="hero-cta-secondary"
-              className="group inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{ border: `2px solid ${C.borderStrong}`, color: C.text, background: C.surface }}
+              className="group inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 backdrop-blur-sm active:scale-[0.98]"
+              style={{
+                border: `2px solid ${theme === "dark" ? "rgba(255,255,255,0.15)" : C.borderStrong}`,
+                color: C.text,
+                background: theme === "dark" ? "rgba(20,26,33,0.7)" : C.surface,
+              }}
             >
               <LuFlaskConical size={20} style={{ color: C.accent }} aria-hidden="true" />
               Try Circuit Builder
