@@ -40,6 +40,7 @@ export default function AdminDashboardOverview({ user, onNavigateTab }) {
           api: { name: 'Node.js Express API', status: 'ONLINE', latencyMs: 14, port: 5001 },
           database: { name: 'PostgreSQL (Neon AWS)', status: 'ONLINE', latencyMs: 34 },
           aiEngine: { name: 'FastAPI Quantum Tutor', status: 'ONLINE', latencyMs: 65, port: 8000 },
+          agenticEngine: { name: 'Agentic Autonomous Engine (QubitMind v2.0)', status: 'ONLINE', latencyMs: 38, activeAgents: 6 },
           quantumBackends: { name: 'Qiskit / PennyLane / Cirq / qBraid', status: 'ONLINE', available: 4 },
         },
         recentActivity: [

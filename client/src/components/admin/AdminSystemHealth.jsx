@@ -29,6 +29,7 @@ export default function AdminSystemHealth() {
           { name: 'API Core Server', framework: 'Express + Prisma ORM', status: 'ONLINE', latencyMs: 8, port: 5001 },
           { name: 'PostgreSQL Database', framework: 'Neon Serverless AWS', status: 'ONLINE', latencyMs: 34, poolActive: 4, poolMax: 20 },
           { name: 'FastAPI AI Engine', framework: 'Python Uvicorn', status: 'ONLINE', latencyMs: 45, port: 8000 },
+          { name: 'Agentic Reasoning Engine', framework: 'Autonomous Agentic Orchestrator v2.0', status: 'ONLINE', latencyMs: 38, activeAgents: 6 },
           { name: 'Quantum Simulation Engines', framework: 'Qiskit Aer / PennyLane / Cirq', status: 'ONLINE', latencyMs: 24, activeWorkers: 4 },
         ],
         infrastructure: {
@@ -153,7 +154,7 @@ export default function AdminSystemHealth() {
                 <div className="p-2.5 rounded-xl bg-[var(--color-background)] border border-[var(--color-border)]/50">
                   <span className="text-[10px] text-[var(--color-muted)] block">Port / Pool</span>
                   <span className="font-bold font-mono text-[var(--color-text)]">
-                    {srv.port ? `Port ${srv.port}` : srv.poolActive ? `${srv.poolActive}/${srv.poolMax} conn` : 'Active'}
+                    {srv.port ? `Port ${srv.port}` : srv.poolActive ? `${srv.poolActive}/${srv.poolMax} conn` : srv.activeAgents ? `${srv.activeAgents} active agents` : 'Active'}
                   </span>
                 </div>
               </div>

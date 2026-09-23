@@ -1,10 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LuKeyRound, LuShield, LuCheck, LuX, LuLock, LuUsers, LuUserCheck,
   LuSparkles, LuHistory, LuGraduationCap, LuBookOpen,
 } from 'react-icons/lu';
+import { apiFetch } from '../../services/api';
 
 const PERMISSION_DOMAINS = [
   {
@@ -55,6 +56,22 @@ const PERMISSION_DOMAINS = [
 ];
 
 export default function AdminRolesPermissions() {
+  const [roleCounts, setRoleCounts] = useState({ LEARNER: 0, INSTRUCTOR: 0, ADMIN: 0 });
+
+  useEffect(() => {
+    let isMounted = true;
+    apiFetch('/admin/overview')
+      .then((res) => {
+        if (isMounted && res?.success && res.data?.metrics?.roleDistribution) {
+          setRoleCounts(res.data.metrics.roleDistribution);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Title */}
@@ -74,7 +91,7 @@ export default function AdminRolesPermissions() {
         <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-blue-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              ROLE: LEARNER
+              ROLE: LEARNER ({roleCounts.LEARNER} users)
             </span>
             <LuBookOpen className="text-blue-400" size={18} />
           </div>
@@ -92,7 +109,7 @@ export default function AdminRolesPermissions() {
         <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-emerald-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-              ROLE: INSTRUCTOR
+              ROLE: INSTRUCTOR ({roleCounts.INSTRUCTOR} users)
             </span>
             <LuGraduationCap className="text-emerald-700 dark:text-emerald-400" size={18} />
           </div>
@@ -110,7 +127,7 @@ export default function AdminRolesPermissions() {
         <div className="p-5 rounded-3xl bg-[var(--color-surface)] border border-rose-500/20 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-              ROLE: ADMIN
+              ROLE: ADMIN ({roleCounts.ADMIN} users)
             </span>
             <LuShield className="text-rose-700 dark:text-rose-400" size={18} />
           </div>

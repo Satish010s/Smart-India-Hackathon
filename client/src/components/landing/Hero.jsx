@@ -2,43 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { LuArrowRight, LuFlaskConical } from "react-icons/lu";
+import { LuArrowRight, LuFlaskConical, LuSparkles } from "react-icons/lu";
 
-/* ── Palettes: neutral + single teal accent (no purple) ─────────────────── */
-const THEMES = {
-  dark: {
-    bg: "#0a0c0f",
-    surface: "#0f1318",
-    surface2: "#141a21",
-    border: "#1f2730",
-    borderStrong: "#2b3540",
-    text: "#e8ecf1",
-    muted: "#8a95a3",
-    accent: "#5eead4",
-    accentSoft: "rgba(94,234,212,0.15)",
-    neutral: "#cbd5e1",
-    shadow: "0 30px 80px -30px rgba(0,0,0,0.8)",
-    gridOpacity: 0.35,
-  },
-  light: {
-    bg: "#fafaf9",
-    surface: "#ffffff",
-    surface2: "#f4f4f5",
-    border: "#e4e4e7",
-    borderStrong: "#d4d4d8",
-    text: "#111418",
-    muted: "#5b6572",
-    accent: "#0f766e",
-    accentSoft: "rgba(15,118,110,0.15)",
-    neutral: "#475569",
-    shadow: "0 30px 70px -30px rgba(15,23,42,0.2)",
-    gridOpacity: 0.7,
-  },
-};
+/* ── High-Quality Quantum Images (Excluding images 2 and 6) ────────────────── */
+const HERO_IMAGES = [
+  "/images/datacenter.jpg",
+  "/images/quantum-bg.jpg",
+  "/images/c8b456d8a4c183d6ba3a34f326eb7b19.jpg",
+  "/images/44aab134f62d3230400e2dc44759e10a.jpg",
+];
 
-/* ── Theme detection: follows your toggle (class / data-attr / color-scheme)
-   and falls back to the OS preference. Re-runs live on every toggle.
-   If your toggle uses something else, adjust readTheme() only.            */
+/* ── Theme detection ─────────────────────────────────────────────────────── */
 function readTheme() {
   const roots = [document.documentElement, document.body];
   for (const el of roots) {
@@ -78,8 +52,17 @@ function useTheme() {
 
 export default function Hero() {
   const theme = useTheme();
-  const C = THEMES[theme];
+  const isLight = theme === "light";
   const [mounted, setMounted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Auto-advance background carousel (every 5 seconds)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -94,107 +77,212 @@ export default function Hero() {
     <section
       id="hero"
       aria-label="QubitMinds introduction"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-24 pb-16 transition-colors duration-300"
-      style={{ background: mounted ? C.bg : "transparent", color: C.text }}
+      className={`relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pt-28 pb-16 transition-colors duration-300 ${
+        isLight ? "bg-[#fafaf9] text-slate-900" : "bg-[#0a0c0f] text-white"
+      }`}
     >
+      {/* ── Background Image Carousel ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
+        {HERO_IMAGES.map((src, idx) => {
+          const isActive = idx === currentIndex;
+          return (
+            <div
+              key={src}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                isActive ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt="Quantum Infrastructure Background"
+                loading={idx === 0 ? "eager" : "lazy"}
+                className="w-full h-full object-cover object-center brightness-105 contrast-105 opacity-100"
+              />
+            </div>
+          );
+        })}
 
+        {/* Smooth Subtle Overlay (No heavy white wash or blurring on images) */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-all duration-500"
+          style={{
+            background: isLight
+              ? "linear-gradient(180deg, rgba(250,250,249,0.3) 0%, rgba(250,250,249,0.05) 35%, rgba(250,250,249,0.1) 65%, rgba(250,250,249,0.7) 100%)"
+              : "linear-gradient(180deg, rgba(10,12,15,0.82) 0%, rgba(10,12,15,0.55) 35%, rgba(10,12,15,0.6) 65%, rgba(10,12,15,1) 100%)",
+          }}
+        />
+      </div>
 
-      {/* 3 Layer of Waves in 1/3 Bottom */}
-      <div className="absolute bottom-0 left-0 w-full z-0 overflow-hidden" style={{ height: "33vh" }}>
+      {/* ── Bottom Wave Transition ── */}
+      <div
+        className="absolute bottom-0 left-0 w-full z-[5] overflow-hidden pointer-events-none"
+        style={{ height: "10vh" }}
+      >
         <svg
           className="absolute bottom-0 w-full h-full"
           preserveAspectRatio="none"
           viewBox="0 0 1440 320"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Layer 1 (Back - Burnt Sienna) */}
           <path
-            fill="#d64a17"
-            fillOpacity="0.3"
+            fill="#ea580c"
+            fillOpacity={isLight ? "0.15" : "0.3"}
             d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          ></path>
-          {/* Layer 2 (Middle - Yellow Green) */}
+          />
           <path
-            fill="#dee64c"
-            fillOpacity="0.3"
-            d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          ></path>
-          {/* Layer 3 (Front, matching background to seamlessly transition into next section) */}
-          <path
-            fill={C.bg}
+            fill={isLight ? "#fafaf9" : "#0a0c0f"}
             fillOpacity="1"
             d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,133.3C672,139,768,181,864,208C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          ></path>
+          />
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-center">
+      {/* ── Main Content Container ── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col items-center text-center my-auto">
+        {/* Soft Backlight Spotlight behind text (Ensures 100% text legibility over busy background images) */}
+        <div
+          className="absolute -inset-x-8 -inset-y-6 -z-10 pointer-events-none rounded-3xl"
+          style={{
+            background: isLight
+              ? "radial-gradient(ellipse 90% 75% at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0) 100%)"
+              : "radial-gradient(ellipse 90% 75% at 50% 50%, rgba(10,12,15,0.85) 0%, rgba(10,12,15,0.55) 45%, rgba(10,12,15,0) 100%)",
+            filter: "blur(20px)",
+          }}
+        />
+
         <div className={`flex flex-col items-center text-center ${reveal()}`}>
+          {/* Top Pill Badge */}
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase mb-6 backdrop-blur-md transition-colors ${
+              isLight
+                ? "bg-white/90 text-slate-900 border border-slate-300 shadow-sm"
+                : "bg-teal-950/70 text-teal-300 border border-teal-500/30 shadow-md"
+            }`}
+          >
+            <LuSparkles className={isLight ? "text-amber-600" : "text-amber-400"} size={14} />
+            Next-Gen AI Quantum Platform
+          </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl xl:text-7xl font-heading font-bold tracking-tight leading-[1.1] mb-8 drop-shadow-lg" style={{ color: C.text }}>
+          <h1
+            className={`text-4xl sm:text-6xl xl:text-7xl font-heading font-extrabold tracking-tight leading-[1.15] mb-6 ${
+              isLight ? "text-slate-950" : "text-white"
+            }`}
+            style={{
+              textShadow: isLight
+                ? "0 0 20px #ffffff, 0 0 10px #ffffff, 0 1px 3px #ffffff"
+                : "0 2px 8px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)",
+            }}
+          >
             The intelligent way to learn{" "}
             <br className="hidden sm:block" />
             <span className="relative inline-block mt-2">
-              <span 
-                className="relative z-10 bg-clip-text text-transparent"
+              {/* Pure Crisp White / Light Gold Text */}
+              <span
+                className={`relative z-10 inline-block font-extrabold bg-clip-text text-transparent ${
+                  isLight
+                    ? "bg-gradient-to-r from-[#0f172a] via-[#d97706] to-[#0284c7]"
+                    : "bg-gradient-to-r from-[#ffffff] via-[#fef08a] to-[#38bdf8]"
+                }`}
                 style={{
-                  backgroundImage: theme === 'dark'
-                    ? "linear-gradient(to right, #d64a17, #e7b46a, #dee64c)"
-                    : "linear-gradient(to right, #c24115, #ba812f, #84901b)"
+                  textShadow: isLight
+                    ? "0 0 20px #ffffff"
+                    : "0 0 20px rgba(56, 189, 248, 0.5), 0 2px 8px rgba(0, 0, 0, 0.9)",
                 }}
               >
                 Quantum Computing.
               </span>
-              {theme === 'dark' && (
-                <span className="absolute bottom-2 left-0 w-full h-4 opacity-30 blur-sm rounded-full bg-[#d64a17]" />
-              )}
+
+              {/* Sleek Underline Accent Bar */}
+              <span
+                className="absolute -bottom-1 left-0 w-full h-1.5 rounded-full"
+                style={{
+                  background: isLight
+                    ? "linear-gradient(90deg, #d97706, #0284c7, #38bdf8)"
+                    : "linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24)",
+                  boxShadow: isLight
+                    ? "0 0 10px rgba(217, 119, 6, 0.4)"
+                    : "0 0 16px rgba(56, 189, 248, 0.85)",
+                }}
+              />
             </span>
           </h1>
 
-          {/* Subhead */}
-          <p className="text-lg sm:text-2xl leading-relaxed mb-12 max-w-3xl drop-shadow-md font-medium mx-auto" style={{ color: C.muted }}>
+          {/* Subheading */}
+          <p
+            className={`text-base sm:text-xl lg:text-2xl leading-relaxed mb-8 max-w-3xl mx-auto ${
+              isLight ? "text-slate-950 font-bold" : "text-slate-200 font-medium"
+            }`}
+            style={{
+              textShadow: isLight
+                ? "0 0 16px #ffffff, 0 0 8px #ffffff, 0 1px 2px #ffffff"
+                : "0 2px 8px rgba(0,0,0,0.9)",
+            }}
+          >
             An end-to-end educational platform featuring an AI quantum tutor, an interactive circuit playground, multi-backend simulations, and a fully gamified learning experience.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center mb-10">
             <Link
               href="/signup"
               id="hero-cta-primary"
-              className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 overflow-hidden bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_10px_35px_-8px_rgba(234,88,12,0.5)] hover:shadow-[0_14px_45px_-6px_rgba(255,85,0,0.65)] border border-white/20 active:scale-[0.98]"
+              className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base sm:text-lg text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 overflow-hidden bg-gradient-to-r from-[#ea580c] via-[#f97316] to-[#d97706] shadow-[0_10px_35px_-8px_rgba(234,88,12,0.6)] hover:shadow-[0_14px_45px_-6px_rgba(234,88,12,0.85)] border border-white/30 active:scale-[0.98]"
             >
               <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-out -translate-x-full skew-x-12 pointer-events-none" />
-              <span className="relative z-10 flex items-center gap-2.5 drop-shadow-sm">
+              <span className="relative z-10 flex items-center gap-2.5 drop-shadow">
                 Start Learning Free
-                <LuArrowRight size={20} className="transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true" />
+                <LuArrowRight
+                  size={20}
+                  className="transition-transform duration-300 group-hover:translate-x-1.5"
+                  aria-hidden="true"
+                />
               </span>
             </Link>
 
             <Link
               href="/playground"
               id="hero-cta-secondary"
-              className="group inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 backdrop-blur-sm active:scale-[0.98]"
-              style={{
-                border: `2px solid ${theme === "dark" ? "rgba(255,255,255,0.15)" : C.borderStrong}`,
-                color: C.text,
-                background: theme === "dark" ? "rgba(20,26,33,0.7)" : C.surface,
-              }}
+              className={`group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 backdrop-blur-md active:scale-[0.98] ${
+                isLight
+                  ? "bg-white/80 hover:bg-white text-slate-900 border border-slate-300 shadow-md"
+                  : "bg-slate-900/80 hover:bg-slate-900 text-white border border-slate-700 shadow-xl"
+              }`}
             >
-              <LuFlaskConical size={20} style={{ color: C.accent }} aria-hidden="true" />
+              <LuFlaskConical
+                size={20}
+                className={isLight ? "text-teal-700" : "text-teal-300"}
+                aria-hidden="true"
+              />
               Try Circuit Builder
             </Link>
           </div>
 
-          {/* Trust strip */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4 justify-center px-8 py-4 rounded-3xl" style={{ border: `1px solid ${C.border}`, background: C.surface2 }}>
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: C.muted }}>
+          {/* Trust Strip */}
+          <div
+            className={`flex flex-wrap items-center gap-x-6 gap-y-3 justify-center px-7 py-3.5 rounded-full backdrop-blur-md border ${
+              isLight
+                ? "bg-white/90 border-slate-200/90 text-slate-700 shadow-sm"
+                : "bg-slate-900/80 border-slate-800 text-slate-300 shadow-lg"
+            }`}
+          >
+            <span
+              className={`text-xs font-bold uppercase tracking-widest ${
+                isLight ? "text-slate-500" : "text-slate-400"
+              }`}
+            >
               Runs on
             </span>
             {["Qiskit Aer", "PennyLane", "Cirq", "qBraid"].map((tool, i) => (
-              <span key={tool} className="flex items-center gap-8">
-                {i > 0 && <span className="w-px h-5" style={{ background: C.borderStrong }} aria-hidden="true" />}
-                <span className="font-mono text-sm font-semibold tracking-wide" style={{ color: C.text }}>
+              <span key={tool} className="flex items-center gap-6">
+                {i > 0 && (
+                  <span
+                    className={`w-px h-4 ${isLight ? "bg-slate-300" : "bg-slate-700"}`}
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="font-mono text-xs sm:text-sm font-bold tracking-wide">
                   {tool}
                 </span>
               </span>
