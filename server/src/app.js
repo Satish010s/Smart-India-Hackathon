@@ -9,28 +9,47 @@ import instructorRoutes from './routes/instructorRoutes.js';
 
 const app = express();
 
-const clientOrigin = process.env.CLIENT_URL || 'http://localhost:3000';
+// Parse configured origins from CLIENT_URL (supports comma-separated list, strips trailing slashes)
+const configuredOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
+  .split(',')
+  .map((url) => url.trim().replace(/\/$/, ''))
+  .filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
-      if (!origin) return callback(null, true);
-      // Allow configured client origin, any localhost / 127.0.0.1 port, or any origin in development
-      if (
-        origin === clientOrigin ||
-        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
-        process.env.NODE_ENV !== 'production'
-      ) {
-        return callback(null, true);
-      }
-      return callback(null, false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  })
-);
+const isAllowedOrigin = (origin) => {
+  // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+  if (!origin) return true;
+  const cleanOrigin = origin.replace(/\/$/, '');
+
+  // 1. Matches configured CLIENT_URL list
+  if (configuredOrigins.includes(cleanOrigin)) return true;
+
+  // 2. Allow any localhost / 127.0.0.1 port
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)) return true;
+
+  // 3. Allow Vercel deployments (production domain & branch preview URLs)
+  if (/^https:\/\/([a-zA-Z0-9_-]+\.)*vercel\.app$/.test(cleanOrigin)) return true;
+
+  // 4. Non-production fallback
+  if (process.env.NODE_ENV !== 'production') return true;
+
+  return false;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+    console.warn(`[CORS] Blocked request from origin: ${origin}`);
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
