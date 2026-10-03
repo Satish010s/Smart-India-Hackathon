@@ -1,70 +1,38 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import QubitMindLogo from "../common/QubitMindLogo";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import QubitMindLogo from "../common/QubitMindLogo";
 import {
   LuMenu, LuX, LuMoon, LuSun, LuLogOut,
   LuLayoutDashboard, LuGraduationCap, LuChevronDown, LuArrowRight,
 } from "react-icons/lu";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthModalStore } from "../../store/useAuthModalStore";
 
 const NAV_LINKS = [
   { name: "Features", href: "#features" },
-  { name: "How It Works", href: "#how-it-works" },
+  { name: "How it works", href: "#how-it-works" },
   { name: "Backends", href: "#backends" },
-  { name: "For Instructors", href: "#instructors" },
+  { name: "For instructors", href: "#instructors" },
   { name: "FAQ", href: "#faq" },
 ];
 
-const NAV_CSS = `
-.qm-nav{
-  --n-bg:#fafaf9;
-  --n-surface:#ffffff;
-  --n-surface2:#f4f4f5;
-  --n-border:#e4e4e7;
-  --n-border-strong:#d4d4d8;
-  --n-text:#111418;
-  --n-muted:#5b6572;
-  --n-accent:#0f766e;
-  --n-accent-soft:rgba(15,118,110,0.09);
-  --n-danger:#be123c;
-  --n-danger-soft:rgba(190,18,60,0.08);
-  --n-shadow:0 20px 50px -20px rgba(15,23,42,0.22);
-}
-.dark .qm-nav,
-[data-theme="dark"] .qm-nav{
-  --n-bg:rgba(10,12,15,0.85);
-  --n-surface:#0f1318;
-  --n-surface2:#161d26;
-  --n-border:rgba(255,255,255,0.08);
-  --n-border-strong:rgba(255,255,255,0.18);
-  --n-text:#ffffff;
-  --n-muted:#cbd5e1;
-  --n-accent:#5eead4;
-  --n-accent-soft:rgba(94,234,212,0.14);
-  --n-danger:#fb7185;
-  --n-danger-soft:rgba(251,113,133,0.12);
-  --n-shadow:0 24px 60px -20px rgba(0,0,0,0.85);
-}
-html{scroll-padding-top:6rem;}
-`;
-
 const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--n-accent)]";
-
-/* Navbar height: 72px mobile, 96px desktop (used by header + spacer) */
-const NAV_H = "h-[72px] lg:h-24";
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]";
 
 export default function Navbar() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [activeId, setActiveId] = useState("");
   const dropdownRef = useRef(null);
+
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
+  const openAuthModal = useAuthModalStore((s) => s.openAuthModal);
 
   const isDark = mounted && resolvedTheme === "dark";
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
@@ -72,6 +40,11 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
     checkAuth();
+
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     const onClickOut = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setProfileOpen(false);
     };
@@ -84,13 +57,15 @@ export default function Navbar() {
     const onResize = () => {
       if (window.innerWidth >= 1024) setMobileOpen(false);
     };
-    window.addEventListener("resize", onResize);
+
     document.addEventListener("mousedown", onClickOut);
     document.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll);
       document.removeEventListener("mousedown", onClickOut);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
     };
   }, [checkAuth]);
 
@@ -118,323 +93,233 @@ export default function Navbar() {
   };
 
   const portalLabel =
-    user?.role === "ADMIN" ? "Admin Console" : user?.role === "INSTRUCTOR" ? "Faculty Portal" : "My Dashboard";
-
-  const badgeStyle = (role) => {
-    if (role === "ADMIN")
-      return { color: "var(--n-danger)", background: "var(--n-danger-soft)", borderColor: "var(--n-danger)" };
-    if (role === "INSTRUCTOR")
-      return { color: "var(--n-accent)", background: "var(--n-accent-soft)", borderColor: "var(--n-accent)" };
-    return { color: "var(--n-muted)", background: "var(--n-surface2)", borderColor: "var(--n-border-strong)" };
-  };
-
-  const primaryCta = isDark
-    ? { background: "#ffffff", color: "#0a0c0f", boxShadow: "0 4px 20px rgba(94,234,212,0.22)" }
-    : { background: "var(--n-text)", color: "var(--n-bg)" };
-
-  const themeButton = mounted ? (
-    <button
-      onClick={toggleTheme}
-      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`w-10 h-10 inline-flex items-center justify-center rounded-full border transition-colors cursor-pointer ${focusRing}`}
-      style={{
-        background: isDark ? "rgba(255,255,255,0.05)" : "var(--n-surface2)",
-        borderColor: isDark ? "rgba(255,255,255,0.12)" : "var(--n-border)",
-        color: isDark ? "#fde047" : "var(--n-muted)",
-      }}
-    >
-      {isDark ? <LuSun size={17} /> : <LuMoon size={17} />}
-    </button>
-  ) : (
-    <span className="inline-block w-10 h-10" aria-hidden="true" />
-  );
+    user?.role === "ADMIN" ? "Admin console" : user?.role === "INSTRUCTOR" ? "Faculty portal" : "My dashboard";
 
   return (
-    <>
-      {/* FIXED header: always pinned to the viewport top with frosted glass in dark mode */}
-      <header
-        className="qm-nav fixed top-0 left-0 right-0 z-[100] border-b backdrop-blur-xl transition-[background-color,border-color] duration-300"
-        style={{
-          background: isDark ? "rgba(10, 12, 15, 0.88)" : "var(--n-bg)",
-          borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "var(--n-border)",
-          boxShadow: isDark ? "0 10px 30px -10px rgba(0,0,0,0.8)" : "var(--n-shadow)",
-        }}
-      >
-        <style>{NAV_CSS}</style>
+    <header
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+        scrolled
+          ? "bg-[var(--color-background)]/85 backdrop-blur-xl border-b border-[var(--color-border)]"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <QubitMindLogo iconSize={34} />
 
-        {/* Wavy Background Contained Inside Navbar */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0" style={{ transform: "rotate(180deg) scaleX(-1)" }}>
-          <svg
-            className="block w-full h-full"
-            preserveAspectRatio="none"
-            viewBox="0 0 1440 320"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Base Background: soft peach in light mode, transparent in dark mode */}
-            <rect
-              width="1440"
-              height="320"
-              fill={isDark ? "transparent" : "#f1a17e"}
-              fillOpacity={isDark ? "0" : "0.1"}
-            />
-            {/* Layer 1: Soft Peach in light / Subtle Warm Amber glow in dark */}
-            <path
-              fill={isDark ? "#f97316" : "#f1a17e"}
-              fillOpacity={isDark ? "0.08" : "0.2"}
-              d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-            {/* Layer 2: Soft Olive in light / Quantum Teal accent in dark */}
-            <path
-              fill={isDark ? "#2dd4bf" : "#dee64c"}
-              fillOpacity={isDark ? "0.10" : "0.2"}
-              d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,74.7C672,75,768,117,864,154.7C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
-          </svg>
-        </div>
+          {/* Desktop links */}
+          <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+            {NAV_LINKS.map((link) => {
+              const active = activeId === link.href.slice(1);
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  aria-current={active ? "true" : undefined}
+                  className={`relative px-3.5 py-2 text-[13.5px] font-medium rounded-lg transition-colors ${focusRing} ${
+                    active
+                      ? "text-[var(--color-text)]"
+                      : "text-[var(--color-muted)] hover:text-[var(--color-text)]"
+                  }`}
+                >
+                  {link.name}
+                </a>
+              );
+            })}
+          </nav>
 
-        {/* Subtle Bottom Accent Glow in Dark Mode */}
-        {isDark && (
-          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[rgba(94,234,212,0.3)] to-transparent pointer-events-none" />
-        )}
+          {/* Right controls */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+              className={`w-9 h-9 inline-flex items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)] transition-colors cursor-pointer ${focusRing}`}
+            >
+              {mounted ? isDark ? <LuSun size={16} /> : <LuMoon size={16} /> : <span className="w-4 h-4" />}
+            </button>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className={`flex items-center justify-between ${NAV_H}`}>
-            <QubitMindLogo iconSize={40} subtitle="Quantum Learning Lab" />
-
-            {/* Desktop links */}
-            <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
-              {NAV_LINKS.map((link) => {
-                const active = activeId === link.href.slice(1);
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    aria-current={active ? "true" : undefined}
-                    className={`relative px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 hover:text-[color:var(--n-text)] ${focusRing}`}
-                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
+            <div className="hidden md:flex items-center gap-2">
+              {isAuthenticated && user ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className={`flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-[var(--color-border)] hover:bg-[var(--color-surface)] transition-colors cursor-pointer ${focusRing}`}
+                    aria-label="User menu"
+                    aria-haspopup="menu"
+                    aria-expanded={profileOpen}
                   >
-                    {link.name}
-                    <span
-                      className="absolute left-4 right-4 bottom-0 h-0.5 rounded-full transition-all duration-200"
-                      style={{
-                        background: "var(--n-accent)",
-                        opacity: active ? 1 : 0,
-                        boxShadow: isDark && active ? "0 0 8px rgba(94, 234, 212, 0.7)" : "none",
-                      }}
-                      aria-hidden="true"
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-semibold uppercase bg-[var(--color-primary)]/12 text-[var(--color-primary)]">
+                      {user.name?.charAt(0) || "U"}
+                    </div>
+                    <span className="hidden xl:block text-[13px] font-medium max-w-[120px] truncate text-[var(--color-text)]">
+                      {user.name}
+                    </span>
+                    <LuChevronDown
+                      size={14}
+                      className={`text-[var(--color-muted)] transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
                     />
-                  </a>
-                );
-              })}
-            </nav>
+                  </button>
 
-            {/* Right controls */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {themeButton}
-
-              <div className="hidden md:flex items-center gap-2">
-                {isAuthenticated && user ? (
-                  <div className="relative" ref={dropdownRef}>
-                    <button
-                      onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
-                      aria-label="User menu"
-                      aria-haspopup="menu"
-                      aria-expanded={profileOpen}
+                  {profileOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 mt-2.5 w-64 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 space-y-0.5 z-50 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.35)]"
                     >
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold uppercase border"
-                        style={{
-                          background: "var(--n-accent-soft)",
-                          color: "var(--n-accent)",
-                          borderColor: "var(--n-accent)",
-                        }}
-                      >
-                        {user.name?.charAt(0) || "U"}
+                      <div className="px-3 py-2.5 mb-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)]">
+                        <div className="text-[13px] font-semibold truncate text-[var(--color-text)]">{user.name}</div>
+                        <div className="text-[11px] font-mono truncate text-[var(--color-muted)]">{user.email}</div>
+                        <span className="inline-block mt-1.5 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-muted)]">
+                          {user.role}
+                        </span>
                       </div>
-                      <span className="hidden xl:block text-sm font-medium max-w-[120px] truncate text-[color:var(--n-text)]">
-                        {user.name}
-                      </span>
-                      <LuChevronDown
-                        size={14}
-                        className={`text-[color:var(--n-muted)] transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
 
-                    {profileOpen && (
-                      <div
-                        role="menu"
-                        className="absolute right-0 mt-3 w-64 rounded-xl border border-[color:var(--n-border)] p-1.5 space-y-0.5 z-50"
-                        style={{ background: "var(--n-surface)", boxShadow: "var(--n-shadow)" }}
+                      <Link
+                        href={getDashboardHref()}
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-[var(--color-text)] hover:bg-[var(--color-background)] transition-colors"
                       >
-                        <div className="px-3 py-2.5 mb-1 rounded-lg border border-[color:var(--n-border)] bg-[var(--n-surface2)]">
-                          <div className="text-sm font-semibold truncate text-[color:var(--n-text)]">{user.name}</div>
-                          <div className="text-[11px] font-mono truncate text-[color:var(--n-muted)]">{user.email}</div>
-                          <span
-                            className="inline-block mt-1.5 text-[9px] font-mono font-bold px-2 py-0.5 rounded border"
-                            style={badgeStyle(user.role)}
-                          >
-                            {user.role}
-                          </span>
-                        </div>
+                        <LuLayoutDashboard size={15} className="text-[var(--color-primary)]" />
+                        {portalLabel}
+                      </Link>
 
+                      {user.role === "ADMIN" && (
                         <Link
-                          href={getDashboardHref()}
+                          href="/dashboard"
                           role="menuitem"
                           onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-background)] transition-colors"
                         >
-                          <LuLayoutDashboard size={15} style={{ color: "var(--n-accent)" }} />
-                          {portalLabel}
+                          <LuGraduationCap size={15} /> Learner preview
                         </Link>
+                      )}
 
-                        {user.role === "ADMIN" && (
-                          <Link
-                            href="/dashboard"
-                            role="menuitem"
-                            onClick={() => setProfileOpen(false)}
-                            className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors"
-                          >
-                            <LuGraduationCap size={15} /> Learner Preview
-                          </Link>
-                        )}
-
-                        <div className="pt-1 mt-1 border-t border-[color:var(--n-border)]">
-                          <button
-                            role="menuitem"
-                            onClick={() => {
-                              setProfileOpen(false);
-                              logout();
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[color:var(--n-danger)] hover:bg-[var(--n-danger-soft)] transition-colors cursor-pointer"
-                          >
-                            <LuLogOut size={14} /> Sign Out
-                          </button>
-                        </div>
+                      <div className="pt-1 mt-1 border-t border-[var(--color-border)]">
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        >
+                          <LuLogOut size={14} /> Sign out
+                        </button>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      className={`px-5 py-2.5 rounded-full text-sm font-medium text-[color:var(--n-muted)] hover:text-[color:var(--n-text)] transition-colors ${focusRing}`}
-                    >
-                      Log In
-                    </Link>
-                    <Link
-                      href="/signup"
-                      id="nav-cta"
-                      className={`group relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-[0_4px_18px_rgba(234,88,12,0.38)] hover:shadow-[0_6px_25px_rgba(255,85,0,0.55)] border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden ${focusRing}`}
-                    >
-                      <div className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out skew-x-12 pointer-events-none" />
-                      <span className="relative z-10 flex items-center gap-2 drop-shadow-sm">
-                        Start Learning Free
-                        <LuArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-                      </span>
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              {/* Hamburger */}
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors cursor-pointer ${focusRing}`}
-                aria-label="Toggle navigation"
-                aria-expanded={mobileOpen}
-              >
-                {mobileOpen ? <LuX size={22} /> : <LuMenu size={22} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile drawer (overlays content) */}
-        {mobileOpen && (
-          <div
-            className="lg:hidden absolute top-full inset-x-0 mt-2 mx-4 rounded-2xl border border-[color:var(--n-border)] p-3 space-y-3 max-h-[calc(100svh-6rem)] overflow-y-auto backdrop-blur-2xl"
-            style={{
-              background: isDark ? "rgba(15, 19, 24, 0.95)" : "var(--n-surface)",
-              boxShadow: "var(--n-shadow)",
-              borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "var(--n-border)",
-            }}
-          >
-            <nav className="flex flex-col gap-0.5" aria-label="Mobile navigation">
-              {NAV_LINKS.map((link) => {
-                const active = activeId === link.href.slice(1);
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium hover:bg-[var(--n-surface2)] transition-colors"
-                    style={{ color: active ? "var(--n-text)" : "var(--n-muted)" }}
-                  >
-                    {link.name}
-                    {active && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--n-accent)" }} />}
-                  </a>
-                );
-              })}
-            </nav>
-
-            <div className="md:hidden pt-3 border-t border-[color:var(--n-border)] flex flex-col gap-2">
-              {isAuthenticated && user ? (
-                <>
-                  <div className="px-3 py-2.5 rounded-lg border border-[color:var(--n-border)] bg-[var(--n-surface2)] flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold truncate text-[color:var(--n-text)]">{user.name}</div>
-                      <div className="text-[11px] font-mono truncate text-[color:var(--n-muted)]">{user.email}</div>
                     </div>
-                    <span
-                      className="text-[9px] font-mono font-bold px-2 py-0.5 rounded border shrink-0"
-                      style={badgeStyle(user.role)}
-                    >
-                      {user.role}
-                    </span>
-                  </div>
-                  <Link
-                    href={getDashboardHref()}
-                    onClick={() => setMobileOpen(false)}
-                    className="w-full text-center px-4 py-3 rounded-lg text-sm font-semibold"
-                    style={primaryCta}
-                  >
-                    {portalLabel}
-                  </Link>
+                  )}
+                </div>
+              ) : (
+                <>
                   <button
-                    onClick={() => {
-                      setMobileOpen(false);
-                      logout();
-                    }}
-                    className="w-full text-center px-4 py-3 rounded-lg text-sm font-semibold border cursor-pointer hover:bg-[var(--n-danger-soft)] transition-colors"
-                    style={{ color: "var(--n-danger)", borderColor: "var(--n-danger)" }}
+                    onClick={() => openAuthModal("login")}
+                    className={`px-4 py-2 text-[13.5px] font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors cursor-pointer rounded-lg ${focusRing}`}
                   >
-                    Sign Out
+                    Log in
+                  </button>
+                  <button
+                    onClick={() => openAuthModal("signup")}
+                    id="nav-cta"
+                    className={`group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13.5px] font-semibold bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer ${focusRing}`}
+                  >
+                    Get started
+                    <LuArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-center px-4 py-3 rounded-lg border border-[color:var(--n-border-strong)] text-sm font-semibold text-[color:var(--n-text)] hover:bg-[var(--n-surface2)] transition-colors"
-                  >
-                    Log In
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-center px-4 py-3 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-[#ff5500] via-[#ea580c] to-[#d64a17] shadow-md shadow-orange-500/30 border border-white/20 active:scale-[0.98] transition-transform"
-                  >
-                    Start Free
-                  </Link>
-                </div>
               )}
             </div>
-          </div>
-        )}
-      </header>
 
-    </>
+            {/* Hamburger */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-surface)] transition-colors cursor-pointer ${focusRing}`}
+              aria-label="Toggle navigation"
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <LuX size={18} /> : <LuMenu size={18} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="lg:hidden absolute top-full inset-x-0 mx-4 mt-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 space-y-3 max-h-[calc(100svh-6rem)] overflow-y-auto shadow-[0_30px_70px_-25px_rgba(0,0,0,0.4)]">
+          <nav className="flex flex-col gap-0.5" aria-label="Mobile navigation">
+            {NAV_LINKS.map((link) => {
+              const active = activeId === link.href.slice(1);
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-colors ${
+                    active
+                      ? "bg-[var(--color-primary)]/8 text-[var(--color-text)]"
+                      : "text-[var(--color-muted)] hover:bg-[var(--color-background)]"
+                  }`}
+                >
+                  {link.name}
+                  {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className="md:hidden pt-3 border-t border-[var(--color-border)] flex flex-col gap-2">
+            {isAuthenticated && user ? (
+              <>
+                <div className="px-3 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[13px] font-semibold truncate text-[var(--color-text)]">{user.name}</div>
+                    <div className="text-[11px] font-mono truncate text-[var(--color-muted)]">{user.email}</div>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-muted)] shrink-0">
+                    {user.role}
+                  </span>
+                </div>
+                <Link
+                  href={getDashboardHref()}
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full text-center px-4 py-2.5 rounded-lg text-[13.5px] font-semibold bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+                >
+                  {portalLabel}
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logout();
+                  }}
+                  className="w-full text-center px-4 py-2.5 rounded-lg text-[13.5px] font-semibold border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    openAuthModal("login");
+                  }}
+                  className="text-center px-4 py-2.5 rounded-lg border border-[var(--color-border)] text-[13.5px] font-semibold text-[var(--color-text)] hover:bg-[var(--color-background)] transition-colors cursor-pointer"
+                >
+                  Log in
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    openAuthModal("signup");
+                  }}
+                  className="text-center px-4 py-2.5 rounded-lg text-[13.5px] font-semibold bg-[var(--color-primary)] text-[var(--color-primary-foreground)] active:scale-[0.98] transition-transform cursor-pointer"
+                >
+                  Get started
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </header>
   );
 }

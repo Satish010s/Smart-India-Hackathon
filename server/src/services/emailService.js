@@ -5,7 +5,7 @@ dotenv.config();
 const resendApiKey = process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.trim() : '';
 const isRealResendKey = resendApiKey && resendApiKey.startsWith('re_') && !resendApiKey.includes('xxxx');
 const resend = isRealResendKey ? new Resend(resendApiKey) : null;
-const fromEmail = process.env.RESEND_FROM_EMAIL || 'Quantum Platform <onboarding@resend.dev>';
+const fromEmail = process.env.RESEND_FROM_EMAIL;
 
 /**
  * Log styled fallback to console for development when Resend is unconfigured

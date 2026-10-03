@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import Link from "next/link";
 import { LuZap, LuBrainCircuit, LuAtom, LuNetwork } from "react-icons/lu";
 
 const BACKENDS = [
@@ -8,146 +9,101 @@ const BACKENDS = [
     name: "Qiskit Aer",
     tag: "IBM · Python",
     icon: LuAtom,
-    color: "from-[#d64a17] to-[#d64a17]",
-    accentHex: "#d64a17",
-    borderHex: "#d64a1720",
-    strength: "Industry-standard statevector + shot-based simulation with full noise modeling.",
-    badges: ["Statevector", "Shot-based", "Noise model", "QASM 3"],
-    detail: "Used by researchers and industry teams worldwide. Supports advanced noise models, density matrix simulation, and full Qiskit ecosystem integration.",
+    strength: "Industry-standard statevector and shot-based simulation with full noise modeling.",
+    badges: ["Statevector", "Shot-based", "Noise model"],
   },
   {
     name: "PennyLane",
     tag: "Xanadu · Python",
     icon: LuBrainCircuit,
-    color: "from-[#e7b46a] to-[#f1a17e]",
-    accentHex: "#e7b46a",
-    borderHex: "#e7b46a20",
-    strength: "Best for hybrid quantum-classical ML and differentiable quantum computing.",
-    badges: ["Gradient-based", "ML/QML", "Auto-diff", "Hybrid"],
-    detail: "Enables quantum machine learning workflows with automatic differentiation. Perfect for VQE, QAOA, and quantum neural network experiments.",
+    strength: "Hybrid quantum-classical machine learning with differentiable circuits.",
+    badges: ["Gradients", "ML / QML", "Auto-diff"],
   },
   {
     name: "Cirq",
     tag: "Google · Python",
     icon: LuNetwork,
-    color: "from-rose-500 to-pink-600",
-    accentHex: "#f43f5e",
-    borderHex: "#f43f5e20",
-    strength: "Google's framework for NISQ algorithms with native hardware-aware circuit compilation.",
-    badges: ["NISQ", "Hardware-aware", "Gate fidelity", "Sycamore"],
-    detail: "Designed for near-term quantum hardware. Cirq circuits map directly to Google Sycamore architecture with fine-grained gate decomposition control.",
+    strength: "NISQ algorithms with hardware-aware circuit compilation and gate fidelity control.",
+    badges: ["NISQ", "Hardware-aware", "Sycamore"],
   },
   {
     name: "qBraid",
     tag: "qBraid · Cloud",
     icon: LuZap,
-    color: "from-[#d64a17] to-[#d64a17]",
-    accentHex: "#d64a17",
-    borderHex: "#d64a1720",
-    strength: "Unified cloud platform — run on multiple real quantum processors with one API.",
-    badges: ["Multi-hardware", "Cloud", "IonQ", "Rigetti"],
-    detail: "qBraid bridges multiple hardware providers. Run the same circuit on IonQ, Rigetti, or Oxford Quantum Computing backends through a single unified interface.",
+    strength: "Unified cloud access to multiple real quantum processors with one API.",
+    badges: ["Multi-hardware", "Cloud", "IonQ / Rigetti"],
   },
 ];
 
 export default function Backends() {
-  const [hovered, setHovered] = useState(null);
-
   return (
-    <section id="backends" className="py-28 bg-[var(--color-background)] relative overflow-hidden">
-      <div className="absolute inset-0 bg-noise opacity-20 pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-px section-divider" />
-
-      {/* Center glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-[var(--color-primary)]/6 blur-[100px] pointer-events-none" aria-hidden="true" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
+    <section id="backends" className="py-24 sm:py-28 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/8 text-[var(--color-primary)] text-xs font-semibold tracking-wider mb-5">
-            SIMULATION BACKENDS
+        <div className="max-w-2xl mb-12">
+          <div className="inline-flex items-center gap-2 text-[11.5px] font-mono font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)] mb-4">
+            <span className="w-1 h-1 rounded-full bg-[var(--color-primary)]" />
+            Simulation backends
           </div>
-          <h2 className="text-4xl sm:text-5xl font-heading font-bold mb-5 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-heading font-bold tracking-tight text-[var(--color-text)] leading-tight">
             One circuit.{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-accent)] to-[var(--color-secondary)]">
-              Four world-class simulators.
-            </span>
+            <span className="text-[var(--color-muted)]">Four world-class simulators.</span>
           </h2>
-          <p className="text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
-            Build once, run anywhere. Switch between backends with a single click — no config files, no installs.
+          <p className="mt-4 text-[15.5px] text-[var(--color-muted)] leading-relaxed">
+            Build once, run anywhere. Switch between backends with a single click — no config
+            files, no installs.
           </p>
         </div>
 
-        {/* Backend cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {BACKENDS.map((b, i) => {
+        {/* Cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {BACKENDS.map((b) => {
             const Icon = b.icon;
-            const isHovered = hovered === i;
             return (
               <div
                 key={b.name}
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-                className="group relative rounded-3xl border p-6 flex flex-col gap-4 cursor-default transition-all duration-400"
-                style={{
-                  borderColor: isHovered ? b.accentHex : "var(--color-border)",
-                  background: isHovered ? `${b.accentHex}08` : "var(--color-surface)",
-                  boxShadow: isHovered ? `0 0 40px ${b.accentHex}20, 0 20px 40px rgba(0,0,0,0.2)` : "none",
-                  transform: isHovered ? "translateY(-4px)" : "none",
-                }}
+                className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] p-6 flex flex-col gap-4 transition-all duration-300 hover:border-[var(--color-primary)]/40 hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_color-mix(in_srgb,var(--color-primary)_45%,transparent)]"
               >
-                {/* Icon */}
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${b.color} flex items-center justify-center text-white shadow-lg transition-transform duration-300 group-hover:scale-110`}>
-                  <Icon size={26} aria-hidden="true" />
+                <div className="w-11 h-11 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] flex items-center justify-center text-[var(--color-primary)]">
+                  <Icon size={20} aria-hidden="true" />
                 </div>
 
-                {/* Name & tag */}
                 <div>
-                  <h3 className="text-xl font-bold text-[var(--color-text)] mb-1">{b.name}</h3>
-                  <span className="text-[10px] font-mono text-[var(--color-muted)] border border-[var(--color-border)] px-2 py-0.5 rounded-full">{b.tag}</span>
+                  <h3 className="text-[15.5px] font-semibold text-[var(--color-text)] mb-1.5">{b.name}</h3>
+                  <span className="text-[10.5px] font-mono text-[var(--color-muted)] border border-[var(--color-border)] px-2 py-0.5 rounded-full">
+                    {b.tag}
+                  </span>
                 </div>
 
-                {/* Strength */}
-                <p className="text-sm text-[var(--color-muted)] leading-relaxed">{b.strength}</p>
+                <p className="text-[13px] text-[var(--color-muted)] leading-relaxed">{b.strength}</p>
 
-                {/* Badges */}
-                <div className="flex flex-wrap gap-1.5 mt-auto">
-                  {b.badges.map(badge => (
+                <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
+                  {b.badges.map((badge) => (
                     <span
                       key={badge}
-                      className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border transition-all duration-300"
-                      style={{
-                        borderColor: isHovered ? `${b.accentHex}40` : "var(--color-border)",
-                        color: isHovered ? b.accentHex : "var(--color-muted)",
-                        background: isHovered ? `${b.accentHex}10` : "transparent",
-                      }}
+                      className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-muted)] group-hover:border-[var(--color-primary)]/30 group-hover:text-[var(--color-primary)] transition-colors"
                     >
                       {badge}
                     </span>
                   ))}
-                </div>
-
-                {/* Expanded detail on hover */}
-                <div className={`overflow-hidden transition-all duration-400 ${isHovered ? "max-h-24 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
-                  <div className="pt-3 border-t border-[var(--color-border)]/50">
-                    <p className="text-xs text-[var(--color-muted)] leading-relaxed">{b.detail}</p>
-                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-[var(--color-muted)] mb-4">
-            All backends available instantly — no IBM Quantum account or cloud credentials needed for simulation.
+        {/* Bottom note */}
+        <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)]">
+          <p className="text-[13.5px] text-[var(--color-muted)]">
+            All backends available instantly — no IBM Quantum account or cloud credentials needed
+            for simulation.
           </p>
-          <a href="/playground"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[var(--color-primary)]/40 text-[var(--color-primary)] font-semibold text-sm hover:bg-[var(--color-primary)]/8 hover:border-[var(--color-primary)]/60 transition-all">
-            Open the Quantum Playground →
-          </a>
+          <Link
+            href="/playground"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--color-primary)]/40 text-[var(--color-primary)] font-semibold text-[13.5px] hover:bg-[var(--color-primary)]/8 transition-all shrink-0"
+          >
+            Open the playground →
+          </Link>
         </div>
       </div>
     </section>

@@ -17,10 +17,11 @@ import Backends from "./Backends";
 import SocialProof from "./SocialProof";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
+import AuthModal from "../auth/AuthModal";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300 overflow-hidden font-sans">
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300 overflow-x-hidden font-sans">
       <Navbar />
       <main>
         <Hero />
@@ -38,7 +39,7 @@ export default function LandingPage() {
         <FAQ />
       </main>
       <Footer />
+      <AuthModal />
     </div>
   );
 }
-

@@ -1,110 +1,124 @@
 "use client";
 
 import React from "react";
-import { LuSparkles, LuTerminal, LuCode, LuCircleHelp, LuLightbulb, LuUser } from "react-icons/lu";
+import {
+  LuSparkles, LuTerminal, LuCode, LuCircleHelp, LuLightbulb, LuUser,
+} from "react-icons/lu";
+
+const CAPABILITIES = [
+  { icon: LuCircleHelp, text: "Explain concepts" },
+  { icon: LuCode, text: "Generate code" },
+  { icon: LuTerminal, text: "Debug circuits" },
+  { icon: LuSparkles, text: "Optimize circuits" },
+  { icon: LuLightbulb, text: "Give calibrated hints" },
+  { icon: LuUser, text: "Recommend lessons" },
+];
 
 export default function AITutor() {
   return (
-    <section className="ai-tutor-section py-24 bg-gradient-to-b from-[var(--color-surface)] to-[var(--color-background)] border-b border-[var(--color-border)]">
+    <section className="py-24 sm:py-28 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
-          {/* LEFT: Conversation UI */}
-          <div className="order-2 lg:order-1 relative">
-            <div className="absolute inset-0 bg-[var(--color-primary)]/10 blur-[100px] -z-10 rounded-full" />
-            
-            <div className="bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden flex flex-col h-[500px]">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
+          {/* Conversation UI */}
+          <div className="order-2 lg:order-1">
+            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] shadow-[0_35px_80px_-45px_rgba(2,6,23,0.4)] overflow-hidden flex flex-col h-[440px]">
               {/* Header */}
-              <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-surface)] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white">
-                  <LuSparkles size={16} />
+              <div className="px-5 py-4 border-b border-[var(--color-border)] flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/12 text-[var(--color-primary)] flex items-center justify-center">
+                  <LuSparkles size={15} />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-[var(--color-text)]">QubitMind AI</div>
-                  <div className="text-xs text-[var(--color-primary)] font-medium">Always online</div>
+                  <div className="text-[13px] font-semibold text-[var(--color-text)]">QubitMinds AI</div>
+                  <div className="text-[11px] text-emerald-500 font-medium flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> Context-aware
+                  </div>
                 </div>
               </div>
 
-              {/* Chat Area */}
-              <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
-                {/* User Message */}
-                <div className="ai-msg flex gap-4 w-full justify-end">
-                  <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl rounded-tr-sm p-4 max-w-[85%] text-sm shadow-sm">
+              {/* Chat */}
+              <div className="flex-1 p-5 flex flex-col gap-4 overflow-y-auto">
+                <div className="flex justify-end">
+                  <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-[13px] text-[var(--color-text)]">
                     Why does the Hadamard gate create superposition?
-                  </div>
-                  <div className="w-8 h-8 shrink-0 rounded-full bg-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)]">
-                    <LuUser size={16} />
                   </div>
                 </div>
 
-                {/* AI Message */}
-                <div className="ai-msg flex gap-4 w-full justify-start">
-                  <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white">
-                    <LuSparkles size={16} />
-                  </div>
-                  <div className="bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-2xl rounded-tl-sm p-4 max-w-[85%] text-sm">
-                    <p className="mb-3">The Hadamard gate (H) transforms the basis state <strong className="font-mono">|0⟩</strong> into an equal superposition of <strong className="font-mono">|0⟩</strong> and <strong className="font-mono">|1⟩</strong>.</p>
-                    <p>Mathematically, it creates the state <strong className="font-mono">|+⟩ = 1/√2 (|0⟩ + |1⟩)</strong>.</p>
-                    
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button className="text-xs px-3 py-1.5 rounded bg-[var(--color-background)] border border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors">
-                        Explain Visually
+                <div className="flex justify-start">
+                  <div className="bg-[var(--color-primary)]/8 border border-[var(--color-primary)]/20 rounded-2xl rounded-tl-sm px-4 py-3.5 max-w-[85%] text-[13px] leading-relaxed text-[var(--color-text)]">
+                    <p className="mb-2.5">
+                      The Hadamard gate (H) transforms the basis state{" "}
+                      <strong className="font-mono text-[12px]">|0⟩</strong> into an equal superposition of{" "}
+                      <strong className="font-mono text-[12px]">|0⟩</strong> and{" "}
+                      <strong className="font-mono text-[12px]">|1⟩</strong>.
+                    </p>
+                    <p>
+                      Mathematically it creates{" "}
+                      <strong className="font-mono text-[12px]">|+⟩ = 1/√2(|0⟩ + |1⟩)</strong>.
+                    </p>
+                    <div className="mt-3.5 flex flex-wrap gap-2">
+                      <button className="text-[11.5px] px-3 py-1.5 rounded-lg border border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors cursor-pointer">
+                        Explain visually
                       </button>
-                      <button className="text-xs px-3 py-1.5 rounded bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)]/50 transition-colors">
-                        Show Example
+                      <button className="text-[11.5px] px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-background)] transition-colors cursor-pointer">
+                        Show example
                       </button>
                     </div>
                   </div>
                 </div>
-                
-                {/* Typing indicator */}
-                <div className="ai-msg flex gap-4 w-full justify-start items-center">
-                  <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white">
-                    <LuSparkles size={16} />
+
+                <div className="flex justify-start">
+                  <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted)] animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted)] animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted)] animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
-                  <div className="flex gap-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl rounded-tl-sm p-3">
-                    <div className="w-2 h-2 rounded-full bg-[var(--color-muted)] animate-bounce" style={{animationDelay: "0ms"}} />
-                    <div className="w-2 h-2 rounded-full bg-[var(--color-muted)] animate-bounce" style={{animationDelay: "150ms"}} />
-                    <div className="w-2 h-2 rounded-full bg-[var(--color-muted)] animate-bounce" style={{animationDelay: "300ms"}} />
-                  </div>
+                </div>
+              </div>
+
+              {/* Input mock */}
+              <div className="p-4 border-t border-[var(--color-border)]">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+                  <span className="text-[13px] text-[var(--color-muted)] flex-1">Ask anything about your circuit...</span>
+                  <span className="text-[10px] font-mono text-[var(--color-muted)] border border-[var(--color-border)] px-1.5 py-0.5 rounded">
+                    ⏎
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Text content */}
+          {/* Copy */}
           <div className="order-1 lg:order-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 text-[var(--color-primary)] text-xs font-semibold tracking-wider mb-6">
-              <LuSparkles size={14} /> INTELLIGENT ASSISTANT
+            <div className="inline-flex items-center gap-2 text-[11.5px] font-mono font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)] mb-4">
+              <span className="w-1 h-1 rounded-full bg-[var(--color-primary)]" />
+              AI tutor
             </div>
-            
-            <h2 className="text-4xl sm:text-5xl font-heading font-bold mb-6">
-              Your Quantum Tutor Is <br />
-              <span className="text-[var(--color-primary)]">Always With You.</span>
+
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold tracking-tight text-[var(--color-text)] leading-tight mb-4">
+              Your quantum tutor is{" "}
+              <span className="text-[var(--color-muted)]">always with you.</span>
             </h2>
-            
-            <p className="text-lg text-[var(--color-muted)] mb-10 max-w-xl">
-              Our AI isn't just a generic chatbot. It's context-aware, understanding your current lesson, your circuit canvas, your code, and your simulation results.
+
+            <p className="text-[15.5px] text-[var(--color-muted)] leading-relaxed mb-9 max-w-xl">
+              Not a generic chatbot. The AI understands your current lesson, your circuit canvas,
+              your code and your simulation results — so every answer fits exactly where you are.
             </p>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { icon: <LuCircleHelp size={18} />, text: "Explain Concepts" },
-                { icon: <LuCode size={18} />, text: "Generate Code" },
-                { icon: <LuTerminal size={18} />, text: "Debug Circuits" },
-                { icon: <LuSparkles size={18} />, text: "Optimize Circuits" },
-                { icon: <LuLightbulb size={18} />, text: "Give Hints" },
-                { icon: <LuUser size={18} />, text: "Recommend Lessons" },
-              ].map((feature, idx) => (
-                <div key={idx} className="ai-feature flex items-center gap-3 p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
-                  <div className="text-[var(--color-primary)]">{feature.icon}</div>
-                  <span className="font-medium text-sm">{feature.text}</span>
-                </div>
-              ))}
+            <div className="grid sm:grid-cols-2 gap-3">
+              {CAPABILITIES.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <div
+                    key={f.text}
+                    className="flex items-center gap-3 p-3.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]"
+                  >
+                    <Icon size={16} className="text-[var(--color-primary)] shrink-0" />
+                    <span className="text-[13.5px] font-medium text-[var(--color-text)]">{f.text}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
-
         </div>
       </div>
     </section>

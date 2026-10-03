@@ -1,70 +1,138 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { LuArrowRight, LuFlaskConical, LuSparkles } from "react-icons/lu";
+import {
+  LuArrowRight, LuFlaskConical, LuSparkles, LuPlay, LuGithub,
+} from "react-icons/lu";
+import { useAuthModalStore } from "../../store/useAuthModalStore";
 
-/* ── High-Quality Quantum Images (Excluding images 2 and 6) ────────────────── */
-const HERO_IMAGES = [
-  "/images/datacenter.jpg",
-  "/images/quantum-bg.jpg",
-  "/images/c8b456d8a4c183d6ba3a34f326eb7b19.jpg",
-  "/images/44aab134f62d3230400e2dc44759e10a.jpg",
-];
+/* ── Circuit composer preview (mock) ──────────────────────────────────── */
+function CircuitPreview() {
+  return (
+    <div className="relative rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[0_40px_90px_-40px_rgba(2,6,23,0.45)]">
+      {/* Window chrome */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-background)]">
+        <div className="flex gap-1.5" aria-hidden="true">
+          <div className="w-2.5 h-2.5 rounded-full bg-rose-400/70" />
+          <div className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/70" />
+        </div>
+        <span className="text-[11px] font-mono text-[var(--color-muted)] mx-auto truncate">
+          composer · bell-state.qasm
+        </span>
+        <span className="hidden sm:inline-flex items-center gap-1.5 text-[10.5px] font-mono text-emerald-500">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Qiskit Aer
+        </span>
+      </div>
 
-/* ── Theme detection ─────────────────────────────────────────────────────── */
-function readTheme() {
-  const roots = [document.documentElement, document.body];
-  for (const el of roots) {
-    if (!el) continue;
-    const attr = el.getAttribute("data-theme") || el.getAttribute("data-mode");
-    if (el.classList.contains("dark") || attr === "dark") return "dark";
-    if (el.classList.contains("light") || attr === "light") return "light";
-  }
-  const cs = document.documentElement.style.colorScheme;
-  if (cs === "dark" || cs === "light") return cs;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
+      <div className="grid lg:grid-cols-[1fr_240px]">
+        {/* Circuit canvas */}
+        <div className="p-6 sm:p-8 bg-grid relative">
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-[10.5px] font-mono font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              Circuit
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] font-mono text-[var(--color-primary)]">
+              <LuPlay size={10} fill="currentColor" /> 1024 shots
+            </span>
+          </div>
 
-function useTheme() {
-  const [theme, setTheme] = useState("dark");
+          <div className="relative space-y-9">
+            {/* Qubit 0 wire */}
+            <div className="relative flex items-center gap-3">
+              <span className="w-6 text-[11px] font-mono text-[var(--color-muted)]">q0</span>
+              <div className="flex-1 relative h-px bg-[var(--color-border)]">
+                <div className="absolute inset-y-0 left-0 w-1/3 animate-wire-pulse bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent opacity-70" />
+              </div>
+              <span className="absolute left-[76px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center text-[13px] font-mono font-bold">
+                H
+              </span>
+              <span className="absolute right-14 w-9 h-9 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-muted)] flex items-center justify-center text-[11px] font-mono">
+                M
+              </span>
+            </div>
 
-  useEffect(() => {
-    const apply = () => setTheme(readTheme());
-    apply();
+            {/* Qubit 1 wire */}
+            <div className="relative flex items-center gap-3">
+              <span className="w-6 text-[11px] font-mono text-[var(--color-muted)]">q1</span>
+              <div className="flex-1 relative h-px bg-[var(--color-border)]">
+                <div
+                  className="absolute inset-y-0 left-0 w-1/3 animate-wire-pulse bg-gradient-to-r from-transparent via-[#818cf8] to-transparent opacity-70"
+                  style={{ animationDelay: "0.9s" }}
+                />
+              </div>
+              <span className="absolute right-14 w-9 h-9 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-muted)] flex items-center justify-center text-[11px] font-mono">
+                M
+              </span>
+            </div>
 
-    const opts = { attributes: true, attributeFilter: ["class", "data-theme", "data-mode", "style"] };
-    const mo = new MutationObserver(apply);
-    mo.observe(document.documentElement, opts);
-    if (document.body) mo.observe(document.body, opts);
+            {/* CNOT connector */}
+            <div className="absolute left-[76px] top-[18px] flex flex-col items-center" aria-hidden="true">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
+              <span className="w-px h-[64px] bg-[var(--color-primary)]/60" />
+            </div>
+            <span className="absolute left-[76px] top-[86px] w-10 h-10 rounded-lg border border-[var(--color-primary)]/40 bg-[var(--color-background)] text-[var(--color-primary)] flex items-center justify-center">
+              <span className="relative w-4 h-4">
+                <span className="absolute top-1/2 left-0 w-full h-px bg-current" />
+                <span className="absolute left-1/2 top-0 h-full w-px bg-current" />
+              </span>
+            </span>
+          </div>
+        </div>
 
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    mq.addEventListener("change", apply);
+        {/* Results panel */}
+        <div className="hidden lg:flex flex-col border-l border-[var(--color-border)] bg-[var(--color-background)] p-5 gap-5">
+          <div>
+            <div className="text-[10.5px] font-mono font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+              Probabilities
+            </div>
+            <div className="space-y-3.5">
+              {[
+                { state: "|00⟩", pct: 49, tone: "var(--color-primary)" },
+                { state: "|01⟩", pct: 1, tone: "var(--color-border)" },
+                { state: "|10⟩", pct: 1, tone: "var(--color-border)" },
+                { state: "|11⟩", pct: 49, tone: "var(--color-accent)" },
+              ].map((row) => (
+                <div key={row.state}>
+                  <div className="flex justify-between text-[10.5px] font-mono mb-1.5">
+                    <span className="text-[var(--color-text)]">{row.state}</span>
+                    <span className="text-[var(--color-muted)]">{row.pct}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-[var(--color-border)]/50 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${Math.max(row.pct, 2)}%`, background: row.tone }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-    return () => {
-      mo.disconnect();
-      mq.removeEventListener("change", apply);
-    };
-  }, []);
-
-  return theme;
+          <div className="mt-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
+            <div className="flex items-center gap-2 mb-2">
+              <LuSparkles size={12} className="text-[var(--color-primary)]" />
+              <span className="text-[10.5px] font-mono font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+                AI insight
+              </span>
+            </div>
+            <p className="text-[11.5px] leading-relaxed text-[var(--color-muted)]">
+              Perfectly correlated outcomes — you&apos;ve built a maximally entangled Bell state.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Hero() {
-  const theme = useTheme();
-  const isLight = theme === "light";
+  const openAuthModal = useAuthModalStore((s) => s.openAuthModal);
   const [mounted, setMounted] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Auto-advance background carousel (every 5 seconds)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
+  React.useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -77,217 +145,80 @@ export default function Hero() {
     <section
       id="hero"
       aria-label="QubitMinds introduction"
-      className={`relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pt-28 pb-16 transition-colors duration-300 ${
-        isLight ? "bg-[#fafaf9] text-slate-900" : "bg-[#0a0c0f] text-white"
-      }`}
+      className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28"
     >
-      {/* ── Background Image Carousel ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
-        {HERO_IMAGES.map((src, idx) => {
-          const isActive = idx === currentIndex;
-          return (
-            <div
-              key={src}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt="Quantum Infrastructure Background"
-                loading={idx === 0 ? "eager" : "lazy"}
-                className="w-full h-full object-cover object-center brightness-105 contrast-105 opacity-100"
-              />
-            </div>
-          );
-        })}
-
-        {/* Smooth Subtle Overlay (No heavy white wash or blurring on images) */}
-        <div
-          className="absolute inset-0 pointer-events-none transition-all duration-500"
-          style={{
-            background: isLight
-              ? "linear-gradient(180deg, rgba(250,250,249,0.3) 0%, rgba(250,250,249,0.05) 35%, rgba(250,250,249,0.1) 65%, rgba(250,250,249,0.7) 100%)"
-              : "linear-gradient(180deg, rgba(10,12,15,0.82) 0%, rgba(10,12,15,0.55) 35%, rgba(10,12,15,0.6) 65%, rgba(10,12,15,1) 100%)",
-          }}
-        />
-      </div>
-
-      {/* ── Bottom Wave Transition ── */}
+      {/* Backdrop: glows */}
       <div
-        className="absolute bottom-0 left-0 w-full z-[5] overflow-hidden pointer-events-none"
-        style={{ height: "10vh" }}
-      >
-        <svg
-          className="absolute bottom-0 w-full h-full"
-          preserveAspectRatio="none"
-          viewBox="0 0 1440 320"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill="#ea580c"
-            fillOpacity={isLight ? "0.15" : "0.3"}
-            d="M0,160L48,149.3C96,139,192,117,288,138.7C384,160,480,224,576,245.3C672,267,768,245,864,208C960,171,1056,117,1152,112C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          />
-          <path
-            fill={isLight ? "#fafaf9" : "#0a0c0f"}
-            fillOpacity="1"
-            d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,133.3C672,139,768,181,864,208C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          />
-        </svg>
-      </div>
+        className="pointer-events-none absolute -top-56 left-1/2 -translate-x-1/2 w-[820px] h-[520px] rounded-full blur-[140px]"
+        style={{ background: "color-mix(in srgb, var(--color-primary) 16%, transparent)" }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-40 -right-40 w-[420px] h-[420px] rounded-full blur-[130px] opacity-70"
+        style={{ background: "color-mix(in srgb, var(--color-accent) 12%, transparent)" }}
+        aria-hidden="true"
+      />
 
-      {/* ── Main Content Container ── */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col items-center text-center my-auto">
-        {/* Soft Backlight Spotlight behind text (Ensures 100% text legibility over busy background images) */}
-        <div
-          className="absolute -inset-x-8 -inset-y-6 -z-10 pointer-events-none rounded-3xl"
-          style={{
-            background: isLight
-              ? "radial-gradient(ellipse 90% 75% at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0) 100%)"
-              : "radial-gradient(ellipse 90% 75% at 50% 50%, rgba(10,12,15,0.85) 0%, rgba(10,12,15,0.55) 45%, rgba(10,12,15,0) 100%)",
-            filter: "blur(20px)",
-          }}
-        />
-
-        <div className={`flex flex-col items-center text-center ${reveal()}`}>
-          {/* Top Pill Badge */}
-          <div
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase mb-6 backdrop-blur-md transition-colors ${
-              isLight
-                ? "bg-white/90 text-slate-900 border border-slate-300 shadow-sm"
-                : "bg-teal-950/70 text-teal-300 border border-teal-500/30 shadow-md"
-            }`}
-          >
-            <LuSparkles className={isLight ? "text-amber-600" : "text-amber-400"} size={14} />
-            Next-Gen AI Quantum Platform
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Copy */}
+        <div className="max-w-3xl mx-auto text-center">
+          <div className={reveal()}>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[12px] font-medium text-[var(--color-muted)] shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
+              AI-powered quantum learning platform
+            </div>
           </div>
 
-          {/* Headline */}
           <h1
-            className={`text-4xl sm:text-6xl xl:text-7xl font-heading font-extrabold tracking-tight leading-[1.15] mb-6 ${
-              isLight ? "text-slate-950" : "text-white"
-            }`}
-            style={{
-              textShadow: isLight
-                ? "0 0 20px #ffffff, 0 0 10px #ffffff, 0 1px 3px #ffffff"
-                : "0 2px 8px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)",
-            }}
+            className={`mt-6 text-4xl sm:text-6xl font-heading font-bold tracking-tight leading-[1.08] text-[var(--color-text)] ${reveal("delay-75")}`}
           >
             The intelligent way to learn{" "}
-            <br className="hidden sm:block" />
-            <span className="relative inline-block mt-2">
-              {/* Pure Crisp White / Light Gold Text */}
-              <span
-                className={`relative z-10 inline-block font-extrabold bg-clip-text text-transparent ${
-                  isLight
-                    ? "bg-gradient-to-r from-[#0f172a] via-[#d97706] to-[#0284c7]"
-                    : "bg-gradient-to-r from-[#ffffff] via-[#fef08a] to-[#38bdf8]"
-                }`}
-                style={{
-                  textShadow: isLight
-                    ? "0 0 20px #ffffff"
-                    : "0 0 20px rgba(56, 189, 248, 0.5), 0 2px 8px rgba(0, 0, 0, 0.9)",
-                }}
-              >
-                Quantum Computing.
-              </span>
-
-              {/* Sleek Underline Accent Bar */}
-              <span
-                className="absolute -bottom-1 left-0 w-full h-1.5 rounded-full"
-                style={{
-                  background: isLight
-                    ? "linear-gradient(90deg, #d97706, #0284c7, #38bdf8)"
-                    : "linear-gradient(90deg, #38bdf8, #818cf8, #fbbf24)",
-                  boxShadow: isLight
-                    ? "0 0 10px rgba(217, 119, 6, 0.4)"
-                    : "0 0 16px rgba(56, 189, 248, 0.85)",
-                }}
-              />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-secondary)] to-[var(--color-accent)]">
+              quantum computing
             </span>
           </h1>
 
-          {/* Subheading */}
-          <p
-            className={`text-base sm:text-xl lg:text-2xl leading-relaxed mb-8 max-w-3xl mx-auto ${
-              isLight ? "text-slate-950 font-bold" : "text-slate-200 font-medium"
-            }`}
-            style={{
-              textShadow: isLight
-                ? "0 0 16px #ffffff, 0 0 8px #ffffff, 0 1px 2px #ffffff"
-                : "0 2px 8px rgba(0,0,0,0.9)",
-            }}
-          >
-            An end-to-end educational platform featuring an AI quantum tutor, an interactive circuit playground, multi-backend simulations, and a fully gamified learning experience.
+          <p className={`mt-6 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed max-w-2xl mx-auto ${reveal("delay-150")}`}>
+            Build circuits visually, run them across Qiskit, PennyLane, Cirq and qBraid, and learn
+            with a context-aware AI tutor — all in one clean workspace.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center mb-10">
-            <Link
-              href="/signup"
+          <div className={`mt-9 flex flex-col sm:flex-row items-center justify-center gap-3 ${reveal("delay-200")}`}>
+            <button
+              onClick={() => openAuthModal("signup")}
               id="hero-cta-primary"
-              className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base sm:text-lg text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 overflow-hidden bg-gradient-to-r from-[#ea580c] via-[#f97316] to-[#d97706] shadow-[0_10px_35px_-8px_rgba(234,88,12,0.6)] hover:shadow-[0_14px_45px_-6px_rgba(234,88,12,0.85)] border border-white/30 active:scale-[0.98]"
+              className="group inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-xl font-semibold text-[15px] bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-[0_14px_35px_-12px_color-mix(in_srgb,var(--color-primary)_70%,transparent)] hover:opacity-95 hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
             >
-              <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-out -translate-x-full skew-x-12 pointer-events-none" />
-              <span className="relative z-10 flex items-center gap-2.5 drop-shadow">
-                Start Learning Free
-                <LuArrowRight
-                  size={20}
-                  className="transition-transform duration-300 group-hover:translate-x-1.5"
-                  aria-hidden="true"
-                />
-              </span>
-            </Link>
+              Start learning free
+              <LuArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
+            </button>
 
             <Link
               href="/playground"
               id="hero-cta-secondary"
-              className={`group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 backdrop-blur-md active:scale-[0.98] ${
-                isLight
-                  ? "bg-white/80 hover:bg-white text-slate-900 border border-slate-300 shadow-md"
-                  : "bg-slate-900/80 hover:bg-slate-900 text-white border border-slate-700 shadow-xl"
-              }`}
+              className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-xl font-semibold text-[15px] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:border-[var(--color-primary)]/50 hover:-translate-y-0.5 active:scale-[0.98] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
             >
-              <LuFlaskConical
-                size={20}
-                className={isLight ? "text-teal-700" : "text-teal-300"}
-                aria-hidden="true"
-              />
-              Try Circuit Builder
+              <LuFlaskConical size={17} className="text-[var(--color-primary)]" />
+              Open the playground
             </Link>
           </div>
 
-          {/* Trust Strip */}
-          <div
-            className={`flex flex-wrap items-center gap-x-6 gap-y-3 justify-center px-7 py-3.5 rounded-full backdrop-blur-md border ${
-              isLight
-                ? "bg-white/90 border-slate-200/90 text-slate-700 shadow-sm"
-                : "bg-slate-900/80 border-slate-800 text-slate-300 shadow-lg"
-            }`}
-          >
-            <span
-              className={`text-xs font-bold uppercase tracking-widest ${
-                isLight ? "text-slate-500" : "text-slate-400"
-              }`}
-            >
-              Runs on
+          <div className={`mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 ${reveal("delay-300")}`}>
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              Simulates on
             </span>
             {["Qiskit Aer", "PennyLane", "Cirq", "qBraid"].map((tool, i) => (
-              <span key={tool} className="flex items-center gap-6">
-                {i > 0 && (
-                  <span
-                    className={`w-px h-4 ${isLight ? "bg-slate-300" : "bg-slate-700"}`}
-                    aria-hidden="true"
-                  />
-                )}
-                <span className="font-mono text-xs sm:text-sm font-bold tracking-wide">
-                  {tool}
-                </span>
+              <span key={tool} className="flex items-center gap-5">
+                {i > 0 && <span className="w-px h-3.5 bg-[var(--color-border)]" aria-hidden="true" />}
+                <span className="text-[12.5px] font-mono font-medium text-[var(--color-muted)]">{tool}</span>
               </span>
             ))}
           </div>
+        </div>
+
+        {/* Product preview */}
+        <div className={`mt-16 sm:mt-20 max-w-5xl mx-auto ${reveal("delay-300")}`}>
+          <CircuitPreview />
         </div>
       </div>
     </section>
